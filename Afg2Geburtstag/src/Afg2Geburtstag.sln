@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Afg2Geburtstag.CLI", "Afg2Geburtstag.CLI\Afg2Geburtstag.CLI.csproj", "{7188491B-0399-4AF6-A78A-D7E2BA0EAABF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Afg2Geburtstag", "Afg2Geburtstag\Afg2Geburtstag.csproj", "{B538E623-FE3F-4E01-B8B2-950E0509F275}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7188491B-0399-4AF6-A78A-D7E2BA0EAABF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7188491B-0399-4AF6-A78A-D7E2BA0EAABF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7188491B-0399-4AF6-A78A-D7E2BA0EAABF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7188491B-0399-4AF6-A78A-D7E2BA0EAABF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B538E623-FE3F-4E01-B8B2-950E0509F275}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B538E623-FE3F-4E01-B8B2-950E0509F275}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B538E623-FE3F-4E01-B8B2-950E0509F275}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B538E623-FE3F-4E01-B8B2-950E0509F275}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1BF6FEF0-9F70-4A0C-B979-E025398400AD}
+	EndGlobalSection
+EndGlobal
