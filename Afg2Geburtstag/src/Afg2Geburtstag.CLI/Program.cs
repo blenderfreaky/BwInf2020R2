@@ -13,8 +13,13 @@
         public static void Main(string[] args)
         {
             //Farm(2019, 3);
-            var targets = new BigRational[] { 2020, 2030, 2050, 2980 };
-            Synchronized.For(1, 10, x => Farm(targets, x));
+            var targets = new BigRational[]
+            { 
+                2019,
+                //2020, 2030, 2080, 2980,
+                //202020, 69420 
+            };
+            Parallel.For(1, 10, x => Farm(targets, x));
         }
 
         public static void Farm(IEnumerable<BigRational> targetsSource, long digit, long @base = 10)
@@ -52,9 +57,10 @@
 
             for (int i = 1; ; i++)
             {
-                farm.GetAllOfSize(i);
+                
+                GC. farm.GetAllOfSize(i);
 
-                Console.WriteLine("Calculated optimal expressions with " + i + " digits (d: " + digit + ", b: " + @base + ")");
+                //Console.WriteLine("Calculated optimal expressions with " + i + " digits (d: " + digit + ", b: " + @base + ")");
                 var elapsed = stopwatch.Elapsed;
 
                 foreach (var hitTarget in targets.Where(farm.AllValues.Contains).ToList())
@@ -67,6 +73,8 @@
                 if (targets.Count == 0)
                 {
                     stopwatch.Stop();
+                    farm = null;
+                    GC.Collect();
                     break;
                 }
             }
