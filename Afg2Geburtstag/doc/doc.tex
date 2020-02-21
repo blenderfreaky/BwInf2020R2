@@ -1,0 +1,18 @@
+\documentclass{article}
+
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\newcommand{\one}{\frac{d}{d}}
+
+\begin{document}
+    
+\section{Lösungsidee}
+
+Die Lösung basiert auf der Idee, alle Terme, die aus \(n\) Ziffern bestehen zu errechnen, basierend auf Kombinationen von zwei Termen mit \(i\) und \(j\), \(i+j=n\) Ziffern.
+Hierbei muss für jede rationale Zahl \(\frac{a}{b}\in\mathbb{Q}\), \(a,b\in\mathbb{N}\) maximal jeder Term mit \(2(a+b)\) Ziffern berechnet werden, also terminiert der Algorithmus immer.
+Dies gilt, da für jede Ziffer \(d\) gilt:
+\[\frac{a}{b} = \frac{\one + \one + \ldots + \one}{\one + \one + \ldots + \one}\]
+
+\end{document}
