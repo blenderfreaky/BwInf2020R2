@@ -14,12 +14,14 @@
         {
             //Farm(2019, 3);
             var targets = new BigRational[]
-            { 
-                2019,
+            {
+                2020,
+                //2020,
                 //2020, 2030, 2080, 2980,
                 //202020, 69420 
             };
-            Parallel.For(1, 10, x => Farm(targets, x));
+            Farm(targets, 1);
+            //Parallel.For(1, 10, x => Farm(targets, x));
         }
 
         public static void Farm(IEnumerable<BigRational> targetsSource, long digit, long @base = 10)
@@ -57,13 +59,12 @@
 
             for (int i = 1; ; i++)
             {
-                
-                GC. farm.GetAllOfSize(i);
+                farm.GetAllOfSize(i);
 
                 //Console.WriteLine("Calculated optimal expressions with " + i + " digits (d: " + digit + ", b: " + @base + ")");
                 var elapsed = stopwatch.Elapsed;
 
-                foreach (var hitTarget in targets.Where(farm.AllValues.Contains).ToList())
+                foreach (var hitTarget in targets.Where(farm.AllValues.ContainsKey).ToList())
                 {
                     targets.Remove(hitTarget);
                     var val = farm.TermsOfSize[i].First(x => x.Value == hitTarget);

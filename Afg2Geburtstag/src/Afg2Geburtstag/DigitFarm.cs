@@ -7,11 +7,14 @@
     using System.Numerics;
     using System.Threading.Tasks;
 
+    using RationalSet = System.Collections.Concurrent.ConcurrentDictionary<BigRational, byte>;
+    using TermSet = System.Collections.Concurrent.ConcurrentDictionary<ITerm, byte>;
+
     public class DigitFarm
     {
-        public List<ConcurrentBag<ITerm>> TermsOfSize { get; }
+        public List<TermSet> TermsOfSize { get; }
         public List<BinaryOperator> BinaryOperators { get; }
-        public HashSet<BigRational> AllValues { get; }
+        public RationalSet AllValues { get; }
 
         public long Digit { get; }
         public long Base { get; }
@@ -19,8 +22,8 @@
 
         public DigitFarm(List<BinaryOperator> binaryOperators, long digit, long @base = 10)
         {
-            TermsOfSize = new List<ConcurrentBag<ITerm>>() { new ConcurrentBag<ITerm>() };
-            AllValues = new HashSet<BigRational>();
+            TermsOfSize = new List<TermSet>() { new TermSet() };
+            AllValues = new RationalSet();
             BinaryOperators = binaryOperators;
             Digit = digit;
             Base = @base;
@@ -30,8 +33,8 @@
         public IEnumerable<ITerm> GetAllOfSize(int size)
         {
             if (TermsOfSize.Count < size) GetAllOfSize(size - 1);
-            else if (TermsOfSize.Count > size) return TermsOfSize[size];
-            var currentTerms = new ConcurrentBag<ITerm>();
+            else if (TermsOfSize.Count > size) return TermsOfSize[size].Keys;
+            var currentTerms = new TermSet();
 
             var element = new BigInteger(Digit);
             for (int i = 1; i < size; i++) element = (element * Base) + Digit;
@@ -49,7 +52,7 @@
                     {
                         foreach (var @operator in BinaryOperators)
                         {
-                            var term = BinaryOperation.Create(@operator, lhs, rhs);
+                            var term = BinaryOperation.Create(@operator, lhs.Key, rhs.Key);
 
                             RegisterTerm(currentTerms, term);
                         }
@@ -59,12 +62,12 @@
 
             TermsOfSize.Add(currentTerms);
 
-            return currentTerms;
+            return currentTerms.Keys;
         }
 
         private static readonly UnaryOperator Factorial = new UnaryOperator(x => BigRational.Factorial(x.Value, 1000), x => $"({x})!");
 
-        private void RegisterTerm(ConcurrentBag<ITerm> terms, ITerm? term)
+        private void RegisterTerm(TermSet terms, ITerm? term)
         {
             if (term == null) return;
             AddTermIfNew(terms, term);
@@ -78,14 +81,14 @@
             }
         }
 
-        private void AddTermIfNew(ConcurrentBag<ITerm> terms, ITerm? term)
+        private void AddTermIfNew(TermSet terms, ITerm? term)
         {
-            if (term == null || AllValues.Contains(term.Value)) return;
+            if (term == null || AllValues.ContainsKey(term.Value)) return;
 
             if (term.Value.Absolute > int.MaxValue) return;
 
-            AllValues.Add(term.Value);
-            terms.Add(term);
+            AllValues.TryAdd(term.Value, 0);
+            terms.TryAdd(term, 0);
         }
     }
 }
