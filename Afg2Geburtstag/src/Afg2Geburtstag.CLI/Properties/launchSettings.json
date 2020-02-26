@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Afg2Geburtstag.CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "-t 2020 -d 1 -f -e"
+    }
+  }
+}

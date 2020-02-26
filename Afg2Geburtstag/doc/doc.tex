@@ -1,18 +1,106 @@
 \documentclass{article}
 
+\usepackage[utf8]{inputenc}
+\usepackage[german]{babel}
+
 \usepackage{mathtools}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{ntheorem}
 
-\newcommand{\one}{\frac{d}{d}}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\itshape}
+\theorembodyfont{\normalfont}
+\theoremseparator{.\,—}
+\theoremsymbol{}
+\newtheorem{proof-wo}{Beweis}
+\theoremsymbol{\ensuremath{\color{lightgray}\blacksquare}}
+\newtheorem{proof}{Beweis}
 
 \begin{document}
     
 \section{Lösungsidee}
 
-Die Lösung basiert auf der Idee, alle Terme, die aus \(n\) Ziffern bestehen zu errechnen, basierend auf Kombinationen von zwei Termen mit \(i\) und \(j\), \(i+j=n\) Ziffern.
-Hierbei muss für jede rationale Zahl \(\frac{a}{b}\in\mathbb{Q}\), \(a,b\in\mathbb{N}\) maximal jeder Term mit \(2(a+b)\) Ziffern berechnet werden, also terminiert der Algorithmus immer.
-Dies gilt, da für jede Ziffer \(d\) gilt:
-\[\frac{a}{b} = \frac{\one + \one + \ldots + \one}{\one + \one + \ldots + \one}\]
+Die Kernidee des Algorithmus ist es, alle Terme die mit \(n\) Ziffern optimal ihren Wert darstellen zu ermitteln.
+Dies wird induktiv gelöst, wobei für die Errechnung der optimalen Terme mit Größe \(n\) alle kleineren Terme vorausgesetzt werden.
+Zuerst werden alle infrage kommenden Terme mit Größe \(n\) gebildet, indem alle Terme von Größe \(i\) mit allen Termen von Größe \(n-i\) mit allen binären Operationen gekreuzt werden.
+Daraufhin werden alle Terme entfernt, deren Wert schon mit kleineren oder gleich großen Termen dargestellt wurde.
+Um mit diesem Verfahren nun die Aufgabe zu lösen ermittelt man solange größere Terme, bis der gesuchte Wert optimal von einem Term dargestellt wird.
+
+Der Algorithmus scheint auf ersten Blick eine stark explosive Komplexität zu besitzen, jedoch ist dem tatsächlich garnicht so.
+Im folgenden wird die Komplexität dieses Verfahrens genauer betrachtet.
+
+\newcommand{\termsetn}[1]{\mathbb{T}_{d,b,{#1}}}
+\newcommand{\termset}{\termsetn{n}}
+
+\newcommand{\fad}{\forall d, b:\ }
+\newcommand{\measure}[1]{\varphi_{d,b}\left(#1\right)}
+
+\subsection{Term-Menge}
+
+Die Term-Menge \(\termset\) enthält alle Terme die \(n\) mal die Ziffer \(d\) in der Basis \(b\) (meistens \(= 10\) für Dezimalsystem) verwenden.
+Die Elemente der Term-Menge \(\termset\) sind 3-Tupel bestehend aus einer Operation und zwei Termen der Größe \(i\) und \(n-i\) oder \(n\)-fache Wiederholungen der Ziffer \(d\).
+
+\[\termset :=
+\bigcup_{i=1}^{n-1} \left\{ (l, r, o) | l \in \termsetn{i}, r \in \termsetn{n-i}, o \in \{ +, -, \cdot, \div \} \right\}
+\cup \left\{ \left(\sum_{i=0}^n b^n \cdot d \right) \right\} \]
+Weiterhin ist der Spezialfall \(n=0\) als die leere Menge definiert:
+
+\[\termsetn{0} := \{\}\]
+
+\subsection{Evaluationsfunktion}
+
+Basierend auf der Term-Menge ist die Evaluationsfunktion \(\epsilon : \termset \to \mathbb{Q}\) definiert, die den Wert eines Terms ermittelt:
+Für rationale Zahlen \(x\in\mathbb{Q}\) gilt:
+\[\epsilon(x) = x\]
+Ansonsten gilt:
+\[\epsilon((l, r, o)) = o(l,r)\]
+
+\subsection{Größenmaß-Funktion}
+
+Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\varphi_{d,b} : \mathbb{Q} \to \mathbb{N}\) betrachtet, die die Anzahl an Verwendungen der Ziffer \(d\) errechnet, die für die optimale Repräsentation beliebiger rationaler Zahlen benötigt wird.
+Genauer formuliert ist \(\measure{x} := \min_{i\in\mathbb{N} \land x \in \termsetn{i}} i \)
+Beispielsweise ist \(\fad\measure{d} = 1\).
+
+\begin{corollary}
+    Aus der Definition lassen sich direkt folgende
+\end{corollary}
+
+\begin{lemma}[Triviale obere Grenze des Größenmaß]
+Für jede rationale Zahl
+
+\[s\cdot\frac{a}{b}\in\mathbb{Q},\ a,b\in\mathbb{N}\backslash\{0\},\ s\in\{-1,0,1\}\]
+gilt:
+
+\[\fad \measure{s\cdot\frac{a}{b}} \leq a + b + 2\]
+\end{lemma}
+
+\begin{proof-wo}
+Für jede Ziffer \(d\) gilt:
+
+\[\frac{a}{b}
+= \frac{1 + 1 + \ldots + 1}{1 + 1 + \ldots + 1}
+= \frac{d\cdot(1 + 1 + \ldots + 1)}{d\cdot(1 + 1 + \ldots + 1)}
+= \frac{\overbrace{d + d + \ldots + d}^{a}}{\underbrace{d + d + \ldots + d}_{b}}\]
+\[\implies \measure{\frac{a}{b}} \leq a + b\]
+
+weiterhin gilt auch:
+
+\[s\cdot\frac{a}{b} = 
+\begin{cases}
+    \frac{d + d + \ldots + d}{d + d + \ldots + d} & s = +1 \vspace{0.2em}\\
+    d-d & s = 0 \vspace{0.2em}\\
+    (d-d) - \frac{d + d + \ldots + d}{d + d + \ldots + d} & s = -1 \\
+\end{cases}\]
+
+Somit lässt sich jede positive rationale Zahl mit \(a+b\) oder weniger und jede negative rationale Zahl mit \(a+b+2\) oder weniger Ziffern darstellen. Null lässt sich immer mit 2 Ziffern darstellen.
+Folglich lässt sich jede rationale Zahl \(s\cdot\frac{a}{b}\) mit \(a+b+2\) oder weniger Ziffern darstellen.
+\end{proof-wo}
+
+
 
 \end{document}

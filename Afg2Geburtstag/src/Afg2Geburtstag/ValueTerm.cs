@@ -1,8 +1,5 @@
 ﻿namespace Afg2Geburtstag
 {
-    using System.Collections.Generic;
-    using System.Numerics;
-
     public class ValueTerm : ITerm
     {
         public BigRational Value { get; }

@@ -1,9 +1,7 @@
 ﻿namespace Afg2Geburtstag
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Numerics;
 
     [DebuggerDisplay("{Term}")]
     public sealed class UnaryOperation : ITerm

@@ -1,11 +1,9 @@
 ﻿namespace Afg2Geburtstag
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Numerics;
 
-    [DebuggerDisplay("{Term}")]
+    [DebuggerDisplay("{Term} = {Value}")]
     public sealed class BinaryOperation : ITerm
     {
         public BinaryOperator Operator { get; }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Afg3Abbiegen.CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "-p ../../../../../ex/abbiegen3.txt"
+    }
+  }
+}

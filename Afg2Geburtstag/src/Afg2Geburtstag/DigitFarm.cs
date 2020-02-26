@@ -1,10 +1,10 @@
 ﻿namespace Afg2Geburtstag
 {
-    using System.Collections;
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Numerics;
+    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
 
     using RationalSet = System.Collections.Concurrent.ConcurrentDictionary<BigRational, byte>;
@@ -12,34 +12,50 @@
 
     public class DigitFarm
     {
-        public List<TermSet> TermsOfSize { get; }
         public List<BinaryOperator> BinaryOperators { get; }
+        public UnaryOperator? UnaryOperator { get; }
+
+        public List<TermSet> TermsOfSize { get; }
         public RationalSet AllValues { get; }
 
         public long Digit { get; }
         public long Base { get; }
-        public long UnaryDepth { get; }
+        //public long UnaryDepth { get; }
 
-        public DigitFarm(List<BinaryOperator> binaryOperators, long digit, long @base = 10)
+        public ConcurrentDictionary<BigRational, ITerm?> HitTargets { get; }
+        public int UnfoundTargets { get; private set; }
+        public Action<ITerm, int> OnFound { get; }
+
+        public DigitFarm(
+            List<BinaryOperator> binaryOperators,
+            UnaryOperator? unaryOperator,
+            ConcurrentDictionary<BigRational, ITerm?> hitTargets,
+            Action<ITerm, int> onFound,
+            long digit,
+            long @base = 10)
         {
             TermsOfSize = new List<TermSet>() { new TermSet() };
             AllValues = new RationalSet();
             BinaryOperators = binaryOperators;
+            UnaryOperator = unaryOperator;
             Digit = digit;
             Base = @base;
-            UnaryDepth = 0;
+            //UnaryDepth = unaryOperator1000;
+            HitTargets = hitTargets;
+            UnfoundTargets = hitTargets.Count;
+            OnFound = onFound;
         }
 
-        public IEnumerable<ITerm> GetAllOfSize(int size)
+        public void GetAllOfSize(int size)
         {
             if (TermsOfSize.Count < size) GetAllOfSize(size - 1);
-            else if (TermsOfSize.Count > size) return TermsOfSize[size].Keys;
+            else if (TermsOfSize.Count > size) return;
             var currentTerms = new TermSet();
 
             var element = new BigInteger(Digit);
             for (int i = 1; i < size; i++) element = (element * Base) + Digit;
 
-            RegisterTerm(currentTerms, new ValueTerm(new BigRational(element)));
+            RegisterTerm(currentTerms, new ValueTerm(new BigRational(element)), size);
 
             Parallel.For(1, size, i =>
             {
@@ -54,41 +70,55 @@
                         {
                             var term = BinaryOperation.Create(@operator, lhs.Key, rhs.Key);
 
-                            RegisterTerm(currentTerms, term);
+                            RegisterTerm(currentTerms, term, size);
                         }
                     }
+
+                    if (UnfoundTargets == 0) return;
                 }
             });
 
             TermsOfSize.Add(currentTerms);
-
-            return currentTerms.Keys;
         }
 
-        private static readonly UnaryOperator Factorial = new UnaryOperator(x => BigRational.Factorial(x.Value, 1000), x => $"({x})!");
-
-        private void RegisterTerm(TermSet terms, ITerm? term)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void RegisterTerm(TermSet terms, ITerm? term, int digits)
         {
             if (term == null) return;
-            AddTermIfNew(terms, term);
+            if (AddTermIfNew(terms, term, digits)) return;
 
-            for (int i = 1; i <= UnaryDepth; i++)
+            if (UnaryOperator == null) return;
+
+            for (int i = 1; ; i++)
             {
-                if (term == null) break;
-
-                term = UnaryOperation.Create(Factorial, term);
-                AddTermIfNew(terms, term);
+                var newTerm = UnaryOperation.Create(UnaryOperator, term);
+                if (newTerm == null || newTerm.Value == term.Value) break;
+                term = newTerm;
+                if (!AddTermIfNew(terms, term, digits)) break;
             }
         }
 
-        private void AddTermIfNew(TermSet terms, ITerm? term)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool AddTermIfNew(TermSet terms, ITerm? term, int digits)
         {
-            if (term == null || AllValues.ContainsKey(term.Value)) return;
+            if (term == null
+                || AllValues.ContainsKey(term.Value)
+                || term.Value.Absolute > int.MaxValue)
+            {
+                return false;
+            }
 
-            if (term.Value.Absolute > int.MaxValue) return;
+            if (HitTargets.TryGetValue(term.Value, out var otherTerm) && otherTerm == null)
+            {
+                HitTargets[term.Value] = term;
+                UnfoundTargets--;
+                OnFound(term, digits);
+            }
 
             AllValues.TryAdd(term.Value, 0);
             terms.TryAdd(term, 0);
+
+            return true;
         }
     }
 }
