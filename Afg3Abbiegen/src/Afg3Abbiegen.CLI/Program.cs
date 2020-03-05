@@ -35,6 +35,8 @@
                 WriteError("Parsing file failed.");
                 return;
             }
+
+
         }
 
         private static void WriteError(string error) => Console.WriteLine("ERROR: " + error, Color.Red);

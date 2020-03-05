@@ -1,5 +1,6 @@
 ﻿namespace Afg2Geburtstag.CLI
 {
+    using Colorful;
     using CommandLine;
     using System;
     using System.Collections.Concurrent;

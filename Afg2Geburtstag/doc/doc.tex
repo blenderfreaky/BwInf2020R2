@@ -1,12 +1,57 @@
 \documentclass{article}
 
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[german]{babel}
+\usepackage[a4paper,margin=2.2cm,footskip=0.5cm]{geometry}
 
 \usepackage{mathtools}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{ntheorem}
+
+\usepackage{lmodern}
+%\usepackage{csquotes}
+
+\usepackage{tikz}
+\usetikzlibrary{chains}
+\usetikzlibrary{matrix,positioning,calc}
+\usetikzlibrary{decorations.pathreplacing}
+
+\usepackage{cite}
+
+\usepackage{fancyhdr, lastpage}
+
+\pagestyle{fancy}
+
+\newcommand{\Fpage}{\thepage{}/\pageref{LastPage}}
+\newcommand{\Ftitle}{Aufgabe 2 Geburtstag}
+\newcommand{\Fauthor}{Nikolas Kilian}
+
+\lhead{\Fauthor}
+\rhead{\Ftitle}
+\chead{}
+\lfoot{}
+\rfoot{}
+\cfoot{\Fpage}
+
+\setlength{\parskip}{.8em} 
+\setlength{\parindent}{0pt}
+
+% Für Algorithmen
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+%\usepackage{pxfonts}
+
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+
+%
+% Für Quelltext
+\usepackage{listings}
+\usepackage{xcolor}
+
+\usepackage{url}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{corollary}{Corollary}[theorem]
@@ -34,73 +79,171 @@ Um mit diesem Verfahren nun die Aufgabe zu lösen ermittelt man solange größer
 Der Algorithmus scheint auf ersten Blick eine stark explosive Komplexität zu besitzen, jedoch ist dem tatsächlich garnicht so.
 Im folgenden wird die Komplexität dieses Verfahrens genauer betrachtet.
 
-\newcommand{\termsetn}[1]{\mathbb{T}_{d,b,{#1}}}
-\newcommand{\termset}{\termsetn{n}}
-
 \newcommand{\fad}{\forall d, b:\ }
 \newcommand{\measure}[1]{\varphi_{d,b}\left(#1\right)}
-
-\subsection{Term-Menge}
-
-Die Term-Menge \(\termset\) enthält alle Terme die \(n\) mal die Ziffer \(d\) in der Basis \(b\) (meistens \(= 10\) für Dezimalsystem) verwenden.
-Die Elemente der Term-Menge \(\termset\) sind 3-Tupel bestehend aus einer Operation und zwei Termen der Größe \(i\) und \(n-i\) oder \(n\)-fache Wiederholungen der Ziffer \(d\).
-
-\[\termset :=
-\bigcup_{i=1}^{n-1} \left\{ (l, r, o) | l \in \termsetn{i}, r \in \termsetn{n-i}, o \in \{ +, -, \cdot, \div \} \right\}
-\cup \left\{ \left(\sum_{i=0}^n b^n \cdot d \right) \right\} \]
-Weiterhin ist der Spezialfall \(n=0\) als die leere Menge definiert:
-
-\[\termsetn{0} := \{\}\]
-
-\subsection{Evaluationsfunktion}
-
-Basierend auf der Term-Menge ist die Evaluationsfunktion \(\epsilon : \termset \to \mathbb{Q}\) definiert, die den Wert eines Terms ermittelt:
-Für rationale Zahlen \(x\in\mathbb{Q}\) gilt:
-\[\epsilon(x) = x\]
-Ansonsten gilt:
-\[\epsilon((l, r, o)) = o(l,r)\]
 
 \subsection{Größenmaß-Funktion}
 
 Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\varphi_{d,b} : \mathbb{Q} \to \mathbb{N}\) betrachtet, die die Anzahl an Verwendungen der Ziffer \(d\) errechnet, die für die optimale Repräsentation beliebiger rationaler Zahlen benötigt wird.
-Genauer formuliert ist \(\measure{x} := \min_{i\in\mathbb{N} \land x \in \termsetn{i}} i \)
 Beispielsweise ist \(\fad\measure{d} = 1\).
 
-\begin{corollary}
-    Aus der Definition lassen sich direkt folgende
-\end{corollary}
-
-\begin{lemma}[Triviale obere Grenze des Größenmaß]
-Für jede rationale Zahl
-
-\[s\cdot\frac{a}{b}\in\mathbb{Q},\ a,b\in\mathbb{N}\backslash\{0\},\ s\in\{-1,0,1\}\]
-gilt:
-
-\[\fad \measure{s\cdot\frac{a}{b}} \leq a + b + 2\]
+\begin{lemma}[Größenmaß für ganze Zahlen]\label{lemma:measure_linear}
+    Für jede ganze Zahl \(n\) gilt:
+    \[\fad \measure{n} \leq n+2\]
 \end{lemma}
+\begin{proof}
+    \subsubsection*{Fall 1: \(n > 0\)}
+        
+    \(n > 0\) lässt sich als \(n\) mal wiederholte Summierung von \(d\) darstellen:
+    \[n = \frac{d+d+\ldots+d}{d} \implies \measure{n} \leq n \leq n + 2\]
 
-\begin{proof-wo}
-Für jede Ziffer \(d\) gilt:
+    \subsubsection*{Fall 2: \(n = 0\)}
+        
+    \(n = 0 = const.\) lässt sich immer mit genau zwei Ziffern darstellen:
+    \[n = d - d \implies \measure{n} \leq 2 \leq n + 2\]
 
-\[\frac{a}{b}
-= \frac{1 + 1 + \ldots + 1}{1 + 1 + \ldots + 1}
-= \frac{d\cdot(1 + 1 + \ldots + 1)}{d\cdot(1 + 1 + \ldots + 1)}
-= \frac{\overbrace{d + d + \ldots + d}^{a}}{\underbrace{d + d + \ldots + d}_{b}}\]
-\[\implies \measure{\frac{a}{b}} \leq a + b\]
+    \subsubsection*{Fall 3: \(n < 0\)}
+        
+    \(n < 0\) lässt sich als Differenz aus \(0 = d-d\) und \(-d\) darstellen:
+    \[n = d - d - \frac{d+d+\ldots+d}{d} \implies \measure{n} \leq n + 2\]
+\end{proof}
 
-weiterhin gilt auch:
+\begin{lemma}[Größenmaß für rationale Zahlen]\label{lemma:phi_rational}
+    Für jede rationale Zahl \(\frac{a}{b}\in\mathbb{Q},\ a\in\mathbb{Z},\ b\in\mathbb{Z}^+\) gilt:
 
-\[s\cdot\frac{a}{b} = 
-\begin{cases}
-    \frac{d + d + \ldots + d}{d + d + \ldots + d} & s = +1 \vspace{0.2em}\\
-    d-d & s = 0 \vspace{0.2em}\\
-    (d-d) - \frac{d + d + \ldots + d}{d + d + \ldots + d} & s = -1 \\
-\end{cases}\]
+    \[\measure{\frac{a}{b}} \leq \measure{a} + \measure{b}\]
+\end{lemma}
+\begin{proof}
+    Die natürlichen Zahlen \(a\) und \(b\) lassen sich mit \(\measure{a}\) und \(\measure{b}\) Ziffern ausdrücken, also lässt sich \(\frac{a}{b}\) mit \(\measure{a} + \measure{b}\) Ziffern ausdrücken.
+\end{proof}
 
-Somit lässt sich jede positive rationale Zahl mit \(a+b\) oder weniger und jede negative rationale Zahl mit \(a+b+2\) oder weniger Ziffern darstellen. Null lässt sich immer mit 2 Ziffern darstellen.
-Folglich lässt sich jede rationale Zahl \(s\cdot\frac{a}{b}\) mit \(a+b+2\) oder weniger Ziffern darstellen.
-\end{proof-wo}
+\begin{theorem}[Genauere obere Grenze des Größenmaß für positive ganze Zahlen]
+    Für jede positive ganze Zahl \(n\) gilt:
+    
+        \[\measure{n} \leq \log_d(n) \cdot (n+3)\]
+\end{theorem}
+\begin{proof}
+    Jede ganze Zahl lässt sich im Horner-Schema darstellen.
+    Betrachte man die natürliche Zahl \(n\) in Basis \(d\):
 
+        \[n = a_1 + d (a_2 + d (\ldots d a_k)),\ a_i\in\mathbb{N},\ 0 \leq a_i < d\]
 
+    Es lässt sich leicht ablesen:
+
+    \begin{align*}
+        \measure{n} 
+        &\leq \measure{a_1} + \measure{d} + \measure{a_2} + \measure{d} + \ldots + \measure{d} + \measure{a_k} \\
+        &= (k-1)\cdot\measure{d} + \sum_{i=1}^k \measure{a_i}
+    \end{align*}
+    
+    Da \(0 \leq a_i < d\) gilt, folgt aus \ref{lemma:measure_linear} \(\measure{a_i} \leq d + 2\).
+    Zusammen mit \(\measure{d} = 1\) gilt:
+
+    \begin{align*}
+        \measure{n} 
+        &\leq (k-1) \cdot \measure{d} + \sum_{i=1}^k \measure{a_i} \\
+        &\leq (k-1) \cdot 1 + \sum_{i=1}^k (d+2) \\
+        &\leq (k-1) + k \cdot (d+2) \\
+        &\leq k + k \cdot (d+2) = k \cdot (d+3) \\
+    \end{align*}
+    
+    Bei der Repräsentation mit dem Horner-Schema gilt \(k = \lfloor \log_d(n) \rfloor\), somit folgt:
+
+        \[\measure{n} \leq k \cdot (d+3) = \lfloor \log_d(n) \rfloor \cdot (d+3) \leq \log_d(n) \cdot (d+3)\]
+\end{proof}
+
+\begin{corollary}[Genauere obere Grenze des Größenmaß für ganze Zahlen]\label{corollary:phi_bound}
+    Für jede ganze Zahl \(n\) gilt:
+    
+        \[\measure{n} \leq \log_d(n) \cdot (d+3) + 2\]
+\end{corollary}
+\begin{proof}
+    Analog zum Beweis von \ref{lemma:measure_linear}.
+\end{proof}
+
+\subsection{Anzahl an Termen}
+
+Die Anzahl an Termen mit \(n\) Ziffern sei definiert als \(t_n\).
+Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(t_1 = 1\) Terme und bei \(2\) gibt es \(t_2 = 6\) Terme (\(d; dd; d+d; d-d; d \cdot d; d \div d\)).
+
+\begin{theorem}[Abschätzung für \(t_n\)]\label{theorem:tn_bound}
+    Die Anzahl an Termen lässt sich wie folgt nach oben abschätzen, wobei \(C_n\) die Catalan Zahlen bezeichnet:
+
+    \[t_n \leq C_n \cdot 5^{n-1}\]
+\end{theorem}
+\begin{proof}
+    Terme von Größe \(n\) können als volle Binärbäume mit \(n\) Blättern aufgefasst werden, wobei jedes Blatt eine Ziffer oder eine Wiederholung der Ziffer darstellt und jeder Knoten eine binäre Operation zwischen seinen zwei Kindern darstellt.
+    Am Beispiel für \(6 = (1+1)\cdot(1+(1+1))\):
+    \begin{center}
+        \begin{tikzpicture}[level/.style={sibling distance = 4cm/#1,  level distance = 0.8cm}] 
+        \node [circle,draw] {$\cdot$}
+            child{ node  [circle,draw] {$+$}
+                child{ node  [circle,draw] {$1$}} 
+                child{ node  [circle,draw] {$1$}} 
+            }
+            child{ node  [circle,draw] {$+$} 
+                child{ node  [circle,draw] {$1$}} 
+                child{ node  [circle,draw] {$+$}
+                    child{ node  [circle,draw] {$1$}} 
+                    child{ node  [circle,draw] {$1$}} 
+                } 
+            }
+        ; 
+        \end{tikzpicture}
+    \end{center}
+    Hierbei werden auch invalide Terme mit Division durch Null wie \(1 \div (1-1)\) mitbetrachtet, jedoch sind alle validen Terme wie oben repräsentierbar, somit ist das folgende eine obere Abschätzung.
+    Im folgenden werden zunächst nur Terme ohne Konkatenierung von Ziffern betrachtet.
+
+    Betrachte man nun die Anzahl solcher Binärbäume.
+    Die Anzahl an vollen Binärbäume mit \(n\) Blättern wird durch die Catalan Zahlen \(C_n\) beschrieben.
+    Die Catalan Zahlen beschreiben jedoch nur die Anzahl an Binärbäumen, nicht die Anzahl an Binärbäumen mit Operatoren in den Knoten.
+    In einem vollen Binärbaum mit \(n\) Blättern gibt es \(n-1\) Knoten bzw. \(n-1\) Operatoren.
+    Bei \(4\) Operatoren heißt das, dass die Anzahl an Kombinationen von Operatoren \(4^{n-1}\) beträgt.
+    Folglich ist die Anzahl an Binärbäumen mit Operatoren in den Knoten das Produkt dieser beiden Zahlen: \(C_n \cdot 4^{n-1}\).
+
+    Um nun noch Konkatenierung von Ziffern mitzubetrachten kann man sich einen Konkatenierungs-Operator vorstellen:
+    \[l \circ r = b \cdot l + r \quad\quad 1\circ1 = b + 1 = 10 + 1 = 11\]
+    Dieser würde natürlich auch ``unerlaubte'' Konkatenierungen erlauben:
+    \[(4+4+4) \circ (4\cdot4) = 12 \circ 16 = 12b + 16 = 120 + 16 = 136\]
+    Jedoch werden so alle validen Konkatenierungen und mehr abgebildet, weshalb es für eine Abschätzung nach oben geeignet ist.
+    Nun lässt sich die vorherige Herangehensweise analog durchführen, jedoch diesmal mit \(5\) Operatoren.
+    Somit ist die Anzahl an Termen der Größe \(n\) kleiner gleich \(C_n \cdot 5^{n-1}\).
+\end{proof}
+
+\begin{corollary}[Anzahl zu betrachtender Terme]
+    Aus \ref{corollary:phi_bound}, \ref{lemma:phi_rational} und \ref{theorem:tn_bound} folgt, dass für jede rationale Zahl \(\frac{a}{b}\in\mathbb{Q},\ a\in\mathbb{Z},\ b\in\mathbb{Z}^+\) gilt:
+
+        \[t_{\measure{\frac{a}{b}}} \leq a^2+b^2\]
+\end{corollary}
+\begin{proof}
+    Laut \ref{theorem:tn_bound} gilt:
+
+        \[t_n \leq C_n \cdot 5^{n-1}\]
+
+    Für die Catalan Zahlen gilt folgende obere Abschätzung:
+
+        \[C_n < \frac{4^n}{(n+1)\sqrt{\pi n}}\]
+
+    Somit folgt:
+
+        \[t_n \leq C_n \cdot 5^{n-1} < \frac{4^n}{(n+1)\sqrt{\pi n}} 5^{n-1} = \frac{4^n \cdot 5^n}{5(n+1)\sqrt{\pi n}} = \frac{20^n}{5(n+1)\sqrt{\pi n}}\]
+
+    Nun kann man \(\measure{\frac{a}{b}}\) für \(n\) einsetzen.
+    Mit \ref{corollary:phi_bound} gilt:%(\(\measure{n} \leq \log_d(n)\cdot(d+3)+2\)) gilt:
+
+    \begin{align*}
+        t_{\measure{\frac{a}{b}}} 
+        &< \frac{20^{\log_d(n)\cdot(d+3)+2}}{5((\log_d(n)\cdot(d+3)+2)+1)\sqrt{\pi \cdot \log_d(n)\cdot(d+3)+2}} \\
+        &\leq \frac{\left(20^{\log_d(n)}\right)^{d+3}\cdot20^2}{5(\log_d(n)\cdot(d+3)+3)\sqrt{\pi \cdot \log_d(n)\cdot(d+3)+2}} \\
+        &\leq 80\cdot\frac{\left(20^{\log_d(n)}\right)^{d+3}}{(\log_d(n)\cdot(d+3)+3)\sqrt{\pi \cdot \log_d(n)\cdot(d+3)+2}} \\
+        &\leq 80\cdot\frac{\left(20^{\log_d(n)}\right)^{d+3}}{\log_d(n) \cdot d \sqrt{\pi \cdot \log_d(n) \cdot d}} \\
+        &\leq 80\cdot\frac{\left(20^{\frac{\log_{20}(n)}{\log_{20}(d)}}\right)^{d+3}}{\log_d(n) \cdot d \sqrt{\pi \cdot \log_d(n) \cdot d}} \\
+        &\leq 80\cdot\frac{\left(n^{\frac{1}{\log_{20}(d)}}\right)^{d+3}}{\log_d(n) \cdot d \sqrt{\log_d(n) \cdot d}} \\
+        &\leq 80 \cdot n^{\frac{d+3}{\log_{20}(d)}}\cdot(\log_d(n) \cdot d)^{-\frac{3}{2}} \\
+        &= \mathcal{O}(n^{\frac{d+3}{\log_{20}(d)}}\cdot(\log_d(n) \cdot d)^{-\frac{3}{2}}) \\
+        
+    \end{align*}
+
+\end{proof}
 
 \end{document}
