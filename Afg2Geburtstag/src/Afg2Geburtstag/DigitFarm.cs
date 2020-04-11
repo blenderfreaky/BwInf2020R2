@@ -20,7 +20,6 @@
 
         public long Digit { get; }
         public long Base { get; }
-        //public long UnaryDepth { get; }
 
         public ConcurrentDictionary<BigRational, ITerm?> HitTargets { get; }
         public int UnfoundTargets { get; private set; }
@@ -40,7 +39,7 @@
             UnaryOperator = unaryOperator;
             Digit = digit;
             Base = @base;
-            //UnaryDepth = unaryOperator1000;
+
             HitTargets = hitTargets;
             UnfoundTargets = hitTargets.Count;
             OnFound = onFound;
@@ -55,7 +54,7 @@
             var element = new BigInteger(Digit);
             for (int i = 1; i < size; i++) element = (element * Base) + Digit;
 
-            RegisterTerm(currentTerms, new ValueTerm(new BigRational(element)), size);
+            RegisterTerm(currentTerms, new BigRational(element), size);
 
             Parallel.For(1, size, i =>
             {

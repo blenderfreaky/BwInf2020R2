@@ -13,7 +13,7 @@
 
         public BigRational Value { get; }
 
-        public string Term => ToString();
+        public long HashCode { get; }
 
         private BinaryOperation(BinaryOperator @operator, ITerm lhs, ITerm rhs, BigRational value)
         {
@@ -21,6 +21,12 @@
             Lhs = lhs;
             Rhs = rhs;
             Value = value;
+
+            var hashCode = -1180296392;
+            hashCode = (hashCode * -1521134295) + EqualityComparer<BinaryOperator>.Default.GetHashCode(Operator);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<ITerm>.Default.GetHashCode(Lhs);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<ITerm>.Default.GetHashCode(Rhs);
+            HashCode = hashCode;
         }
 
         public static BinaryOperation? Create(BinaryOperator @operator, ITerm lhs, ITerm rhs)
@@ -32,22 +38,15 @@
                 : null;
         }
 
-
         public override string ToString() => Operator.OperationToString(Lhs, Rhs);
 
         public override bool Equals(object? obj) => obj is BinaryOperation operation
+            && HashCode == operation.HashCode
+            && Value == operation.Value
             && EqualityComparer<BinaryOperator>.Default.Equals(Operator, operation.Operator)
             && EqualityComparer<ITerm>.Default.Equals(Lhs, operation.Lhs)
-            && EqualityComparer<ITerm>.Default.Equals(Rhs, operation.Rhs)
-            && Value.Equals(operation.Value);
+            && EqualityComparer<ITerm>.Default.Equals(Rhs, operation.Rhs);
 
-        public override int GetHashCode()
-        {
-            var hashCode = -1180296392;
-            hashCode = (hashCode * -1521134295) + EqualityComparer<BinaryOperator>.Default.GetHashCode(Operator);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<ITerm>.Default.GetHashCode(Lhs);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<ITerm>.Default.GetHashCode(Rhs);
-            return hashCode;
-        }
+        public override int GetHashCode() => (int)(HashCode % int.MaxValue);
     }
 }

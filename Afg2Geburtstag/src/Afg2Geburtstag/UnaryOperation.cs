@@ -12,13 +12,18 @@
 
         public BigRational Value { get; }
 
-        public string Term => ToString();
+        public long HashCode { get; }
 
         private UnaryOperation(UnaryOperator @operator, ITerm operand, BigRational value)
         {
             Operator = @operator;
             Operand = operand;
             Value = value;
+
+            var hashCode = -1180296392;
+            hashCode = (hashCode * -1521134295) + EqualityComparer<UnaryOperator>.Default.GetHashCode(Operator);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<ITerm>.Default.GetHashCode(Operand);
+            HashCode = hashCode;
         }
 
         public static UnaryOperation? Create(UnaryOperator @operator, ITerm operand)
@@ -30,20 +35,14 @@
                 : null;
         }
 
-
         public override string ToString() => Operator.OperationToString(Operand);
 
         public override bool Equals(object? obj) => obj is UnaryOperation operation
+            && HashCode == operation.HashCode
+            && Value == operation.Value
             && EqualityComparer<UnaryOperator>.Default.Equals(Operator, operation.Operator)
-            && EqualityComparer<ITerm>.Default.Equals(Operand, operation.Operand)
-            && Value.Equals(operation.Value);
+            && EqualityComparer<ITerm>.Default.Equals(Operand, operation.Operand);
 
-        public override int GetHashCode()
-        {
-            var hashCode = -1180296392;
-            hashCode = (hashCode * -1521134295) + EqualityComparer<UnaryOperator>.Default.GetHashCode(Operator);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<ITerm>.Default.GetHashCode(Operand);
-            return hashCode;
-        }
+        public override int GetHashCode() => (int)(HashCode % int.MaxValue);
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace Afg2Geburtstag
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Numerics;
@@ -10,9 +11,9 @@
         /// <summary>
         /// The max number of parallel tasks
         /// </summary>
-        private static readonly int DegreeOfParallelism = 2;//Environment.ProcessorCount;
+        private static readonly int _degreeOfParallelism = Environment.ProcessorCount;
 
-        private static readonly Dictionary<long, BigInteger> Lookup = new Dictionary<long, BigInteger>
+        private static readonly Dictionary<long, BigInteger> _lookup = new Dictionary<long, BigInteger>
         {
             [1] = BigInteger.Parse("1"),
             [2] = BigInteger.Parse("2"),
@@ -217,12 +218,12 @@
 
         public static BigInteger Factorial(long x)
         {
-            if (Lookup.TryGetValue(x, out var val)) return val;
+            if (_lookup.TryGetValue(x, out var val)) return val;
 
             // Make as many parallel tasks as our DOP
             // And make them operate on separate subsets of data
             var parallelTasks =
-                Enumerable.Range(1, DegreeOfParallelism)
+                Enumerable.Range(1, _degreeOfParallelism)
                             .Select(i => Task.Factory.StartNew(() => Multiply(x, i),
                                          TaskCreationOptions.LongRunning))
                             .ToArray();
@@ -238,7 +239,7 @@
                 finalResult *= partialResult;
             }
 
-            return Lookup[x] = finalResult;
+            return _lookup[x] = finalResult;
         }
 
         /// <summary>
@@ -252,7 +253,7 @@
         {
             BigInteger result = 1;
 
-            for (var i = startFrom; i <= upperBound; i += DegreeOfParallelism)
+            for (var i = startFrom; i <= upperBound; i += _degreeOfParallelism)
                 result *= i;
 
             return result;

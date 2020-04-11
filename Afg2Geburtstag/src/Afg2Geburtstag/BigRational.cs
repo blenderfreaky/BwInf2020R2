@@ -5,10 +5,12 @@
     using System.Numerics;
 
     [DebuggerDisplay("{Numerator}/{Denominator}")]
-    public readonly struct BigRational : IEquatable<BigRational>
+    public readonly struct BigRational : IEquatable<BigRational>, ITerm
     {
         public readonly BigInteger Numerator;
         public readonly BigInteger Denominator;
+
+        BigRational ITerm.Value => this;
 
         public BigRational(BigInteger numerator, BigInteger denominator, bool validate = true)
         {

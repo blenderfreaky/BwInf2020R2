@@ -19,8 +19,8 @@
         public override int GetHashCode()
         {
             var hashCode = 2118633752;
-            hashCode = hashCode * -1521134295 + EqualityComparer<Func<ITerm, ITerm, BigRational?>>.Default.GetHashCode(Evaluate);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Func<ITerm, ITerm, string>>.Default.GetHashCode(OperationToString);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<Func<ITerm, ITerm, BigRational?>>.Default.GetHashCode(Evaluate);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<Func<ITerm, ITerm, string>>.Default.GetHashCode(OperationToString);
             return hashCode;
         }
     }
