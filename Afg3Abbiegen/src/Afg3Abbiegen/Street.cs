@@ -6,40 +6,26 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
-    public class DirectedStreet
+    public class Street
     {
         public Vector2Int Start { get; }
         public Vector2Int End { get; }
 
-        public DirectedStreet? Forward { get; }
+        public IReadOnlyList<Intersection> Intersections { get; }
 
-        public IReadOnlyList<DirectedStreet> Exits { get; }
-
-        public DirectedStreet(Vector2Int start, Vector2Int end, DirectedStreet? forward, IReadOnlyList<DirectedStreet> exits)
+        public Street(Vector2Int start, Vector2Int end)
         {
             Start = start;
             End = end;
-            Forward = forward;
-            Exits = exits;
+            Intersections = new List<Intersection>();
         }
 
-        public static IEnumerable<DirectedStreet> CreateStreets(
+        public static IEnumerable<Street> CreateStreets(
             [DisallowNull] Vector2Int start, [DisallowNull] Vector2Int end,
             [DisallowNull] IEnumerable<(Vector2Int Start, Vector2Int End)> streetsSource)
         {
-            var streets = streetsSource.ToList();
+            var streets = streetsSource.ToDictionary(x => x, x => new Street(x.Start, x.End));
 
-            var intersections = new Dictionary<Vector2Int, List<(Vector2Int Start, Vector2Int End)>>();
-
-            List<(Vector2Int Start, Vector2Int End)> Intersections(Vector2Int vec)
-            {
-                if (!intersections.TryGetValue(vec, out var list))
-                {
-                    return intersections[vec] = new List<(Vector2Int Start, Vector2Int End)>();
-                }
-
-                return list;
-            }
 
             for (int i = 0; i < streets.Count; i++)
             {
@@ -59,7 +45,8 @@
                     list.Add(first);
                     list.Add(second);
                 }
-
+                var a = "";
+                a.
                 if (IsPointOnLine(start, first.Start, first.End))
                 {
                     Intersections(start).Add(first);
@@ -73,7 +60,7 @@
 
             foreach (var intersection in intersections)
             {
-                inter
+                intersection
             }
         }
 

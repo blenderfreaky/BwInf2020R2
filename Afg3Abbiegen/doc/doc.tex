@@ -1,0 +1,124 @@
+\documentclass{article}
+
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper,margin=2.2cm,footskip=0.5cm]{geometry}
+
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{ntheorem}
+
+\usepackage{lmodern}
+%\usepackage{csquotes}
+
+\usepackage{tikz}
+\usetikzlibrary{chains}
+\usetikzlibrary{matrix,positioning,calc}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary {positioning}
+
+\usepackage{cite}
+
+\usepackage{fancyhdr, lastpage}
+
+\pagestyle{fancy}
+
+\newcommand{\Fpage}{\thepage{}/\pageref{LastPage}}
+\newcommand{\Ftitle}{Aufgabe 2 Geburtstag}
+\newcommand{\Fauthor}{Nikolas Kilian}
+
+\lhead{\Fauthor}
+\rhead{\Ftitle}
+\chead{}
+\lfoot{}
+\rfoot{}
+\cfoot{\Fpage}
+
+\setlength{\parskip}{.8em} 
+\setlength{\parindent}{0pt}
+
+% Für Algorithmen
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+%\usepackage{pxfonts}
+
+\algnewcommand\algorithmicforeach{\textbf{for each}}
+\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
+
+%
+% Für Quelltext
+\usepackage{listings}
+\usepackage{xcolor}
+
+\usepackage{url}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\itshape}
+\theorembodyfont{\normalfont}
+\theoremseparator{.\,—}
+\theoremsymbol{}
+\newtheorem{proof-wo}{Beweis}
+\theoremsymbol{\ensuremath{\color{lightgray}\blacksquare}}
+\newtheorem{proof}{Beweis}
+
+\begin{document}
+    
+\section{Lösungsidee}
+
+Die Lösungsidee dreht sich darum, den Dijkstra Algorithmus so umzubauen, dass er nach dem Weg mit dem wenigsten Abbiegen statt geringster Länge sucht.
+
+Hierfür müssen die Eingabedaten zuerst in einen für Dijkstra geeigneten Graphen konvertiert werden, also müssen die Kreuzungen ermittelt werden.
+Hierfür kann der Sweep-Line bzw. Bentley–Ottmann Algorithmus verwendet werden, mit einer durchschnittlichen Komplexität von \(n \log n\). Mehr dazu später.
+Sind die Kreuzungen gefunden, kann der Dijkstra-Algorithmus verwendet werden.
+Zuerst wird der kürzeste Weg berechnet, woraufhin dessen Länge und die Anzahl an Abbiegungen darin ermittelt.
+
+Daraufhin beginnt die Ermittlung des endgültigem Wegs.
+Grundlegend verläuft diese Ermittlung wie der normale Dijkstra Algorithmus, mit ein paar kleinen Unterschieden.
+Der erste Unterschied ist, dass der Algorithmus alle Wege mit einer Länge größer der Länge des kürzesten Wegs plus die erlaubte Extrastrecke (also +15\% oder +30\%) eliminiert werden.
+Der zweite Unterschied ist, dass alle Wege mit genau so vielen oder mehr Abbiegungen als der kürzeste Weg ebenfalls eliminiert werden.
+Der dritte und wichtigste Unterschied ist, dass Dijkstra hierbei nicht nach Länge, sondern nach Anzahl an Abbiegungen optimiert.
+
+\subsection{Modifizierter Dijkstra im Detail}
+
+Um Dijkstra für eine Minimierung von Abbiegungen umzubauen, könnten die Kosten von Kanten des Graphs, anstatt Länge, Existenz von Abbiegungen beschreiben, mit entweder einer 1 für eine Abbiegung oder 0 für eine Gerade. 
+Dabei fällt auf, dass um die Kosten einer Kante des Graphs zu berechnen, die im Weg vorherkommende Kante betrachtet werden muss.
+Das bedeutet, dass Dijkstra hier nicht in der Form verwendet werden kann, da Dijkstra manchmal Knoten des Graphs von einem anderen Weg aus erneut besucht, wobei sich die Kosten der Kanten aus dem Knoten heraus verändern würden.
+%TODO: Naiven Graphen plotten
+
+Um dieses Problem zu umgehen wird der Graph verändert.
+Kreuzungen werden im Graphen immernoch als Knoten dargestellt, jedoch gibt es für jede Kreuzung mehrere Knoten, einen für jede geradlinige Straße die in der Kreuzung vorhanden ist.
+Alle Knoten einer Kreuzung sind dabei verbunden durch Kanten mit Kosten von 1.
+
+%TODO: Remove arrows
+\begin {center}
+\begin {tikzpicture}[-latex, auto, node distance =4 cm and 5cm, on grid,semithick,
+state/.style={ circle, draw, minimum width =1 cm}]
+\node[state] (A1)                 {};
+\node[state] (A2) [right = of A1] {};
+\node[state] (A3) [right = of A2] {};
+
+\node[state] (B1) [below = of A1] {};
+\node[state] (B2) [right = of B1] {};
+\node[state] (B3) [right = of B2] {};
+
+\path (A1) edge node[below =0.15 cm] {$0$} (A2);
+\path (A2) edge node[below =0.15 cm] {$0$} (A3);
+
+\path (B1) edge node[below =0.15 cm] {$0$} (B2);
+\path (B2) edge node[below =0.15 cm] {$0$} (B3);
+
+\path (A2) edge node[right =0.15 cm] {$1$} (B2);
+\end{tikzpicture}
+\end{center}
+
+\subsection{Sweep-Line / Bentley–Ottmann Algorithmus}
+
+Der 
+
+\end{document}

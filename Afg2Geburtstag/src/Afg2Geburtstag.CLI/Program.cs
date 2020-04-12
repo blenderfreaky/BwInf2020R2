@@ -14,11 +14,11 @@
 
     public class Options
     {
-        [Option('t', "targets", HelpText = "The numbers to represent", Required = true)]
-        public IEnumerable<int>? Targets { get; set; }
+        [Option('t', "targets", Separator = ',', HelpText = "The numbers to represent", Required = true)]
+        public IEnumerable<string>? Targets { get; set; }
 
-        [Option('d', "digits", HelpText = "The digits to use", Required = true)]
-        public IEnumerable<int>? Digits { get; set; }
+        [Option('d', "digits", Separator = ',', HelpText = "The digits to use", Required = true)]
+        public IEnumerable<string>? Digits { get; set; }
 
         [Option('b', "base", HelpText = "The base to use", Default = 10)]
         public int Base { get; set; }
@@ -78,6 +78,26 @@
 
         private static void RunWithArguments(Options options)
         {
+            var targets = options.Targets.Select(x => (BigRational)int.Parse(x.Trim().Replace(",", ""))).ToList();
+
+            Parallel.ForEach(options.Digits.Where(x => !string.IsNullOrWhiteSpace(x)),
+                digit =>
+                    Farm(targets,
+                        options.AllowExponentiation,
+                        options.AllowFactorial,
+                        int.Parse(digit.Trim().Replace(",", "")),
+                        options.Base));
+        }
+
+        public static void Farm(
+            IEnumerable<BigRational> targetsSource,
+            bool useExponentiation,
+            bool useFactorial,
+            long digit,
+            long @base = 10)
+        {
+            if (!useFactorial && !useExponentiation && digit == 0) return;
+
             var binaryOperators = new List<BinaryOperator>
             {
                 Addition,
@@ -86,31 +106,14 @@
                 Division,
             };
 
-            if (options.AllowFactorial) binaryOperators.Add(Exponentiation);
-
-            Parallel.ForEach(options.Digits, digit =>
-                Farm(options.Targets.Select(x => (BigRational)x),
-                    binaryOperators,
-                    options.AllowFactorial ? Factorial : null,
-                    digit,
-                    options.Base));
-        }
-
-        public static void Farm(
-            IEnumerable<BigRational> targetsSource,
-            IEnumerable<BinaryOperator> binaryOperatorsSource,
-            UnaryOperator? unaryOperator,
-            long digit,
-            long @base = 10)
-        {
-            var binaryOperators = binaryOperatorsSource.ToList();
+            if (useExponentiation) binaryOperators.Add(Exponentiation);
 
             var targets = new ConcurrentDictionary<BigRational, ITerm?>();
             foreach (var target in targetsSource) targets[target] = null;
 
             var stopwatch = Stopwatch.StartNew();
 
-            var farm = new DigitFarm(binaryOperators, unaryOperator, targets,
+            var farm = new DigitFarm(binaryOperators, useFactorial ? Factorial : null, targets,
                 (term, digits) => Console.WriteLine($"Found solution ({digits} digits) [{stopwatch.Elapsed}]\n  {term.Value} = {term}", Color.Green),
                 digit, @base);
 

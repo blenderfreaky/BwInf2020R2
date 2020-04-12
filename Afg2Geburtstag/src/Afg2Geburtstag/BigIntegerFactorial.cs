@@ -15,6 +15,7 @@
 
         private static readonly Dictionary<long, BigInteger> _lookup = new Dictionary<long, BigInteger>
         {
+            [0] = BigInteger.Parse("1"),
             [1] = BigInteger.Parse("1"),
             [2] = BigInteger.Parse("2"),
             [3] = BigInteger.Parse("6"),
@@ -224,8 +225,7 @@
             // And make them operate on separate subsets of data
             var parallelTasks =
                 Enumerable.Range(1, _degreeOfParallelism)
-                            .Select(i => Task.Factory.StartNew(() => Multiply(x, i),
-                                         TaskCreationOptions.LongRunning))
+                            .Select(i => Task.Run(() => Multiply(x, i)))
                             .ToArray();
 
             // after all tasks are done...

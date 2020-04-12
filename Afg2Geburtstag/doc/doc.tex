@@ -66,6 +66,74 @@
 \theoremsymbol{\ensuremath{\color{lightgray}\blacksquare}}
 \newtheorem{proof}{Beweis}
 
+
+%\usepackage{courier}
+%\setmonofont{Consolas} %to be used with XeLaTeX or LuaLaTeX
+\definecolor{bluekeywords}{rgb}{0,0,1}
+\definecolor{greencomments}{rgb}{0,0.5,0}
+\definecolor{redstrings}{rgb}{0.64,0.08,0.08}
+\definecolor{xmlcomments}{rgb}{0.5,0.5,0.5}
+\definecolor{types}{rgb}{0.17,0.57,0.68}
+\definecolor{turqoisetypes}{rgb}{0.01,0.60,0.3}
+\definecolor{background}{rgb}{0.95,0.95,0.95}
+%\definecolor{background}{rgb}{.97,.97,.97}
+
+\newcommand{\codesize}{\small}
+
+\lstdefinelanguage{CSharp}{ % Better C# highlighting
+language=[Sharp]C,
+frame=lrbt,
+%language=general,
+backgroundcolor=\color{background},
+captionpos=b,
+numbers=left,
+numberstyle=\tiny,
+showspaces=false,
+showtabs=false,
+breaklines=true,
+showstringspaces=false,
+breakatwhitespace=true,
+escapeinside={(*@}{@*)},
+commentstyle=\color{greencomments},
+morekeywords={partial, var, get, set, from, select, package, deref},
+%
+emph=[0]{T,U,V,TToken},
+emphstyle=[0]{\color{types}},
+%
+emph=[1]{BigRational,BigInteger,NotSupportedException,List,HashSet,ITerm,BinaryOperation,UnaryOperation,BinaryOperator,UnaryOperator,DigitFarm},
+emphstyle=[1]{\color{turqoisetypes}},
+%
+otherkeywords={=>,<,>},
+emph=[2]{=>,<,>},
+emphstyle=[2]{\bfseries},
+%
+emph=[3]{ParserResult},
+emph=[3]{\color{turqoisetypes}\bfseries},
+%
+keywordstyle=\color{bluekeywords},
+stringstyle=\color{redstrings},
+basicstyle=\codesize\ttfamily,
+literate=%
+    {Ö}{{\"O}}1
+    {Ä}{{\"A}}1
+    {Ü}{{\"U}}1
+    {ß}{{\ss}}1
+    {ü}{{\"u}}1
+    {ä}{{\"a}}1
+    {ö}{{\"o}}1
+    {~}{{\textasciitilde}}1
+}
+
+\lstMakeShortInline[
+  language=CSharp,
+  columns=fixed,]~
+
+\newcommand{\sidenote}[1]{&&\left|\ \text{#1}\right.}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+\usepackage{hyperref}
+\usepackage{cleveref}
+
 \begin{document}
     
 \section{Lösungsidee}
@@ -87,57 +155,87 @@ Im folgenden wird die Komplexität dieses Verfahrens genauer betrachtet.
 Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\varphi_{d,b} : \mathbb{Q} \to \mathbb{N}\) betrachtet, die die Anzahl an Verwendungen der Ziffer \(d\) errechnet, die für die optimale Repräsentation beliebiger rationaler Zahlen benötigt wird.
 Beispielsweise ist \(\fad\measure{d} = 1\).
 
-\begin{lemma}[Größenmaß für ganze Zahlen]\label{lemma:measure_linear}
-    Für jede ganze Zahl \(n\) gilt:
-    \[\fad \measure{n} \leq n+2\]
+\begin{lemma}[Größenmaß für nicht-negative ganze Zahlen]\label{lemma:measure_linear_nonnegative}
+    Für jede nicht-negative ganze Zahl \(n\) gilt:
+
+    \[\measure{n} \leq n + 2\]
 \end{lemma}
 \begin{proof}
     \subsubsection*{Fall 1: \(n > 0\)}
         
     \(n > 0\) lässt sich als \(n\) mal wiederholte Summierung von \(d\) darstellen:
-    \[n = \frac{d+d+\ldots+d}{d} \implies \measure{n} \leq n \leq n + 2\]
+    \[n = \frac{d+d+\ldots+d}{d} \implies \measure{n} \leq n + 1 < n + 2\]
 
     \subsubsection*{Fall 2: \(n = 0\)}
         
-    \(n = 0 = const.\) lässt sich immer mit genau zwei Ziffern darstellen:
-    \[n = d - d \implies \measure{n} \leq 2 \leq n + 2\]
+    \(n = 0\) lässt sich immer mit genau zwei Ziffern darstellen:
+    \[n = d - d \implies \measure{n} \leq 2 = n + 2\]
+\end{proof}
+\begin{corollary}[Größenmaß für ganze Zahlen]\label{lemma:measure_linear}
+    Für jede ganze Zahl \(n\) gilt:
 
-    \subsubsection*{Fall 3: \(n < 0\)}
+    \[\fad \measure{n} \leq |n| + 3\]
+\end{corollary}
+\begin{proof}
+    \subsubsection*{Fall 1: \(n \geq 0\)}
+
+    Laut \ref{lemma:measure_linear_nonnegative} gilt:
+    \[\measure{n} \leq n + 2 = |n| + 2 < |n| + 3\]
+
+    \subsubsection*{Fall 2: \(n < 0\)}
         
-    \(n < 0\) lässt sich als Differenz aus \(0 = d-d\) und \(-d\) darstellen:
-    \[n = d - d - \frac{d+d+\ldots+d}{d} \implies \measure{n} \leq n + 2\]
+    \(n < 0\) lässt sich als Differenz aus \(0 = d-d\) und \(d\) darstellen:
+    \[n = d - d - \frac{d+d+\ldots+d}{d} \implies \measure{n} \leq |n| + 3\]
+    oder alternativ unter Verwendung von unärer Negation:
+    \[n = -\frac{d+d+\ldots+d}{d} \implies \measure{n} \leq |n| + 1 < |n| + 3\]
 \end{proof}
 
-\begin{lemma}[Größenmaß für rationale Zahlen]\label{lemma:phi_rational}
+\begin{lemma}[Größenmaß für binäre Operationen]\label{lemma:phi_binary}
+    Für jede binäre Operation \(\circ : \mathbb{Q} \times \mathbb{Q} \to \mathbb{Q}\) gilt für alle \(a\in\mathbb{Q},\ b\in\mathbb{Q}\):
+
+    \[\measure{a \circ b} \leq \measure{a} + \measure{b}\]
+
+    Es werden quasi alle binären Operatoren in Addition umgewandelt.
+\end{lemma}
+\begin{proof}
+    Die natürlichen Zahlen \(a\) und \(b\) lassen sich mit \(\measure{a}\) bzw. \(\measure{b}\) Ziffern ausdrücken, also lässt sich \(a \circ b\) durch Anwendung der Operation \(\circ\) auf die Terme für \(a\) und \(b\) mit \(\measure{a} + \measure{b}\) oder weniger Ziffern ausdrücken.
+\end{proof}
+
+\begin{corollary}[Größenmaß für rationale Zahlen]\label{corollary:phi_rational}
     Für jede rationale Zahl \(\frac{a}{b}\in\mathbb{Q},\ a\in\mathbb{Z},\ b\in\mathbb{Z}^+\) gilt:
 
     \[\measure{\frac{a}{b}} \leq \measure{a} + \measure{b}\]
-\end{lemma}
+\end{corollary}
 \begin{proof}
-    Die natürlichen Zahlen \(a\) und \(b\) lassen sich mit \(\measure{a}\) und \(\measure{b}\) Ziffern ausdrücken, also lässt sich \(\frac{a}{b}\) mit \(\measure{a} + \measure{b}\) Ziffern ausdrücken.
+    \(\frac{a}{b}\) ist das Ergebnis der Anwendung des binären Divisions-Operators auf \(a\) und \(b\), somit lässt es sich laut \ref{lemma:phi_binary} mit \(\measure{a} + \measure{b}\) oder weniger Ziffern ausdrücken.
 \end{proof}
 
-\begin{theorem}[Genauere obere Grenze des Größenmaß für positive ganze Zahlen]
+\begin{theorem}[Genauere obere Grenze des Größenmaß für positive ganze Zahlen]\label{theorem:accurate_bound}
     Für jede positive ganze Zahl \(n\) gilt:
     
-        \[\measure{n} \leq \log_d(n) \cdot (n+3)\]
+        \[\measure{n} \leq \log_d(n) \cdot (d+4)\]
 \end{theorem}
 \begin{proof}
-    Jede ganze Zahl lässt sich im Horner-Schema darstellen.
-    Betrachte man die natürliche Zahl \(n\) in Basis \(d\):
+    Jede positive ganze Zahl lässt sich im Horner-Schema darstellen.
+    Betrachte man die natürliche Zahl \(n\) in Basis \(d\).
 
-        \[n = a_1 + d (a_2 + d (\ldots d a_k)),\ a_i\in\mathbb{N},\ 0 \leq a_i < d\]
+        \begin{equation}\label{eqn:horner_schema}
+            n = a_1 + d (a_2 + d (\ldots d a_k)),\ a_i\in\mathbb{N},\ 0 \leq a_i < d
+        \end{equation}
 
-    Es lässt sich leicht ablesen:
+    Hierbei ist es anzumerken, dass keine Basis 1 existiert und somit dies bei \(d=1\) nicht geht.
+    Im folgenden wird zuerst der generelle Fall betrachtet.
+    Aus \ref{eqn:horner_schema} lässt sich ablesen:
 
     \begin{align*}
         \measure{n} 
+        &\leq \measure{a_1 + d (a_2 + d (\ldots d a_k))} \sidenote{\ref{lemma:phi_binary}} \\
         &\leq \measure{a_1} + \measure{d} + \measure{a_2} + \measure{d} + \ldots + \measure{d} + \measure{a_k} \\
-        &= (k-1)\cdot\measure{d} + \sum_{i=1}^k \measure{a_i}
+        &= (k-1)\cdot\measure{d} + \sum_{i=1}^k \measure{a_i} \numberthis\label{eqn:semi_accurate_bound}
     \end{align*}
     
-    Da \(0 \leq a_i < d\) gilt, folgt aus \ref{lemma:measure_linear} \(\measure{a_i} \leq d + 2\).
-    Zusammen mit \(\measure{d} = 1\) gilt:
+    Da \(0 \leq a_i < d\) gilt, folgt mit \ref{lemma:measure_linear_nonnegative} für jedes \(a_i\): \(\measure{a_i} \leq d + 2\).
+    Zusammen mit \(\measure{d} = 1\) folgt aus \ref{eqn:semi_accurate_bound}:
 
     \begin{align*}
         \measure{n} 
@@ -149,13 +247,33 @@ Beispielsweise ist \(\fad\measure{d} = 1\).
     
     Bei der Repräsentation mit dem Horner-Schema gilt \(k = \lfloor \log_d(n) \rfloor\), somit folgt:
 
-        \[\measure{n} \leq k \cdot (d+3) = \lfloor \log_d(n) \rfloor \cdot (d+3) \leq \log_d(n) \cdot (d+3)\]
+        \[\measure{n} \leq k \cdot (d+3) = \lfloor \log_d(n) \rfloor \cdot (d+3) \leq \log_d(n) \cdot (d+3) \leq \log_d(n) \cdot (d+4)\]
+
+    Betrachtet man nun noch einmal den Spezialfall \(d = 1\):
+    Um das Problem der non-existenten Basis zu umgehen, kann man anstatt \(d = 1\) die Basis \(2 = 1 + 1 = d + d\) nehmen.
+    Betrachte man nun \ref{eqn:semi_accurate_bound}:
+    
+    \[\measure{n} \leq (k-1) \cdot \measure{d} + \sum_{i=1}^k \measure{a_i}\]
+
+    Um diese Umgehung des Problems zu integrieren, muss nur \(\measure{d}\) mit \(\measure{d + d} = 2\cdot\measure{d}\) ersetzt werden:
+
+    \[\measure{n} \leq (k-1) \cdot 2 \cdot \measure{d} + \sum_{i=1}^k \measure{a_i}\]
+
+    Somit folgt analog zu oben:
+
+    \begin{align*}
+        \measure{n} 
+        &\leq k \cdot (d+4) \\
+        &\leq \log_d(n) \cdot (d+4) \\
+    \end{align*}
+
+    Somit gilt sowohl im generellen Fall als auch im Spezialfall die Abschätzung.
 \end{proof}
 
 \begin{corollary}[Genauere obere Grenze des Größenmaß für ganze Zahlen]\label{corollary:phi_bound}
     Für jede ganze Zahl \(n\) gilt:
     
-        \[\measure{n} \leq \log_d(n) \cdot (d+3) + 2\]
+        \[\measure{n} \leq \log_d(n) \cdot (d+4) + 2\]
 \end{corollary}
 \begin{proof}
     Analog zum Beweis von \ref{lemma:measure_linear}.
@@ -169,7 +287,7 @@ Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(
 \begin{theorem}[Abschätzung für \(t_n\)]\label{theorem:tn_bound}
     Die Anzahl an Termen lässt sich wie folgt nach oben abschätzen, wobei \(C_n\) die Catalan Zahlen bezeichnet:
 
-    \[t_n \leq C_n \cdot 5^{n-1}\]
+        \[t_n \leq C_n \cdot 5^{n-1}\]
 \end{theorem}
 \begin{proof}
     Terme von Größe \(n\) können als volle Binärbäume mit \(n\) Blättern aufgefasst werden, wobei jedes Blatt eine Ziffer oder eine Wiederholung der Ziffer darstellt und jeder Knoten eine binäre Operation zwischen seinen zwei Kindern darstellt.
@@ -191,10 +309,10 @@ Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(
         ; 
         \end{tikzpicture}
     \end{center}
-    Hierbei werden auch invalide Terme mit Division durch Null wie \(1 \div (1-1)\) mitbetrachtet, jedoch sind alle validen Terme wie oben repräsentierbar, somit ist das folgende eine obere Abschätzung.
+    Hierbei werden auch invalide Terme mit Division durch Null wie \(1 \div (1-1)\) mit betrachtet, jedoch sind alle validen Terme wie oben repräsentierbar, somit ist das folgende eine obere Abschätzung.
     Im folgenden werden zunächst nur Terme ohne Konkatenierung von Ziffern betrachtet.
 
-    Betrachte man nun die Anzahl solcher Binärbäume.
+    Betrachte man nun zuerst die Anzahl solcher Binärbäume.
     Die Anzahl an vollen Binärbäume mit \(n\) Blättern wird durch die Catalan Zahlen \(C_n\) beschrieben.
     Die Catalan Zahlen beschreiben jedoch nur die Anzahl an Binärbäumen, nicht die Anzahl an Binärbäumen mit Operatoren in den Knoten.
     In einem vollen Binärbaum mit \(n\) Blättern gibt es \(n-1\) Knoten bzw. \(n-1\) Operatoren.
@@ -205,16 +323,16 @@ Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(
     \[l \circ r = b \cdot l + r \quad\quad 1\circ1 = b + 1 = 10 + 1 = 11\]
     Dieser würde natürlich auch ``unerlaubte'' Konkatenierungen erlauben:
     \[(4+4+4) \circ (4\cdot4) = 12 \circ 16 = 12b + 16 = 120 + 16 = 136\]
-    Jedoch werden so alle validen Konkatenierungen und mehr abgebildet, weshalb es für eine Abschätzung nach oben geeignet ist.
+    Jedoch werden so alle validen Konkatenierungen und mehr abgebildet, weshalb er für eine Abschätzung nach oben geeignet ist.
     Nun lässt sich die vorherige Herangehensweise analog durchführen, jedoch diesmal mit \(5\) Operatoren.
     Somit ist die Anzahl an Termen der Größe \(n\) kleiner gleich \(C_n \cdot 5^{n-1}\).
 \end{proof}
 
-\begin{corollary}[Anzahl zu betrachtender Terme]
-    Aus \ref{corollary:phi_bound}, \ref{lemma:phi_rational} und \ref{theorem:tn_bound} folgt, dass für jede rationale Zahl \(\frac{a}{b}\in\mathbb{Q},\ a\in\mathbb{Z},\ b\in\mathbb{Z}^+\) gilt:
+\begin{theorem}[Anzahl zu betrachtender Terme]\label{theorem:tn_of_phi}
+    Aus \ref{corollary:phi_bound}, \ref{corollary:phi_rational} und \ref{theorem:tn_bound} folgt, dass für jede rationale Zahl \(\frac{a}{b}\in\mathbb{Q},\ a\in\mathbb{Z},\ b\in\mathbb{Z}^+\) gilt:
 
-        \[t_{\measure{\frac{a}{b}}} \leq a^2+b^2\]
-\end{corollary}
+        \[t_{\measure{\frac{a}{b}}} \in \mathcal{O}(n^{\alpha}),\quad\text{mit }\alpha=\frac{d+4}{\log_{20}(d)}\]
+\end{theorem}
 \begin{proof}
     Laut \ref{theorem:tn_bound} gilt:
 
@@ -229,21 +347,83 @@ Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(
         \[t_n \leq C_n \cdot 5^{n-1} < \frac{4^n}{(n+1)\sqrt{\pi n}} 5^{n-1} = \frac{4^n \cdot 5^n}{5(n+1)\sqrt{\pi n}} = \frac{20^n}{5(n+1)\sqrt{\pi n}}\]
 
     Nun kann man \(\measure{\frac{a}{b}}\) für \(n\) einsetzen.
-    Mit \ref{corollary:phi_bound} gilt:%(\(\measure{n} \leq \log_d(n)\cdot(d+3)+2\)) gilt:
+    Mit \ref{corollary:phi_bound} gilt nach einigen Umformungen (siehe Anhang):%(\(\measure{n} \leq \log_d(n)\cdot(d+3)+2\)) gilt:
 
     \begin{align*}
-        t_{\measure{\frac{a}{b}}} 
-        &< \frac{20^{\log_d(n)\cdot(d+3)+2}}{5((\log_d(n)\cdot(d+3)+2)+1)\sqrt{\pi \cdot \log_d(n)\cdot(d+3)+2}} \\
-        &\leq \frac{\left(20^{\log_d(n)}\right)^{d+3}\cdot20^2}{5(\log_d(n)\cdot(d+3)+3)\sqrt{\pi \cdot \log_d(n)\cdot(d+3)+2}} \\
-        &\leq 80\cdot\frac{\left(20^{\log_d(n)}\right)^{d+3}}{(\log_d(n)\cdot(d+3)+3)\sqrt{\pi \cdot \log_d(n)\cdot(d+3)+2}} \\
-        &\leq 80\cdot\frac{\left(20^{\log_d(n)}\right)^{d+3}}{\log_d(n) \cdot d \sqrt{\pi \cdot \log_d(n) \cdot d}} \\
-        &\leq 80\cdot\frac{\left(20^{\frac{\log_{20}(n)}{\log_{20}(d)}}\right)^{d+3}}{\log_d(n) \cdot d \sqrt{\pi \cdot \log_d(n) \cdot d}} \\
-        &\leq 80\cdot\frac{\left(n^{\frac{1}{\log_{20}(d)}}\right)^{d+3}}{\log_d(n) \cdot d \sqrt{\log_d(n) \cdot d}} \\
-        &\leq 80 \cdot n^{\frac{d+3}{\log_{20}(d)}}\cdot(\log_d(n) \cdot d)^{-\frac{3}{2}} \\
-        &= \mathcal{O}(n^{\frac{d+3}{\log_{20}(d)}}\cdot(\log_d(n) \cdot d)^{-\frac{3}{2}}) \\
-        
+        t_{\measure{\frac{a}{b}}}
+        &\in \mathcal{O}\left(n^{\frac{d+4}{\log_{20}(d)}} \cdot \underbrace{\big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}}_{\text{streng monoton fallend}}\right) \\
+        &= \mathcal{O}(n^{\alpha}),\quad\text{mit }\alpha=\frac{d+4}{\log_{20}(d)}
     \end{align*}
 
+    Da die Ziffer \(d\) dabei immer konstant ist, ist auch \(\alpha\) konstant.
+    Somit ist \(t_{\measure{\frac{a}{b}}}\) nach oben polynomial abschätzbar.
 \end{proof}
+
+Da immer alle Ziffern (außer 0) verwendet werden, muss diese Komplexität für alle Ziffern addiert werden.
+Somit ist die Komplexität eine Summe aus Potenzen, also auch eine Potenz:
+
+\[t_{\measure{\frac{a}{b}}} \in \mathcal{O}(n^{\alpha}),\quad\text{mit }\alpha=\max_{0 < d \leq 9}\frac{d+4}{\log_{20}(d)}\]
+
+All das mag heißen, dass auch wenn quasi purer Brute-Force verwendet wird, die Komplexität polynomial ist und somit auch die Komplexität des obigen Algorithmus.
+
+\section{Umsetzung}
+
+Der Algorithmus wurde in C\# 8.0 mit .NET Core 3.1 implementiert.
+Der Code ist in zwei Projekte geteilt;
+~Afg2Geburtstag.CLI~ und ~Afg2Geburtstag~.
+~Afg2Geburtstag.CLI~ kümmert sich um das Konsolen-Interface und ruft ~Afg2Geburtstag~ auf, was den eigentlichen Algorithmus enthält.
+~Afg2Geburtstag~ definiert einige Typen:
+
+\begin{description}
+    \item[BigRational] definiert mithilfe des BCL-Typs ~BigInteger~ einen Typen für (theoretisch) unendlich große rationale Zahlen.
+    \item[ITerm] repräsentiert eine Schnittstelle für beliebige Terme mit einem ~BigRational~ Wert. Wird von ~BigRational~ implementiert.
+    \item[UnaryOperation] repräsentiert eine unäre Operation auf einem ~ITerm~ und implementiert selbst ~ITerm~.
+    \item[BinaryOperation] repräsentiert eine binäre Operation zwischen zwei ~ITerm~s und implementiert selbst ~ITerm~.
+    \item[DigitFarm] enthält den Kernalgorithmus.
+\end{description}
+
+~UnaryOperation~ und ~BinaryOperation~ speichern als Optimierung ihren berechneten Wert und Hashcode.
+Weiterhin sind die Operanden der beiden Typen ~ITerm~ Instanzen und somit Referenztypen, was bedeutet, dass jede Operation nur einmal gespeichert wird und nicht in anderen Operationen, die sie verwenden, gedoppelt wird.
+
+In ~DigitFarm~, worin der Hauptalgorithmus implementiert wird, werden an vielen Stellen Hashsets verwendet, um schnelle Lookups zu erlauben.
+Spezifischer, da ~HashSet<T>~ nicht Thread-Safe ist, verwendet der Code ~ConcurrentDictionary<T, byte>~, wobei der ~byte~-Wert ignoriert wird.
+
+\section{Code}
+
+
+% Found solution (6 digits) [00:00:00.1096242]
+%   2020 = (4 - ((4 + 4) * (4 - (4 ^ 4))))
+% Found solution (8 digits) [00:00:01.0037739]
+%   2020 = (2 * ((22 * (2 + (2 * 22))) - 2))
+% Found solution (10 digits) [00:00:01.2285788]
+%   2020 = ((1 + 1) / (11 / (11111 - 1)))
+% Found solution (8 digits) [00:00:02.0896543]
+%   2020 = ((5 ^ 5) + ((55 * (5 - (5 * 5))) - 5))
+% Found solution (9 digits) [00:00:12.7895448]
+%   2020 = ((3 + (3 / 3)) + ((3 + 3) * (333 + 3)))
+% Found solution (9 digits) [00:00:14.0407441]
+%   2020 = ((8 / (8 + 8)) * (8 + (8 * ((8 * (8 * 8)) - 8))))
+% Found solution (9 digits) [00:01:09.0910769]
+%   2020 = (((9 + 9) / 9) * (999 + (99 / 9)))
+% Found solution (9 digits) [00:01:50.2958706]
+%   2020 = ((7 * ((7 * ((7 * 7) - 7)) - 7)) + (77 / 7))
+% Found solution (10 digits) [00:11:28.3823431]
+%   2020 = ((6 - (6 / 6)) * (6 + ((6 * 66) + ((6 + 6) / 6))))
+
+\section{Anhang}
+
+\subsection{Rechnung zu \ref{theorem:tn_of_phi}}
+
+\begin{align*}
+    t_{\measure{\frac{a}{b}}}
+    &< \frac{20^{\log_d(n)\cdot(d+4)+2}}{5\Big(\big(\log_d(n) \cdot (d+4)+2\big)+1\Big) \cdot \sqrt{\pi \cdot \log_d(n) \cdot (d+4) + 2}} \\
+    &= \frac{\left(20^{\log_d(n)}\right)^{d+4}\cdot20^2}{5\Big(\big(\log_d(n) \cdot (d+4)+2\big)+1\Big) \cdot \sqrt{\pi \cdot \log_d(n) \cdot (d + 4) + 2}} \\
+    &= 80\cdot\frac{\left(20^{\log_d(n)}\right)^{d+4}}{\big(\log_d(n) \cdot (d+4)+3\big) \cdot\sqrt{\pi \cdot \log_d(n)\cdot(d+4)+2}} \\
+    &\leq 80\cdot\frac{\left(20^{\log_d(n)}\right)^{d+4}}{\log_d(n) \cdot d \cdot \sqrt{\pi \cdot \log_d(n) \cdot d}} \\
+    &\leq 80\cdot\frac{\left(20^{\frac{\log_{20}(n)}{\log_{20}(d)}}\right)^{d+4}}{\log_d(n) \cdot d \cdot \sqrt{\log_d(n) \cdot d}} \\
+    &\leq 80\cdot\frac{\left(n^{\frac{1}{\log_{20}(d)}}\right)^{d+4}}{\big(\log_d(n) \cdot d\big)^{\frac{3}{2}}} \\
+    &\leq 80 \cdot n^{\frac{d+4}{\log_{20}(d)}} \cdot \big(\log_d(n) \cdot d\big)^{-\frac{3}{2}} \\
+    &\in \mathcal{O}\left(n^{\frac{d+4}{\log_{20}(d)}} \cdot \big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}\right) \\
+\end{align*}
 
 \end{document}
