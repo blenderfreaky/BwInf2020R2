@@ -4,13 +4,13 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
-    public static class StreetParser
+    internal static class StreetParser
     {
         public static bool TryParse(
             [DisallowNull] string[] text,
             [NotNullWhen(true)][MaybeNullWhen(false)] out Vector2Int start,
             [NotNullWhen(true)][MaybeNullWhen(false)] out Vector2Int end,
-            [NotNullWhen(true)][MaybeNullWhen(false)] out List<(Vector2Int Start, Vector2Int End)> streets)
+            [NotNullWhen(true)][MaybeNullWhen(false)] out List<Street> streets)
         {
             start = end = default;
             streets = default!;
@@ -18,7 +18,7 @@
             if (!TryParseVector2Int(text[1], out start)) return false;
             if (!TryParseVector2Int(text[2], out end)) return false;
 
-            streets = new List<(Vector2Int Start, Vector2Int End)>();
+            streets = new List<Street>();
 
             for (int i = 0; i < count; i++)
             {
@@ -27,7 +27,7 @@
                 if (!TryParseVector2Int(vectors[0], out var streetStart)) return false;
                 if (!TryParseVector2Int(vectors[1], out var streetEnd)) return false;
 
-                streets.Add((streetStart, streetEnd));
+                streets.Add(new Street(streetStart, streetEnd));
             }
 
             return true;

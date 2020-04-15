@@ -4,5 +4,6 @@
     {
         BigRational Value { get; }
         string ToString();
+        string ToLaTeX();
     }
 }

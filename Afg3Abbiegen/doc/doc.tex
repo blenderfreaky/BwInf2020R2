@@ -9,6 +9,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{ntheorem}
+\usepackage{xcolor}
 
 \usepackage{lmodern}
 %\usepackage{csquotes}
@@ -71,29 +72,50 @@
     
 \section{Lösungsidee}
 
-Die Lösungsidee dreht sich darum, den Dijkstra Algorithmus so umzubauen, dass er nach dem Weg mit dem wenigsten Abbiegen statt geringster Länge sucht.
+Die Lösungsidee besteht darin, den Dijkstra Algorithmus derart umzugestalten, dass er den Weg mit der geringsten Zahl an Abbiegungen statt der geringsten Länge sucht.
+Hierfür müssen die Eingabedaten zuerst in einen für Dijkstra geeigneten Graphen konvertiert werden, es müssen also die vorhandenen Kreuzungen ermittelt werden. Zu diesem Zweck
+kann der {\em Sweep-Line} bzw. {\em Bentley–Ottmann} Algorithmus verwendet werden, die jeweils eine durchschnittliche Komplexität von $n \log n$ aufweisen. Mehr dazu später.
 
-Hierfür müssen die Eingabedaten zuerst in einen für Dijkstra geeigneten Graphen konvertiert werden, also müssen die Kreuzungen ermittelt werden.
-Hierfür kann der Sweep-Line bzw. Bentley–Ottmann Algorithmus verwendet werden, mit einer durchschnittlichen Komplexität von \(n \log n\). Mehr dazu später.
-Sind die Kreuzungen gefunden, kann der Dijkstra-Algorithmus verwendet werden.
-Zuerst wird der kürzeste Weg berechnet, woraufhin dessen Länge und die Anzahl an Abbiegungen darin ermittelt.
+Sind die Kreuzungen erst einmal gefunden, kann der Dijkstra-Algorithmus verwendet werden.
+Zuerst wird der kürzeste Weg berechnet, woraufhin dessen Länge und die Anzahl der darinenthaltenen Abbiegungen bestimmt wird. Daraufhin beginnt die Ermittlung des endgültigem Wegs.
 
-Daraufhin beginnt die Ermittlung des endgültigem Wegs.
-Grundlegend verläuft diese Ermittlung wie der normale Dijkstra Algorithmus, mit ein paar kleinen Unterschieden.
-Der erste Unterschied ist, dass der Algorithmus alle Wege mit einer Länge größer der Länge des kürzesten Wegs plus die erlaubte Extrastrecke (also +15\% oder +30\%) eliminiert werden.
+Grundlegend verläuft dieser Prozess wie der normale Dijkstra Algorithmus, jedoch mit ein paar kleinen Unterschieden:
+Der erste Unterschied besteht darin, dass der Algorithmus alle Wege mit einer Länge größer der Länge des kürzesten Wegs plus die erlaubte Extrastrecke (also +15\% oder +30\%) eliminiert.
 Der zweite Unterschied ist, dass alle Wege mit genau so vielen oder mehr Abbiegungen als der kürzeste Weg ebenfalls eliminiert werden.
 Der dritte und wichtigste Unterschied ist, dass Dijkstra hierbei nicht nach Länge, sondern nach Anzahl an Abbiegungen optimiert.
 
 \subsection{Modifizierter Dijkstra im Detail}
 
-Um Dijkstra für eine Minimierung von Abbiegungen umzubauen, könnten die Kosten von Kanten des Graphs, anstatt Länge, Existenz von Abbiegungen beschreiben, mit entweder einer 1 für eine Abbiegung oder 0 für eine Gerade. 
-Dabei fällt auf, dass um die Kosten einer Kante des Graphs zu berechnen, die im Weg vorherkommende Kante betrachtet werden muss.
-Das bedeutet, dass Dijkstra hier nicht in der Form verwendet werden kann, da Dijkstra manchmal Knoten des Graphs von einem anderen Weg aus erneut besucht, wobei sich die Kosten der Kanten aus dem Knoten heraus verändern würden.
+Um Dijkstra im Hinblick auf die minimale Anzahl an Abbiegungen umzudefinieren, könnte die zugrunde liegende Kostenfunktion anstelle der Länge des Graphen die Existenz von Abbiegungen betrachten, entweder mit einer '1' für eine Abbiegung oder einer '0' für eine Gerade. 
+Dabei fällt auf, dass zur Berechnung der Kosten für eine Kante auch die im Weg vorangehende Kante betrachtet werden muss.
+Dies bedeutet aber, dass Dijkstra nicht in seiner ursprünglichen Form verwendet werden kann. Es könnte ansonsten der Fall auftreten, dass Knoten des Graphen von einem anderen Weg aus erneut besucht würden, was die Kosten der Kanten, die mit dem Knoten verbunden sind, verändern würde.
+
+%\textcolor{red}{Ich verstehe hier nicht genau, was Du mit 'aus dem Knoten heraus' sagen willst. Vielleicht findet sich hier noch eine bessere Formulierung?}
 %TODO: Naiven Graphen plotten
 
-Um dieses Problem zu umgehen wird der Graph verändert.
-Kreuzungen werden im Graphen immernoch als Knoten dargestellt, jedoch gibt es für jede Kreuzung mehrere Knoten, einen für jede geradlinige Straße die in der Kreuzung vorhanden ist.
+\begin {center}
+\begin {tikzpicture}[-latex, auto, node distance =4 cm and 5cm, on grid,semithick,
+state/.style={ circle, draw, minimum width =1 cm}]
+\node[state] (A1)                 {};
+\node[state] (2) [right = of    A1] {};
+\node[state] (A3) [right = of 2] {};
+
+\node[state] (B1) [below = of A1] {};
+\node[state] (B3) [right = of 2] {};
+
+\path (A1) edge node[below =0.15 cm] {$0$} (2);
+\path (2) edge node[below =0.15 cm] {$0$} (A3);
+
+\path (B1) edge node[below =0.15 cm] {$0$} (2);
+\path (2) edge node[below =0.15 cm] {$0$} (B3);
+\end{tikzpicture}
+\end{center}
+
+Um dieses Problem zu umgehen, wird der Graph verändert: Zwar werden
+Kreuzungen innerhalb des Graphen immer noch als Knoten dargestellt. Jedoch gibt es für jede Kreuzung mehrere Knoten, nämlich jeweils einen für jede geradlinige Straße, die in der Kreuzung vorhanden ist.
 Alle Knoten einer Kreuzung sind dabei verbunden durch Kanten mit Kosten von 1.
+
+\textcolor{red}{Das verstehe ich leider auch nicht genau, wo sind denn die mehreren Knoten für eine Kreuzung in dem Bild?}
 
 %TODO: Remove arrows
 \begin {center}

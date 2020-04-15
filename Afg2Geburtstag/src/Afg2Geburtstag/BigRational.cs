@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Numerics;
 
     [DebuggerDisplay("{Numerator}/{Denominator}")]
@@ -77,7 +78,34 @@
             return new BigRational(BigIntegerFactorial.Factorial((long)rational.Numerator));
         }
 
+        public static BigRational ToFraction(double value)
+        {
+            if (value % 1 == 0) // Return whole numbers directly
+            {
+                return new BigRational((long)value);
+            }
+            else
+            {
+                var asString = value.ToString("R", CultureInfo.InvariantCulture);
+                var components = asString.Split('.');
+
+                if (components.Length != 2) throw new InvalidOperationException("Invalid state");
+
+                var (integerComponent, fractionalComponent) = (components[0], components[1]);
+
+                var numerator = BigInteger.Parse(integerComponent + fractionalComponent);
+                var denominator = fractionalComponent.Length;
+
+                return new BigRational(numerator, denominator);
+            }
+        }
+
+        public static BigRational Parse(string text) => ToFraction(double.Parse(text));
+
         public override string ToString() => Numerator.ToString() + (IsInteger ? string.Empty : "/" + Denominator.ToString());
+        public string ToLaTeX() => IsInteger
+            ? Numerator.ToString()
+            : $"\\frac{{{Numerator}}}{{{Denominator}}}";
 
         public bool Equals(BigRational other) => other.Numerator == Numerator && other.Denominator == Denominator;
 

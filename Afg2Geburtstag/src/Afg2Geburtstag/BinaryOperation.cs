@@ -39,6 +39,7 @@
         }
 
         public override string ToString() => Operator.OperationToString(Lhs, Rhs);
+        public string ToLaTeX() => Operator.OperationToLaTeX(Lhs, Rhs);
 
         public override bool Equals(object? obj) => obj is BinaryOperation operation
             && HashCode == operation.HashCode

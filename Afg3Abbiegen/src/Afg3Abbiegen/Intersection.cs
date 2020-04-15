@@ -1,23 +1,15 @@
-﻿namespace Afg3Abbiegen
+﻿using System.Collections.Generic;
+
+namespace Afg3Abbiegen
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-
-    public struct Intersection
+    public static class DictionaryExtensions
     {
-        public Street Street;
-        public Vector2Int Position;
-
-        public Intersection(Street street, Vector2Int position)
+        public static TValue GetOrCreateValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)
+            where TValue : new()
         {
-            Street = street;
-            Position = position;
-        }
+            if (dict.TryGetValue(key, out var result)) return result;
 
-        public override bool Equals(object? obj) => obj is Intersection other && EqualityComparer<Street>.Default.Equals(Street, other.Street) && Position.Equals(other.Position);
-        public override int GetHashCode() => HashCode.Combine(Street, Position);
-}
+            return dict[key] = new TValue();
+        }
+    }
 }

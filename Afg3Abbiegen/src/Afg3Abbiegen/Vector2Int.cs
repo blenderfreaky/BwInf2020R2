@@ -31,19 +31,58 @@
             Y = y;
         }
 
+        /// <summary>
+        /// Returns a <see cref="Vector2Int"/> uniquely describing the direction of the vector that is invariant to scale.
+        /// </summary>
+        public Vector2Int Direction
+        {
+            get
+            {
+                static int gcd(int a, int b)
+                {
+                    while (a != 0 && b != 0)
+                    {
+                        if (a > b) a %= b;
+                        else b %= a;
+                    }
+
+                    return a == 0 ? b : a;
+                }
+
+                var xyGcd = gcd(Math.Abs(X), Math.Abs(Y));
+
+                return new Vector2Int(X / xyGcd, Y / xyGcd);
+            }
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Vector2Int"/> uniquely describing the direction of the vector that is invariant to scale and flipping (scaling by -1).
+        /// </summary>
+        public Vector2Int Bidirection => Direction * Math.Sign(X);
+
         /// <inheritdoc/>
         public readonly bool Equals(Vector2Int vector) => X == vector.X && Y == vector.Y;
 
         /// <inheritdoc/>
         public override readonly bool Equals(object obj) => obj is Vector2Int vector && Equals(vector);
 
-        /// <inheritdoc/>
-        public override readonly int GetHashCode()
+        public int GetHashCode(Vec3 obj)
         {
-            var hashCode = 1861411795;
-            hashCode = (hashCode * -1521134295) + X.GetHashCode();
-            hashCode = (hashCode * -1521134295) + Y.GetHashCode();
-            return hashCode;
+            return ((IntegerHash(obj.x)
+                    ^ (IntegerHash(obj.y) << 1)) >> 1)
+                    ^ (IntegerHash(obj.z) << 1);
+        }
+
+        static int IntegerHash(int a)
+        {
+            // fmix32 from murmurhash
+            uint h = (uint)a;
+            h ^= h >> 16;
+            h *= 0x85ebca6bU;
+            h ^= h >> 13;
+            h *= 0xc2b2ae35U;
+            h ^= h >> 16;
+            return (int)h;
         }
 
         /// <inheritdoc/>
@@ -61,10 +100,25 @@
             => new Vector2Int(lhs.X - rhs.X, lhs.Y - rhs.Y);
 
         /// <inheritdoc/>
+        public static Vector2Int operator *(Vector2Int lhs, int rhs)
+            => new Vector2Int(lhs.X * rhs, lhs.Y * rhs);
+
+        /// <inheritdoc/>
         public static Vector2Int operator -(Vector2Int vec)
             => new Vector2Int(-vec.X, -vec.Y);
 
+        public bool IsParallel(Vector2Int other, double epsilon = 1E-5)
+        {
+            if (X == 0) return other.X == 0;
+            if (other.X == 0) return X == 0;
+
+            var dir = Y / X;
+            var otherDir = other.Y / other.X;
+
+            return Math.Abs(dir - otherDir) < epsilon;
+        }
+
         /// <inheritdoc/>
-        public override readonly string ToString() => $"X:{X}, Y:{Y}";
+        public override readonly string ToString() => $"({X}, {Y})";
     }
 }

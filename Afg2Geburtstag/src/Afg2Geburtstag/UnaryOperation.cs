@@ -36,6 +36,7 @@
         }
 
         public override string ToString() => Operator.OperationToString(Operand);
+        public string ToLaTeX() => Operator.OperationToLaTeX(Operand);
 
         public override bool Equals(object? obj) => obj is UnaryOperation operation
             && HashCode == operation.HashCode
