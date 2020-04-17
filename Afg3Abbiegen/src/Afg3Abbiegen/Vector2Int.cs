@@ -34,7 +34,7 @@
         /// <summary>
         /// Returns a <see cref="Vector2Int"/> uniquely describing the direction of the vector that is invariant to scale.
         /// </summary>
-        public Vector2Int Direction
+        public readonly Vector2Int Direction
         {
             get
             {
@@ -58,7 +58,9 @@
         /// <summary>
         /// Returns a <see cref="Vector2Int"/> uniquely describing the direction of the vector that is invariant to scale and flipping (scaling by -1).
         /// </summary>
-        public Vector2Int Bidirection => Direction * Math.Sign(X);
+        public readonly Vector2Int Bidirection => X != 0 ? Direction * Math.Sign(X) : new Vector2Int(0, 1);
+
+        public readonly float Length => MathF.Sqrt((X * X) + (Y * Y));
 
         /// <inheritdoc/>
         public readonly bool Equals(Vector2Int vector) => X == vector.X && Y == vector.Y;
@@ -66,24 +68,8 @@
         /// <inheritdoc/>
         public override readonly bool Equals(object obj) => obj is Vector2Int vector && Equals(vector);
 
-        public int GetHashCode(Vec3 obj)
-        {
-            return ((IntegerHash(obj.x)
-                    ^ (IntegerHash(obj.y) << 1)) >> 1)
-                    ^ (IntegerHash(obj.z) << 1);
-        }
-
-        static int IntegerHash(int a)
-        {
-            // fmix32 from murmurhash
-            uint h = (uint)a;
-            h ^= h >> 16;
-            h *= 0x85ebca6bU;
-            h ^= h >> 13;
-            h *= 0xc2b2ae35U;
-            h ^= h >> 16;
-            return (int)h;
-        }
+        /// <inheritdoc/>
+        public override int GetHashCode() => HashCode.Combine(X, Y);
 
         /// <inheritdoc/>
         public static bool operator ==(Vector2Int left, Vector2Int right) => left.Equals(right);

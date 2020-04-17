@@ -141,18 +141,18 @@ literate=%
   }}
 {}
 
-\newcommand{\sidenote}[1]{&&\left|\ \text{#1}\right.}
+\newcommand{\sidenote}[1]{&&|\ \text{#1}.}
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 
 \delimitershortfall=-1pt
 
-\let\svlp(
-\catcode`(=\active %
-\def(#1){\left\svlp#1\right)}
-\catcode`(=12 %
-\newcommand\pactive{\catcode`(=\active }
-\everymath{\pactive}
-\everydisplay{\pactive}
+% \let\svlp(
+% \catcode`(=\active %
+% \def(#1){\svlp#1)}
+% \catcode`(=12 %
+% \newcommand\pactive{\catcode`(=\active }
+% \everymath{\pactive}
+% \everydisplay{\pactive}
 
 \usepackage{hyperref}
 \usepackage{cleveref}
@@ -163,7 +163,7 @@ literate=%
 
 \section{Lösungsidee}
 
-Die Kernidee des Algorithmus besteht darin, alle jene Terme zu ermitteln, die mit \(n\) Ziffern optimal ihren Wert darstellen.
+Die Kernidee des Algorithmus besteht darin, alle Terme zu ermitteln, die durch \(n\)-fache Verwendung der gegebenen Ziffer und deren Verknüpfung mit sich selbst (wie in der Aufgabenstellung beschrieben) optimal ihren Wert darstellen.
 Dies wird induktiv gelöst, wobei für die Errechnung der optimalen Terme mit Größe \(n\) alle kleineren Terme vorausgesetzt werden.
 Zuerst werden alle infrage kommenden Terme mit Größe \(n\) gebildet. Hierzu werden alle Terme der Größe \(i\) mit allen Termen der Größe \(n-i\) unter Verwendung aller binärer Operationen gekreuzt.
 Daraufhin werden alle Terme entfernt, deren Wert schon mit kleineren oder gleich großen Termen dargestellt wurde.
@@ -175,13 +175,13 @@ Die Laufzeit entspricht hierbei einfach der längsten Laufzeit der individuellen
 Auf ersten Blick scheint dieser Algorithmus eine stark explosive Komplexität zu besitzen, tatsächlich ist dem aber gar nicht so.
 Im folgenden wird die Komplexität dieses Verfahrens genauer betrachtet.
 
-\newcommand{\fad}{\forall d, b:\ }
-%\newcommand{\measure}[1]{\varphi_{d,b}\left(#1\right)}
-\newcommand{\measure}[1]{\Phi_{d}^{B}\left(#1\right)}
+\newcommand{\fad}{\forall d, B:\ }
+%\newcommand{\measure}[1]{\varphi_{d,b}(#1)}
+\newcommand{\measure}[1]{\Phi_{d}^{B}(#1)}
 
 \subsection{Größenmaß-Funktion}
 
-Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : \mathbb{Q} \to \mathbb{N}\) betrachtet, die die Anzahl an Instanzen der Ziffer \(d\) errechnet, die für die optimale Repräsentation beliebiger rationaler Zahlen benötigt wird, wobei Konkatenierung (also z.B. \(11\) aus zwei mal der Ziffer \(1\) generieren) in Basis \(B\) stattfindet. Beispielsweise ist \(\fad\measure{d} = 1\).
+Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : \mathbb{Q} \to \mathbb{N}\) betrachtet, die die Anzahl an Instanzen der Ziffer \(d\) errechnet, die für die optimale Repräsentation beliebiger rationaler Zahlen benötigt wird, wobei Konkatenierung bezüglich der Basis \(B\) stattfindet (also z.B. \(11\) aus zwei mal der Ziffer \(1\) generieren zur Basis \(B=10\)). Für die Größenmaß-Funktion gilt Beispielsweise \(\fad\measure{d} = 1\).
 
 %\textcolor{red}{\em Anstelle von 'Verwendungen der Ziffer' vielleicht 'Instanzen der Ziffer'? Für was steht denn das 'b' in der Funktion? Könntest Du das 'b' in der Definition der Funktion auch weglassen? Würde die Sache übersichtlicher machen ... Bis zu dieser Stelle wird es mir jedenfalls nicht klar, was 'b' überhaupt ist. Geht das aus der Aufgabenstellung hervor? Aber selbst wenn dem so ist, dann solltest Du das 'b' in dem Text oben drüber nochmal irgendwie erwähnen, ansonsten fällt das hier vom Himmel.}
 
@@ -222,11 +222,11 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
 \end{proof}
 
 \begin{lemma}[Größenmaß für binäre Operationen]\label{lemma:phi_binary}
-    Für jede binäre Operation \(\circ : \mathbb{Q} \times \mathbb{Q} \to \mathbb{Q}\) gilt für alle \(a\in\mathbb{Q},\ b\in\mathbb{Q}\):
+    Für jeden binären Operator \(\circ : \mathbb{Q} \times \mathbb{Q} \to \mathbb{Q}\) gilt für alle \(a\in\mathbb{Q},\ b\in\mathbb{Q}\):
 
     \[\measure{a \circ b} \leq \measure{a} + \measure{b}\]
 
-    Es werden quasi alle binären Operatoren in Addition umgewandelt.
+    Die Anwendung der Größenmaß-Funktion auf binäre Operationen lässt sich also immer durch Addition der Größenmaße der Operanden abschätzen.
 \end{lemma}
 \begin{proof}
     Die natürlichen Zahlen \(a\) und \(b\) lassen sich mit \(\measure{a}\) bzw. \(\measure{b}\) Ziffern ausdrücken, also lässt sich \(a \circ b\) durch Anwendung der Operation \(\circ\) auf die Terme für \(a\) und \(b\) mit \(\measure{a} + \measure{b}\) oder weniger Ziffern ausdrücken.
@@ -287,14 +287,13 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
      
     %\textcolor{red}{Auch hier würde ich Gleichung (2) nicht nochmal hinschreiben. Vielleicht machst Du das hier so (Deine alte Version ist auskommentiert):} 
     
-%    Betrachtet man nun \ref{eqn:semi_accurate_bound}:
+   Betrachtet man nun \ref{eqn:semi_accurate_bound}:
 
-%    \[\measure{n} \leq (k-1) \cdot \measure{d} + \sum_{i=1}^k \measure{a_i}\]
+   \[\measure{n} \leq (k-1) \cdot \measure{d} + \sum_{i=1}^k \measure{a_i}\]
 
- %   Um diese Umgehung des Problems zu integrieren, muss nur \(\measure{d}\) mit \(\measure{d + d} = 2\cdot\measure{d}\) ersetzt werden:
+   Um diese Umgehung des Problems einzubauen, muss nur \(\measure{d}\) mit \(\measure{d + d} = 2\cdot\measure{d}\) ersetzt werden:
 
-Ausgehend von Gleichung \ref{eqn:semi_accurate_bound}, kann für eine alternative Herleitung \(\measure{d}\) einfach durch 
-\(\measure{d + d} = 2\cdot\measure{d}\) ersetzt werden. Es ergibt sich
+%Ausgehend von Gleichung \ref{eqn:semi_accurate_bound}, kann für eine alternative Herleitung \(\measure{d}\) einfach durch \(\measure{d + d} = 2\cdot\measure{d}\) ersetzt werden. Es ergibt sich
 
     \[\measure{n} \leq (k-1) \cdot 2 \cdot \measure{d} + \sum_{i=1}^k \measure{a_i}\]
 
@@ -387,7 +386,7 @@ Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(
 
         \[t_n \leq C_n \cdot 5^{n-1}\]
 
-    Für die Catalan Zahlen gilt folgende obere Abschätzung\footnote{Siehe Seite 212: https://www.sciencedirect.com/science/article/pii/S0195669886800245}:
+    Für die Catalan Zahlen gilt folgende obere Abschätzung\footnote{Siehe Seite 212: \url{https://www.sciencedirect.com/science/article/pii/S0195669886800245}}:
 
         \[C_n < \frac{4^n}{(n+1)\sqrt{\pi n}}\]
 
@@ -402,13 +401,13 @@ Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(
 
 %    \begin{align*}
 %        t_{\measure{\frac{a}{b}}}
- %       &\in \mathcal{O}\left(n^{\frac{d+4}{\log_{20}(d)}} \cdot \underbrace{\big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}}_{\text{streng monoton fallend}}\right) \\
+ %       &\in \mathcal{O}(n^{\frac{d+4}{\log_{20}(d)}} \cdot \underbrace{\big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}}_{\text{streng monoton fallend}}) \\
 %        &= \mathcal{O}(n^{\alpha}),\qquad\text{mit }\alpha=\frac{d+4}{\log_{20}(d)}
  %   \end{align*}
     
     \begin{equation}
         t_{\measure{n}}
-        = \mathcal{O}\left(n^{\frac{d+4}{\log_{20}(d)}} \cdot \underbrace{\big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}}_{\text{streng monoton fallend}}\right) \\
+        = \mathcal{O}(n^{\frac{d+4}{\log_{20}(d)}} \cdot \underbrace{\big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}}_{\text{streng monoton fallend}}) \\
         = \mathcal{O}(n^{\alpha}),\qquad\text{mit }\alpha=\frac{d+4}{\log_{20}(d)}
     \end{equation}
 %\textcolor{red}{Schau Dir das mal so an (in einer Zeile), ich finde das besser ... Auch hier ist wieder $\in$ durch $=$ ersetzt.}
@@ -430,19 +429,22 @@ Da der eigentliche Algorithmus durch die Eliminierung von Duplikaten noch einmal
 
 Um den Algorithmus auf Exponenten und Fakultäten zu erweitern, kann zuerst Exponentiation als weiterer binärer Operator wie Addition und Multiplikation hinzugefügt werden, wobei die Komplexität analog zu vorher polynomial bleibt, nur mit einem größeren Exponenten.
 Für die Integration von Fakultäten ist dies jedoch nicht so leicht.
-Ersteinmal lässt sich Fakultät relativ leicht in den Algorithmus einklinken, wobei jeder neue optimale Term noch einmal mit einer Fakultät hinten zu der Liste aller optimalen Terme addiert wird.
+Zunächst lässt sich Fakultät relativ leicht in den Algorithmus einbauen, wobei jeder neue optimale Term noch einmal mit einer Fakultät hinten zu der Liste aller optimalen Terme addiert wird.
+
 Das Problem hierbei ist, dass Fakultät eine unäre Operation ist, weshalb sie unabhängig von der Anzahl an Instanzen der Ziffer beliebig oft verwendbar ist; beispielsweise ist \(((((d!)!)!)!)!\) in der Theorie erlaubt.
 Betrachtet man jedoch die Werte der Fakultäts-Funktion, so fällt auf, dass dort sehr schnell immens große Werte entstehen; beispielsweise ist \((5!)!=120!\), was eine Zahl mit 199 Ziffern ist.
-Dass diese Werte nur sehr selten brauchbar sind ist relativ offensichtlich.
-Deshalb habe ich zur Umgehung des Problems ganz einfach ein Limit eingefügt, was Fakultäten von Zahlen größer der arbiträr gewählten Grenze \(80\) verbietet.
-Somit wird \((4!)!\) gerade noch so erlaubt, jedoch \((5!)!\) verboten.
+Dass diese Werte nur sehr selten brauchbar sind, ist relativ offensichtlich.
+
+Zur Umgehung dieses Problems habe ich daher ein Limit eingefügt, das Fakultäten von Zahlen größer der arbiträr gewählten Grenze \(80\) verbietet.
+Somit ist \((4!)!\) gerade noch erlaubt, jedoch \((5!)!\) verboten.
 Dies lässt sich auch leicht implementieren, wobei jeder neue Term mit Wert \(x < 80\) den neuen Term \(x!\) rekursiv einfügt.
-Hierbei muss man jedoch noch darauf Achten, dass keine Endlosschleifen auftauchen: \(1 = 1! = \ldots = ((1!)!)!\)
+Dabei muss man jedoch noch darauf achten, dass keine Endlosschleifen auftauchen: \(1 = 1! = \ldots = ((1!)!)!\)
 
 Es lässt sich erkennen, dass hierbei höchstens zwei Fakultäten in Reihe auftreten können.
-Das bedeutet, dass für jeden neu gefundenen optimalen Term noch (höchstens) zwei weitere Terme addiert werden, was heißen mag, dass sich die Rechenzeit (höchstens) verdreifacht, und somit immernoch polynomial ist.
+Das bedeutet, dass für jeden neu gefundenen optimalen Term noch (höchstens) zwei weitere Terme addiert werden.
+Dies bedeutet, dass sich die Rechenzeit (höchstens) verdreifacht, und somit immernoch polynomial ist.
 
-Was an Exponenten und Fakultäten hierbei noch interessant ist, ist, dass die Ziffer \(0\) nun auch verwendet werden kann:
+Im Hinblick auf Exponenten und Fakultäten ist noch interessant, dass nun auch die Ziffer \(0\) verwendet werden kann:
 \(0^0 = 0! = 1\).
 Die Beispiele unten enthalten somit auch Lösungen mit der Ziffer \(0\).
 
@@ -464,7 +466,8 @@ Der Code ist in zwei Projekte geteilt;
 \end{description}
 
 ~UnaryOperation~ und ~BinaryOperation~ speichern als Optimierung ihren berechneten Wert und Hashcode.
-Weiterhin sind die Operanden der beiden Typen ~ITerm~ Instanzen und somit Referenztypen, was bedeutet, dass jede Operation nur einmal gespeichert wird und nicht in anderen Operationen, die sie verwenden, gedoppelt wird.
+Weiterhin sind die Operanden der beiden Typen ~ITerm~ Instanzen und somit Referenztypen.
+Dies bedeutet, dass jede Operation nur einmal gespeichert wird und nicht in anderen Operationen, die sie verwenden, gedoppelt wird.
 
 In ~DigitFarm~, worin der Hauptalgorithmus implementiert wird, werden an vielen Stellen Hashsets verwendet, um schnelle Lookups zu erlauben.
 Spezifischer, da ~HashSet<T>~ nicht Thread-Safe ist, verwendet der Code ~ConcurrentDictionary<T, byte>~, wobei der ~byte~-Wert ignoriert wird.
@@ -472,30 +475,30 @@ Spezifischer, da ~HashSet<T>~ nicht Thread-Safe ist, verwendet der Code ~Concurr
 \section{Beispiele}
 
 \paragraph*{~--targets 2020, 2030, 2080, 2980 --digits 0,1,2,3,4,5,6,7,8,9 --exponentiation --factorial --latex~}
-\begin{center}
-    \begin{longtable}{ | l | l | p{8cm} | l | l | }
-    \hline Digit & Value & Term & Digit Usages & Time \\\hline
-            4 & 2080 & \vspace{-0.6cm}\begin{dmath*} \left(\left(4 + 4\right) \cdot \left(4 + \left({4}^{4}\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 5 & 0.081s \\\hline
-            4 & 2020 & \vspace{-0.6cm}\begin{dmath*} \left(4 + \left(\left(\left({4}^{4}\right) - 4\right) \cdot \left(4 + 4\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 6 & 0.086s \\\hline
-            5 & 2980 & \vspace{-0.6cm}\begin{dmath*} \left(5 - \left(5 \cdot \left(5 - \left(5 \cdot \left((5 * (5 / 5))!\right)\right)\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 7 & 0.378s \\\hline
-            3 & 2080 & \vspace{-0.6cm}\begin{dmath*} \left(\left(((3 * 3) - 3)!\right) \cdot \left(3 - \left(\frac{3}{\left({3}^{3}\right)}\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 7 & 0.828s \\\hline
-            2 & 2020 & \vspace{-0.6cm}\begin{dmath*} \left(2 \cdot \left(2 - \left(\left((2 * 2)!\right) \cdot \left(2 - \left(2 \cdot 22\right)\right)\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 8 & 0.932s \\\hline
-            2 & 2980 & \vspace{-0.6cm}\begin{dmath*} \left(2 \cdot \left(2 + \left(2 \cdot \left(\left((2 * 2)!\right) + \left(((2 + 2) + 2)!\right)\right)\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 8 & 1.207s \\\hline
-            2 & 2080 & \vspace{-0.6cm}\begin{dmath*} \left(2 \cdot \left(\left(2 \cdot \left(22 - 2\right)\right) \cdot \left(2 + \left((2 * 2)!\right)\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 8 & 1.265s \\\hline
-            2 & 2030 & \vspace{-0.6cm}\begin{dmath*} \left(\left(2 + 2\right) - \left(22 - \left({2}^{(22 / 2)}\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 8 & 2.142s \\\hline
-            1 & 2020 & \vspace{-0.6cm}\begin{dmath*} \left(\left(1 + 1\right) \cdot \left(1111 \cdot \left(1 - \left(\frac{1}{11}\right)\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 10 & 3.046s \\\hline
-            5 & 2030 & \vspace{-0.6cm}\begin{dmath*} \left(5 - \left(\left(55 \cdot \left(\left(5 \cdot 5\right) - 5\right)\right) - \left({5}^{5}\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 8 & 3.955s \\\hline
-            8 & 2080 & \vspace{-0.6cm}\begin{dmath*} \left(\frac{\left(8 \cdot 8\right)}{\left(\frac{\left(8 + 8\right)}{\left(8 + \left(8 \cdot \left(8 \cdot 8\right)\right)\right)}\right)}\right) \end{dmath*}\vspace{-0.85cm} & 8 & 4.780s \\\hline
-            4 & 2030 & \vspace{-0.6cm}\begin{dmath*} \left(4 \cdot \left(\left(\frac{\left(\left({(4 + 4)}^{4}\right) - 4\right)}{\left(4 + 4\right)}\right) - 4\right)\right) \end{dmath*}\vspace{-0.85cm} & 8 & 5.457s \\\hline
-            4 & 2980 & \vspace{-0.6cm}\begin{dmath*} \left(4 \cdot \left(\left(((4 / 4) + 4)!\right) + \left({(4 + (4 / 4))}^{4}\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 8 & 5.613s \\\hline
-            1 & 2030 & \vspace{-0.6cm}\begin{dmath*} \left(\left({(1 + 1)}^{11}\right) + \left(\left(1 + 1\right) \cdot \left(1 - \left(11 - 1\right)\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 10 & 6.910s \\\hline
-            1 & 2080 & \vspace{-0.6cm}\begin{dmath*} \left(\left({(1 + 1)}^{11}\right) - \left(1 - \left(\left(1 + \left(1 + 1\right)\right) \cdot 11\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 10 & 6.913s \\\hline
-            0 & 2080 & \vspace{-0.6cm}\begin{dmath*} \left(\left(((((0!) + (0!)) + (0!))!)!\right) \cdot \left(\left(0!\right) - \left(\left({((0!) + ((0!) + (0!)))}^{(0 - ((0!) + (0!)))}\right) - \left(\left(0!\right) + \left(0!\right)\right)\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 23 & 8.147s \\\hline
-            5 & 2020 & \vspace{-0.6cm}\begin{dmath*} \left(\left({5}^{5}\right) - \left(5 + \left(55 \cdot \left(\left(5 \cdot 5\right) - 5\right)\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 8 & 16.900s \\\hline
-            0 & 2020 & \vspace{-0.6cm}\begin{dmath*} \left(\left(\left(0!\right) + \left(0!\right)\right) \cdot \left(\left(0!\right) + \left(\left(0!\right) - \left(\frac{\left((((((0!) + (0!)) + (0!))!) + (0!))!\right)}{\left(\left(0!\right) - \left((((0!) + (0!)) + (0!))!\right)\right)}\right)\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 24 & 18.946s \\\hline
-            0 & 2980 & \vspace{-0.6cm}\begin{dmath*} \left(\left(\left(0!\right) + \left(0!\right)\right) \cdot \left(\left(\left(0!\right) + \left(0!\right)\right) \cdot \left(\left(0!\right) + \left(\left(((((0!) + (0!)) + (0!))!)!\right) + \left((((0!) + (0!)) + ((0!) + (0!)))!\right)\right)\right)\right)\right) \end{dmath*}\vspace{-0.85cm} & 24 & 19.013s \\\hline
-    \end{longtable}
-\end{center}
+% \begin{center}
+%     \begin{longtable}{ | l | l | p{8cm} | l | l | }
+%     \hline Digit & Value & Term & Digit Usages & Time \\\hline
+%             4 & 2080 & \vspace{-0.6cm}\begin{dmath*} ((4 + 4) \cdot (4 + ({4}^{4}))) \end{dmath*}\vspace{-0.85cm} & 5 & 0.081s \\\hline
+%             4 & 2020 & \vspace{-0.6cm}\begin{dmath*} (4 + ((({4}^{4}) - 4) \cdot (4 + 4))) \end{dmath*}\vspace{-0.85cm} & 6 & 0.086s \\\hline
+%             5 & 2980 & \vspace{-0.6cm}\begin{dmath*} (5 - (5 \cdot (5 - (5 \cdot ((5 * (5 / 5))!))))) \end{dmath*}\vspace{-0.85cm} & 7 & 0.378s \\\hline
+%             3 & 2080 & \vspace{-0.6cm}\begin{dmath*} ((((3 * 3) - 3)!) \cdot (3 - (\frac{3}{({3}^{3})}))) \end{dmath*}\vspace{-0.85cm} & 7 & 0.828s \\\hline
+%             2 & 2020 & \vspace{-0.6cm}\begin{dmath*} (2 \cdot (2 - (((2 * 2)!) \cdot (2 - (2 \cdot 22))))) \end{dmath*}\vspace{-0.85cm} & 8 & 0.932s \\\hline
+%             2 & 2980 & \vspace{-0.6cm}\begin{dmath*} (2 \cdot (2 + (2 \cdot (((2 * 2)!) + (((2 + 2) + 2)!))))) \end{dmath*}\vspace{-0.85cm} & 8 & 1.207s \\\hline
+%             2 & 2080 & \vspace{-0.6cm}\begin{dmath*} (2 \cdot ((2 \cdot (22 - 2)) \cdot (2 + ((2 * 2)!)))) \end{dmath*}\vspace{-0.85cm} & 8 & 1.265s \\\hline
+%             2 & 2030 & \vspace{-0.6cm}\begin{dmath*} ((2 + 2) - (22 - ({2}^{(22 / 2)}))) \end{dmath*}\vspace{-0.85cm} & 8 & 2.142s \\\hline
+%             1 & 2020 & \vspace{-0.6cm}\begin{dmath*} ((1 + 1) \cdot (1111 \cdot (1 - (\frac{1}{11})))) \end{dmath*}\vspace{-0.85cm} & 10 & 3.046s \\\hline
+%             5 & 2030 & \vspace{-0.6cm}\begin{dmath*} (5 - ((55 \cdot ((5 \cdot 5) - 5)) - ({5}^{5}))) \end{dmath*}\vspace{-0.85cm} & 8 & 3.955s \\\hline
+%             8 & 2080 & \vspace{-0.6cm}\begin{dmath*} (\frac{(8 \cdot 8)}{(\frac{(8 + 8)}{(8 + (8 \cdot (8 \cdot 8)))})}) \end{dmath*}\vspace{-0.85cm} & 8 & 4.780s \\\hline
+%             4 & 2030 & \vspace{-0.6cm}\begin{dmath*} (4 \cdot ((\frac{(({(4 + 4)}^{4}) - 4)}{(4 + 4)}) - 4)) \end{dmath*}\vspace{-0.85cm} & 8 & 5.457s \\\hline
+%             4 & 2980 & \vspace{-0.6cm}\begin{dmath*} (4 \cdot ((((4 / 4) + 4)!) + ({(4 + (4 / 4))}^{4}))) \end{dmath*}\vspace{-0.85cm} & 8 & 5.613s \\\hline
+%             1 & 2030 & \vspace{-0.6cm}\begin{dmath*} (({(1 + 1)}^{11}) + ((1 + 1) \cdot (1 - (11 - 1)))) \end{dmath*}\vspace{-0.85cm} & 10 & 6.910s \\\hline
+%             1 & 2080 & \vspace{-0.6cm}\begin{dmath*} (({(1 + 1)}^{11}) - (1 - ((1 + (1 + 1)) \cdot 11))) \end{dmath*}\vspace{-0.85cm} & 10 & 6.913s \\\hline
+%             0 & 2080 & \vspace{-0.6cm}\begin{dmath*} ((((((0!) + (0!)) + (0!))!)!) \cdot ((0!) - (({((0!) + ((0!) + (0!)))}^{(0 - ((0!) + (0!)))}) - ((0!) + (0!))))) \end{dmath*}\vspace{-0.85cm} & 23 & 8.147s \\\hline
+%             5 & 2020 & \vspace{-0.6cm}\begin{dmath*} (({5}^{5}) - (5 + (55 \cdot ((5 \cdot 5) - 5)))) \end{dmath*}\vspace{-0.85cm} & 8 & 16.900s \\\hline
+%             0 & 2020 & \vspace{-0.6cm}\begin{dmath*} (((0!) + (0!)) \cdot ((0!) + ((0!) - (\frac{((((((0!) + (0!)) + (0!))!) + (0!))!)}{((0!) - ((((0!) + (0!)) + (0!))!))})))) \end{dmath*}\vspace{-0.85cm} & 24 & 18.946s \\\hline
+%             0 & 2980 & \vspace{-0.6cm}\begin{dmath*} (((0!) + (0!)) \cdot (((0!) + (0!)) \cdot ((0!) + ((((((0!) + (0!)) + (0!))!)!) + ((((0!) + (0!)) + ((0!) + (0!)))!))))) \end{dmath*}\vspace{-0.85cm} & 24 & 19.013s \\\hline
+%     \end{longtable}
+% \end{center}
 
 \section{Code}
 
@@ -518,13 +521,13 @@ Unter Verwendung der Abschätzung \(\measure{n} \leq \log_d(n) \cdot (d+4) + 2\)
 \begin{align*}
     t_{\measure{\frac{a}{b}}}
     &< \frac{20^{\log_d(n)\cdot(d+4)+2}}{5\Big(\big(\log_d(n) \cdot (d+4)+2\big)+1\Big) \cdot \sqrt{\pi \cdot \log_d(n) \cdot (d+4) + 2}} \\
-    &= \frac{\left(20^{\log_d(n)}\right)^{d+4}\cdot20^2}{5\Big(\big(\log_d(n) \cdot (d+4)+2\big)+1\Big) \cdot \sqrt{\pi \cdot \log_d(n) \cdot (d + 4) + 2}} \\
-    &= 80\cdot\frac{\left(20^{\log_d(n)}\right)^{d+4}}{\big(\log_d(n) \cdot (d+4)+3\big) \cdot\sqrt{\pi \cdot \log_d(n)\cdot(d+4)+2}} \\
-    &\leq 80\cdot\frac{\left(20^{\log_d(n)}\right)^{d+4}}{\log_d(n) \cdot d \cdot \sqrt{\pi \cdot \log_d(n) \cdot d}} \\
-    &\leq 80\cdot\frac{\left(20^{\frac{\log_{20}(n)}{\log_{20}(d)}}\right)^{d+4}}{\log_d(n) \cdot d \cdot \sqrt{\log_d(n) \cdot d}} \\
-    &\leq 80\cdot\frac{\left(n^{\frac{1}{\log_{20}(d)}}\right)^{d+4}}{\big(\log_d(n) \cdot d\big)^{\frac{3}{2}}} \\
+    &= \frac{(20^{\log_d(n)})^{d+4}\cdot20^2}{5\Big(\big(\log_d(n) \cdot (d+4)+2\big)+1\Big) \cdot \sqrt{\pi \cdot \log_d(n) \cdot (d + 4) + 2}} \\
+    &= 80\cdot\frac{(20^{\log_d(n)})^{d+4}}{\big(\log_d(n) \cdot (d+4)+3\big) \cdot\sqrt{\pi \cdot \log_d(n)\cdot(d+4)+2}} \\
+    &\leq 80\cdot\frac{(20^{\log_d(n)})^{d+4}}{\log_d(n) \cdot d \cdot \sqrt{\pi \cdot \log_d(n) \cdot d}} \\
+    &\leq 80\cdot\frac{(20^{\frac{\log_{20}(n)}{\log_{20}(d)}})^{d+4}}{\log_d(n) \cdot d \cdot \sqrt{\log_d(n) \cdot d}} \\
+    &\leq 80\cdot\frac{(n^{\frac{1}{\log_{20}(d)}})^{d+4}}{\big(\log_d(n) \cdot d\big)^{\frac{3}{2}}} \\
     &\leq 80 \cdot n^{\frac{d+4}{\log_{20}(d)}} \cdot \big(\log_d(n) \cdot d\big)^{-\frac{3}{2}} \\
-    &\in \mathcal{O}\left(n^{\frac{d+4}{\log_{20}(d)}} \cdot \big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}\right) \\
+    &\in \mathcal{O}(n^{\frac{d+4}{\log_{20}(d)}} \cdot \big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}) \\
 \end{align*}
 
 \end{document}

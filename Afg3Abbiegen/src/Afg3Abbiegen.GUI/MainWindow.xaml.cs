@@ -27,7 +27,7 @@ namespace Afg3Abbiegen.GUI
         {
             InitializeComponent();
 
-            Map = Map.FromText(File.ReadAllLines("../../../../../examples/abbiegen2.txt"));
+            Map = Map.FromText(File.ReadAllLines("../../../../../examples/abbiegen1.txt"));
         }
 
         private void MapCanvas_Loaded(object sender, RoutedEventArgs e)
@@ -40,22 +40,70 @@ namespace Afg3Abbiegen.GUI
             var maxY = Map.Streets.Max(x => Math.Max(x.Start.Y, x.End.Y));
             var width = maxX - minX;
             var height = maxY - minY;
-            var scale = Math.Min(MapCanvas.ActualWidth / width, MapCanvas.ActualHeight / height);
-            var rand = new Random();
-            foreach (var street in Map.Streets)
+            var scale = 50;
+
+            //var rand = new Random();
+            //var col = new SolidColorBrush(Color.FromArgb(255, (byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255)));
+
+            void drawLine(Brush stroke, float strokeThickness, Vector2Int start, Vector2Int end)
             {
                 MapCanvas.Children.Add(new Line
                 {
-                    X1 = (street.Start.X - minX) * scale,
-                    Y1 = (street.Start.Y - minY) * scale,
-                    X2 = (street.End.X - minX) * scale,
-                    Y2 = (street.End.Y - minY) * scale,
+                    X1 = (start.X - minX) * scale,
+                    Y1 = (start.Y - minY) * scale,
+                    X2 = (end.X - minX) * scale,
+                    Y2 = (end.Y - minY) * scale,
 
-                    StrokeThickness = 2,
-                    Stroke = new SolidColorBrush(Color.FromArgb(255, (byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255))),
+                    Stroke = stroke,
+                    StrokeThickness = strokeThickness,
                     VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Center,
                 });
+            }
+
+            void drawDot(Brush stroke, float strokeThickness, Vector2Int position)
+            {
+                MapCanvas.Children.Add(new Ellipse
+                {
+                    Margin = new Thickness(((position.X - minX) * scale) - (strokeThickness / 2), ((position.Y - minX) * scale) - (strokeThickness / 2), 0, 0),
+                    Width = strokeThickness,
+                    Height = strokeThickness,
+
+                    Fill = stroke,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                });
+            }
+
+            drawDot(Brushes.DarkRed, 8, Map.Start);
+            drawDot(Brushes.DarkOrange, 8, Map.End);
+
+            foreach (var street in Map.Streets)
+            {
+                drawLine(Brushes.Black, 1, street.Start, street.End);
+            }
+
+            var bilalsPath = Map.BilalsPath(1f, out var shortestPath, out var shortestPathLength, out var fullTurns, out var fullDistance);
+
+            var shortestPathList = shortestPath.ToList();
+            for (int i = 0; i < shortestPathList.Count - 1; i++)
+            {
+                drawLine(Brushes.Red, 2, shortestPathList[i], shortestPathList[i + 1]);
+            }
+
+            var bilalsPathList = bilalsPath.ToList();
+            for (int i = 0; i < bilalsPathList.Count - 1; i++)
+            {
+                drawLine(Brushes.Green, 3, bilalsPathList[i], bilalsPathList[i + 1]);
+            }
+
+            foreach (var dbg in Map.Debug)
+            {
+                drawDot(Brushes.Purple, dbg.Item2, dbg.Item1);
+            }
+            foreach (var dbg in Map.Debug2)
+            {
+                drawLine(Brushes.SpringGreen, dbg.Item3, dbg.Item1, dbg.Item2);
             }
         }
     }
