@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,13 +23,33 @@ namespace Afg3Abbiegen.GUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Map Map { get; }
+        public Map Map { get; private set; }
 
         public MainWindow()
         {
             InitializeComponent();
 
-            Map = Map.FromText(File.ReadAllLines("../../../../../examples/abbiegen1.txt"));
+            var args = Environment.GetCommandLineArgs();
+
+            var rootCommand = new RootCommand
+            {
+                new Option<FileInfo>(
+                    "--file",
+                    "The file containing the map."),
+                new Option<float>(
+                    "--weather",
+                    "The percentage that the resulting path may be longer than.")
+            };
+
+            rootCommand.Description = "My sample app";
+
+            rootCommand.Handler = CommandHandler.Create<FileInfo>(fileInfo =>
+            {
+                var fileContents = fileInfo.OpenText().ReadToEnd();
+                Map = Map.FromText(fileContents.Split(Environment.NewLine));
+            });
+
+            rootCommand.Invoke(args);
         }
 
         private void MapCanvas_Loaded(object sender, RoutedEventArgs e)
@@ -50,9 +72,9 @@ namespace Afg3Abbiegen.GUI
                 MapCanvas.Children.Add(new Line
                 {
                     X1 = (start.X - minX) * scale,
-                    Y1 = (start.Y - minY) * scale,
+                    Y1 = (maxY - start.Y) * scale,
                     X2 = (end.X - minX) * scale,
-                    Y2 = (end.Y - minY) * scale,
+                    Y2 = (maxY - end.Y) * scale,
 
                     Stroke = stroke,
                     StrokeThickness = strokeThickness,
@@ -65,7 +87,7 @@ namespace Afg3Abbiegen.GUI
             {
                 MapCanvas.Children.Add(new Ellipse
                 {
-                    Margin = new Thickness(((position.X - minX) * scale) - (strokeThickness / 2), ((position.Y - minX) * scale) - (strokeThickness / 2), 0, 0),
+                    Margin = new Thickness(((position.X - minX) * scale) - (strokeThickness / 2), ((maxY - position.Y) * scale) - (strokeThickness / 2), 0, 0),
                     Width = strokeThickness,
                     Height = strokeThickness,
 
@@ -83,7 +105,7 @@ namespace Afg3Abbiegen.GUI
                 drawLine(Brushes.Black, 1, street.Start, street.End);
             }
 
-            var bilalsPath = Map.BilalsPath(1f, out var shortestPath, out var shortestPathLength, out var fullTurns, out var fullDistance);
+            var bilalsPath = Map.BilalsPath(1.1f, out var shortestPath, out var shortestPathLength, out var fullTurns, out var fullDistance);
 
             var shortestPathList = shortestPath.ToList();
             for (int i = 0; i < shortestPathList.Count - 1; i++)
@@ -97,14 +119,19 @@ namespace Afg3Abbiegen.GUI
                 drawLine(Brushes.Green, 3, bilalsPathList[i], bilalsPathList[i + 1]);
             }
 
-            foreach (var dbg in Map.Debug)
+            foreach (var dbg in Map.DebugDots)
             {
                 drawDot(Brushes.Purple, dbg.Item2, dbg.Item1);
             }
-            foreach (var dbg in Map.Debug2)
+            foreach (var dbg in Map.DebugLines)
             {
                 drawLine(Brushes.SpringGreen, dbg.Item3, dbg.Item1, dbg.Item2);
             }
+        }
+
+        private void LoadMap_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

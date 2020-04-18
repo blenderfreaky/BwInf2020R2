@@ -124,8 +124,8 @@
             return path;
         }
 
-        public static List<(Vector2Int, float)> Debug = new List<(Vector2Int, float)>();
-        public static List<(Vector2Int,Vector2Int, float)> Debug2 = new List<(Vector2Int, Vector2Int, float)>();
+        public static List<(Vector2Int, float)> DebugDots = new List<(Vector2Int, float)>();
+        public static List<(Vector2Int,Vector2Int, float)> DebugLines = new List<(Vector2Int, Vector2Int, float)>();
 
         /// <summary>
         /// Gets bilals path, meaning the path with least turns shorter in length then <paramref name="maxLength"/>.
@@ -179,15 +179,16 @@
             var maxCost = int.MaxValue;
             var bestEnd = ends.First(); // Arbitrarily choose the first one just to have some value
 
-            while (priorityQueue.Any() &&!ends.All(paths.ContainsKey)) // While there are ends that have not gotten any path to them discovered
+            while (priorityQueue.Any()) // While there are ends that have not gotten any path to them discovered
             {
                 var head = priorityQueue.Dequeue();
                 var headCost = costs[head];
-
-                if (headCost > maxCost) break;
+                //if (headCost > maxCost) break;
 
                 var headDistance = distances[head];
-                Debug.Add((head.Position, headDistance));
+
+                //if (float.IsInfinity(headDistance)) break;
+                //Debug.Add((head.Position, 10));
 
                 if (ends.Contains(head))
                 {
@@ -201,7 +202,7 @@
                 foreach (var (target, bidirection, distance) in reachableStreets)
                 {
                     var newDistance = headDistance + distance;
-                    //if (newDistance > maxLength + 1E-5) continue;
+                    if (newDistance > maxLength + 1E-5) continue;
 
                     var directedTarget = new DirectedVector2Int(target, bidirection);
                     var oldCost = costs[directedTarget];
@@ -229,10 +230,10 @@
 
             var path = new List<Vector2Int>();
 
-            //var current = bestEnd;
-            //for (; current.Position != Start; current = paths[current]) path.Add(current.Position);
-            //path.Add(Start);
-            //path.Reverse();
+            var current = bestEnd;
+            for (; current.Position != Start; current = paths[current]) path.Add(current.Position);
+            path.Add(Start);
+            path.Reverse();
 
             fullDistance = distances[bestEnd];
             fullTurns = maxCost;

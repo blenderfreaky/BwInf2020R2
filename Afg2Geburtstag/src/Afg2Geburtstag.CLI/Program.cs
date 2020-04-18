@@ -94,7 +94,7 @@
                 Console.WriteLine("\\hline Digit & Value & Term & Digit Usages & Time \\\\\\hline");
             }
 
-            Parallel.ForEach(options.Digits!.CleanStrings().Select(int.Parse),
+            Synchronized.ForEach(options.Digits!.CleanStrings().Select(int.Parse),
                 digit =>
                     Farm(targetsSource: targets,
                         useExponentiation: options.AllowExponentiation,
