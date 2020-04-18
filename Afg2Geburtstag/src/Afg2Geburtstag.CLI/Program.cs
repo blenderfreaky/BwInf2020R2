@@ -34,6 +34,9 @@
 
         [Option('l', "latex", HelpText = "Output as source code for a latex table", Default = false)]
         public bool OutputAsLatex { get; set; }
+
+        [Option('s', "sync", HelpText = "Forces the program to run the code for different digits synchronized rather than parallel. Use if too much RAM is being consumed", Default = false)]
+        public bool Sync { get; set; }
     }
 
     public static class Program
@@ -87,6 +90,12 @@
         private static void RunWithArguments(Options options)
         {
             var targets = options.Targets!.CleanStrings().Select(BigRational.Parse).ToList();
+            var digits = options.Digits!.CleanStrings().Select(int.Parse).ToList();
+
+            Console.WriteLine($"% Targets: {string.Join(", ", targets)}");
+            Console.WriteLine($"% Digits: {string.Join(", ", digits)}");
+            Console.WriteLine($"% Base: {options.Base}");
+            Console.WriteLine($"% {(options.AllowExponentiation ? "Exponentiation " : "")}{(options.AllowFactorial ? "Factorial " : "")}");
 
             if (options.OutputAsLatex)
             {
@@ -94,21 +103,27 @@
                 Console.WriteLine("\\hline Digit & Value & Term & Digit Usages & Time \\\\\\hline");
             }
 
-            Synchronized.ForEach(options.Digits!.CleanStrings().Select(int.Parse),
-                digit =>
-                    Farm(targetsSource: targets,
-                        useExponentiation: options.AllowExponentiation,
-                        useFactorial: options.AllowFactorial,
-                        digit: digit,
-                        asLatex: options.OutputAsLatex,
-                        @base: options.Base));
+            void digitAction(int digit) =>
+                Farm(targetsSource: targets,
+                    useExponentiation: options.AllowExponentiation,
+                    useFactorial: options.AllowFactorial,
+                    digit: digit,
+                    asLatex: options.OutputAsLatex,
+                    @base: options.Base);
+
+            if (options.Sync) Synchronized.ForEach(digits, digitAction);
+            else Parallel.ForEach(digits, digitAction);
 
             if (options.OutputAsLatex)
             {
                 Console.WriteLine("\\end{tabular}\n\\end{center}");
             }
         }
-
+        /// <summary>
+        /// CommandLineParser produces weird outputs for Option Lists sometimes. This cleans them up by removing empty/null strings and removing trailing commas.
+        /// </summary>
+        /// <param name="strings">The strings to clean up.</param>
+        /// <returns>The cleaned up strings.</returns>
         private static IEnumerable<string> CleanStrings(this IEnumerable<string> strings) =>
             strings
             .Where(x => !string.IsNullOrWhiteSpace(x))
@@ -141,7 +156,7 @@
 
             Action<ITerm, int> onFound = asLatex
                 ? (term, digits) =>
-                    Console.WriteLine($"\t{digit} & {term.Value} & \\vspace{{-0.6cm}}\\begin{{dmath*}} {term.ToLaTeX()} \\end{{dmath*}}\\vspace{{-0.85cm}} & {digits} & {stopwatch.Elapsed.TotalSeconds:0.000}s \\\\\\hline")
+                    Console.WriteLine($"\t{digit} & {term.Value} & \\( {term.ToLaTeX()} \\) & {digits} & {stopwatch.Elapsed.TotalSeconds:0.000}s \\\\\\hline")
                 : (Action<ITerm, int>)((term, digits) =>
                     Console.WriteLine($"Found solution for {term.Value} with {digit} with {digits} digits [{stopwatch.Elapsed.TotalSeconds:0.000}s]:\n  {term.Value} = {term}\n"));
 

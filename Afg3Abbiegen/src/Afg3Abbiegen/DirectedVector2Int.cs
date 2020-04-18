@@ -1,11 +1,6 @@
 ﻿namespace Afg3Abbiegen
 {
-    using Priority_Queue;
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
 
     public readonly struct DirectedVector2Int : IEquatable<DirectedVector2Int>
     {

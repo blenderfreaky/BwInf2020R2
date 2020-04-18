@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace Afg3Abbiegen
+﻿namespace Afg3Abbiegen
 {
+    using System;
+
     public readonly struct Street : IEquatable<Street>
     {
         public readonly Vector2Int Start;

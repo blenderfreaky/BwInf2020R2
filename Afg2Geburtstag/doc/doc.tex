@@ -500,6 +500,40 @@ Spezifischer, da ~HashSet<T>~ nicht Thread-Safe ist, verwendet der Code ~Concurr
 %     \end{longtable}
 % \end{center}
 
+\begin{center}
+        \begin{longtable}{ | l | l | p{7cm} | l | l | }
+        \hline Digit & Value & Term & Digit Usages & Time \\\hline
+                0 & 2080 & \( \left(\left(((((0!) + (0!)) + (0!))!)!\right) \cdot \left(\left(\left(0!\right) + \left(0!\right)\right) - \left(\left({((0!) + ((0!) + (0!)))}^{(0 - ((0!) + (0!)))}\right) - \left(0!\right)\right)\right)\right) \) & 23 & 0.782s \\\hline
+                0 & 2980 & \( \left(\left(\left(0!\right) + \left(\left(0!\right) + \left(\left(0!\right) + \left(0!\right)\right)\right)\right) \cdot \left(\left(\left(0!\right) + \left((((0!) + (0!)) + ((0!) + (0!)))!\right)\right) + \left(((((0!) + (0!)) + (0!))!)!\right)\right)\right) \) & 24 & 1.312s \\\hline
+                0 & 2020 & \( \left(\left(\left(\left(0!\right) + \left(0!\right)\right) + \left(\frac{\left(((0!) + ((((0!) + (0!)) + (0!))!))!\right)}{\left(\left((((0!) + (0!)) + (0!))!\right) - \left(0!\right)\right)}\right)\right) \cdot \left(\left(0!\right) + \left(0!\right)\right)\right) \) & 24 & 1.739s \\\hline
+                0 & 2030 & \( \left(\left(\left(\left(0!\right) + \left(\left(0!\right) + \left(0!\right)\right)\right) \cdot \left({((0!) + ((0!) + ((((0!) + (0!)) + ((0!) + (0!)))!)))}^{((0!) + (0!))}\right)\right) + \left(\left(0!\right) + \left(0!\right)\right)\right) \) & 26 & 7.082s \\\hline
+                1 & 2020 & \( \left(\left(\left(1 - \left(\frac{1}{11}\right)\right) \cdot 1111\right) \cdot \left(1 + 1\right)\right) \) & 10 & 0.288s \\\hline
+                1 & 2030 & \( \left(\left(\left({(1 + 1)}^{11}\right) - \left(1 + \left(((1 + 1) + 1)!\right)\right)\right) - 11\right) \) & 10 & 0.378s \\\hline
+                1 & 2080 & \( \left(\left({(1 + 1)}^{((((1 + 1) + 1)!) - 1)}\right) + \left({(1 + 1)}^{11}\right)\right) \) & 10 & 0.436s \\\hline
+                1 & 2980 & \( \left(\left(\left(((((1 + 1) + 1)!) + 1)!\right) - \left({(1 + 1)}^{11}\right)\right) - \left(1 + 11\right)\right) \) & 11 & 2.318s \\\hline
+                2 & 2020 & \( \left(\left({((2 * 2)!)}^{2}\right) + \left(2 \cdot \left(2 + \left(((2 + 2) + 2)!\right)\right)\right)\right) \) & 8 & 0.065s \\\hline
+                2 & 2030 & \( \left(\left(\left({2}^{(22 / 2)}\right) - 22\right) + \left(2 + 2\right)\right) \) & 8 & 0.142s \\\hline
+                2 & 2080 & \( \left(\left(2 \cdot \left(22 - 2\right)\right) \cdot \left(2 \cdot \left(2 + \left((2 * 2)!\right)\right)\right)\right) \) & 8 & 0.143s \\\hline
+                2 & 2980 & \( \left(\frac{\left(\left((2 * 2)!\right) + \left({2}^{(2 ^ (2 + 2))}\right)\right)}{22}\right) \) & 8 & 0.179s \\\hline
+                3 & 2080 & \( \left(\left(((3 * 3) - 3)!\right) \cdot \left(3 - \left(\frac{3}{\left({3}^{3}\right)}\right)\right)\right) \) & 7 & 0.029s \\\hline
+                3 & 2020 & \( \left(\left(333 + \left(\frac{33}{\left(3 \cdot 3\right)}\right)\right) \cdot \left(3 + 3\right)\right) \) & 9 & 2.542s \\\hline
+                3 & 2030 & \( \left(\left(33 + \left(333 \cdot \left(3 + 3\right)\right)\right) - \left(\frac{3}{3}\right)\right) \) & 9 & 2.546s \\\hline
+                3 & 2980 & \( \left(\left(\left(3 \cdot 33\right) + \left(\frac{3}{\left(3 \cdot 3\right)}\right)\right) \cdot \left(3 + \left({3}^{3}\right)\right)\right) \) & 9 & 2.822s \\\hline
+                4 & 2080 & \( \left(\left(4 + \left({4}^{4}\right)\right) \cdot \left(4 + 4\right)\right) \) & 5 & 0.008s \\\hline
+                4 & 2020 & \( \left(\left(\left(4 + 4\right) \cdot \left(\left({4}^{4}\right) - 4\right)\right) + 4\right) \) & 6 & 0.012s \\\hline
+                4 & 2980 & \( \left(\left(\left(4 + \left(4 + 4\right)\right) \cdot \left(\left({4}^{4}\right) - 4\right)\right) - 44\right) \) & 8 & 0.282s \\\hline
+                4 & 2030 & \( \left(\left(\left(\frac{\left(\left({(4 + 4)}^{4}\right) - 4\right)}{\left(4 + 4\right)}\right) - 4\right) \cdot 4\right) \) & 8 & 0.871s \\\hline
+                5 & 2980 & \( \left(\left({5}^{5}\right) + \left(5 - \left(5 \cdot \left(5 + \left(5 \cdot 5\right)\right)\right)\right)\right) \) & 7 & 0.018s \\\hline
+                5 & 2020 & \( \left(\left({5}^{5}\right) + \left(\left(\left(5 - \left(5 \cdot 5\right)\right) \cdot 55\right) - 5\right)\right) \) & 8 & 0.234s \\\hline
+                5 & 2030 & \( \left(\left({5}^{5}\right) + \left(\left(\left(5 - \left(5 \cdot 5\right)\right) \cdot 55\right) + 5\right)\right) \) & 8 & 0.235s \\\hline
+                5 & 2080 & \( \left(\left(5 + \left(5 \cdot \left(5 \cdot 5\right)\right)\right) \cdot \left(5 + \left(\frac{55}{5}\right)\right)\right) \) & 8 & 0.360s \\\hline
+                6 & 2030 & \( \left(\left(\left(6 \cdot 6\right) - \left(\frac{6}{6}\right)\right) \cdot \left(\left({((6 + 6) / 6)}^{6}\right) - 6\right)\right) \) & 9 & 4.690s \\\hline
+                6 & 2080 & \( \left(\left({((6 + 6) / 6)}^{6}\right) \cdot \left(\frac{\left(\left(6 \cdot 66\right) - 6\right)}{\left(6 + 6\right)}\right)\right) \) & 10 & 39.145s \\\hline
+                6 & 2980 & \( \left(\left(6 - \left(\frac{\left(\left(\frac{6}{6}\right) + 66\right)}{\left(6 \cdot 6\right)}\right)\right) \cdot \left((6 * (6 / 6))!\right)\right) \) & 10 & 104.364s \\\hline
+                6 & 2020 & \( \left(\left(6 - \left(\frac{\left(6 - \left(\left(\frac{\left({6}^{6}\right)}{6}\right) - 6\right)\right)}{6}\right)\right) + \left((6 * (6 / 6))!\right)\right) \) & 10 & 116.782s \\\hline
+    \end{longtable}
+\end{center}
+
 \section{Code}
 
 TBD

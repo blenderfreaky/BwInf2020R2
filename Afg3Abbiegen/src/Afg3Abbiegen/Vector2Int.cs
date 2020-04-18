@@ -7,7 +7,7 @@
     /// Represents a 2-dimensional vector of <see cref="int"/>
     /// </summary>
     [DebuggerStepThrough]
-    [DebuggerDisplay("X:{X}, Y:{Y}")]
+    [DebuggerDisplay("({X}, {Y})")]
     public readonly struct Vector2Int : IEquatable<Vector2Int>
     {
         /// <summary>

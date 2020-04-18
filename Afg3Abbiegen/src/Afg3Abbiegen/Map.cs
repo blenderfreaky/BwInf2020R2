@@ -5,7 +5,6 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
 
     public class Map
     {
@@ -34,6 +33,21 @@
         /// Positions of all intersections.
         /// </summary>
         public HashSet<Vector2Int> Intersections { get; }
+
+        /// <summary>
+        /// The smallest x and y coordinates of any intersection.
+        /// </summary>
+        public Vector2Int Min { get; }
+
+        /// <summary>
+        /// The largest x and y coordinates of any intersection.
+        /// </summary>
+        public Vector2Int Max { get; }
+
+        /// <summary>
+        /// The difference between the largest and smallest x and y coordinates of any intersection.
+        /// </summary>
+        public Vector2Int Size { get; }
 
         public static Map FromText(string[] text)
         {
@@ -66,6 +80,15 @@
                 // Both ends are intersections => flip to register the other
                 registerStreet(street.Flipped);
             }
+
+
+            Min = new Vector2Int(
+                Streets.Min(x => Math.Min(x.Start.X, x.End.X)),
+                Streets.Min(x => Math.Min(x.Start.Y, x.End.Y)));
+            Max = new Vector2Int(
+                Streets.Max(x => Math.Max(x.Start.X, x.End.X)),
+                Streets.Max(x => Math.Max(x.Start.Y, x.End.Y)));
+            Size = Max - Min;
         }
 
         /// <summary>
@@ -129,12 +152,13 @@
 
         /// <summary>
         /// Gets bilals path, meaning the path with least turns shorter in length then <paramref name="maxLength"/>.
+        /// Returns <c>null</c> if no such path was found.
         /// </summary>
         /// <param name="maxLength">The longest the path can be.</param>
         /// <param name="fullTurns">The amount of turns in the computed path.</param>
         /// <param name="fullDistance">The length of the computed path.</param>
         /// <returns>The path from starting point to ending point, including those points.</returns>
-        public IEnumerable<Vector2Int> BilalsPath(float maxLength, out int fullTurns, out float fullDistance)
+        public IEnumerable<Vector2Int>? BilalsPath(float maxLength, out int fullTurns, out float fullDistance)
         {
             var paths = new Dictionary<DirectedVector2Int, DirectedVector2Int>();
             var distances = new Dictionary<DirectedVector2Int, float>();
@@ -183,12 +207,10 @@
             {
                 var head = priorityQueue.Dequeue();
                 var headCost = costs[head];
-                //if (headCost > maxCost) break;
 
                 var headDistance = distances[head];
 
-                //if (float.IsInfinity(headDistance)) break;
-                //Debug.Add((head.Position, 10));
+                if (headCost > maxCost) break;
 
                 if (ends.Contains(head))
                 {
@@ -202,7 +224,8 @@
                 foreach (var (target, bidirection, distance) in reachableStreets)
                 {
                     var newDistance = headDistance + distance;
-                    if (newDistance > maxLength + 1E-5) continue;
+                    if (newDistance > maxLength + 1E-5)
+                        continue; // Add 1E-5 as an epsilon to avoid floating point errors
 
                     var directedTarget = new DirectedVector2Int(target, bidirection);
                     var oldCost = costs[directedTarget];
@@ -211,10 +234,8 @@
 
                     var oldDistance = distances[directedTarget];
 
-                    if (newCost == oldCost && newDistance > oldDistance)
-                        continue;
-                    if (newCost > oldCost)
-                        continue;
+                    if (newCost == oldCost && newDistance > oldDistance) continue;
+                    if (newCost > oldCost) continue;
 
                     if (!priorityQueue.TryUpdatePriority(directedTarget, newCost)) priorityQueue.Enqueue(directedTarget, newCost);
 
@@ -223,12 +244,15 @@
                     distances[directedTarget] = newDistance;
                 }
             }
-            foreach(var p in paths)
-            {
-                //Debug2.Add((p.Key.Position, p.Value.Position, 3));
-            }
 
             var path = new List<Vector2Int>();
+
+            if (!paths.ContainsKey(bestEnd))
+            {
+                fullDistance = float.PositiveInfinity;
+                fullTurns = int.MaxValue;
+                return null;
+            }
 
             var current = bestEnd;
             for (; current.Position != Start; current = paths[current]) path.Add(current.Position);
@@ -253,9 +277,6 @@
         public IEnumerable<Vector2Int> BilalsPath(float distanceFactor, out IEnumerable<Vector2Int> shortestPath, out float shortestPathLength, out int fullTurns, out float fullDistance)
         {
             shortestPath = ShortestPath(out shortestPathLength);
-            //fullTurns = 0;
-            //fullDistance = 0;
-            //return Array.Empty<Vector2Int>();
             return BilalsPath(distanceFactor * shortestPathLength, out fullTurns, out fullDistance);
         }
     }

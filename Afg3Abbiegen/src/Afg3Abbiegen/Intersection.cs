@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace Afg3Abbiegen
+﻿namespace Afg3Abbiegen
 {
+    using System.Collections.Generic;
+
     public static class DictionaryExtensions
     {
         public static TValue GetOrCreateValue<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key)

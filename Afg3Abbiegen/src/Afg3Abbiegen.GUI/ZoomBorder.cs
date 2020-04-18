@@ -1,11 +1,11 @@
-﻿using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-
-namespace Afg3Abbiegen.GUI
+﻿namespace Afg3Abbiegen.GUI
 {
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Input;
+    using System.Windows.Media;
+
     // Stolen from https://stackoverflow.com/questions/741956/pan-zoom-image
     public class ZoomBorder : Border
     {

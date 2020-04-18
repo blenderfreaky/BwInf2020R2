@@ -1,40 +1,38 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Afg3Abbiegen
+﻿namespace Afg3Abbiegen
 {
+    using System;
+    using System.Collections.Generic;
+
     public static class EnumerableExtensions
     {
-        public static (int Index, TValue Value, TKey Key) MinValue<TKey, TValue>(this IEnumerable<TValue> source, Func<TValue, TKey> keySelector)
-            where TKey :IComparable<TKey>
+        public static int CountTurns(this IEnumerable<Vector2Int> street)
         {
-            var enumerator = source.GetEnumerator();
+            using var en = street.GetEnumerator();
 
-            if (!enumerator.MoveNext()) throw new ArgumentException("Sequence contains no elements", nameof(source));
+            if (!en.MoveNext()) return 0; // If the street has no intersections there are no turns => return 0
+            var zerothIntersection = en.Current;
 
-            int maxIndex = 0;
-            TValue maxValue = enumerator.Current;
-            TKey maxKey = keySelector(maxValue);
+            if (!en.MoveNext()) return 0; // If the street has only one intersection there are no turns => return 0
+            var lastIntersection = en.Current;
 
-            int index = 0;
+            var lastDirection = (lastIntersection - zerothIntersection).Bidirection;
 
-            while(enumerator.MoveNext())
+            // Remember the last intersection and its direction and compare it against the current one
+            // If the directions differ count a turn
+            var turns = 0;
+
+            while (en.MoveNext())
             {
-                index++;
-                var value = enumerator.Current;
-                var key = keySelector(value);
+                var currentIntersection = en.Current;
+                var currentDirection = (currentIntersection - lastIntersection).Bidirection;
 
-                if (key.CompareTo(maxKey) < 0)
-                {
-                    maxIndex = index;
-                    maxValue = value;
-                    maxKey = key;
-                }
+                if (currentDirection != lastDirection) turns++;
+
+                lastIntersection = currentIntersection;
+                lastDirection = currentDirection;
             }
 
-            return (maxIndex, maxValue, maxKey);
+            return turns;
         }
     }
 }

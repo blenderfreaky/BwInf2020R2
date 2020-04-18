@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.CommandLine.Invocation;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-namespace Afg3Abbiegen.GUI
+﻿namespace Afg3Abbiegen.GUI
 {
+    using Microsoft.Win32;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Media;
+    using System.Windows.Shapes;
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -25,113 +17,171 @@ namespace Afg3Abbiegen.GUI
     {
         public Map Map { get; private set; }
 
+        public IReadOnlyList<Vector2Int> ShortestPath { get; private set; }
+        public int ShortestPathTurns { get; private set; }
+        public float ShortestPathLength { get; private set; }
+
+        public IReadOnlyList<Vector2Int> BilalsPath { get; private set; }
+        public int BilalsPathTurns { get; private set; }
+        public float BilalsPathLength { get; private set; }
+
+        private const int _scale = 50;
+
         public MainWindow()
         {
             InitializeComponent();
-
-            var args = Environment.GetCommandLineArgs();
-
-            var rootCommand = new RootCommand
-            {
-                new Option<FileInfo>(
-                    "--file",
-                    "The file containing the map."),
-                new Option<float>(
-                    "--weather",
-                    "The percentage that the resulting path may be longer than.")
-            };
-
-            rootCommand.Description = "My sample app";
-
-            rootCommand.Handler = CommandHandler.Create<FileInfo>(fileInfo =>
-            {
-                var fileContents = fileInfo.OpenText().ReadToEnd();
-                Map = Map.FromText(fileContents.Split(Environment.NewLine));
-            });
-
-            rootCommand.Invoke(args);
-        }
-
-        private void MapCanvas_Loaded(object sender, RoutedEventArgs e)
-        {
-            MapCanvas.Children.Clear();
-
-            var minX = Map.Streets.Min(x => Math.Min(x.Start.X, x.End.X));
-            var minY = Map.Streets.Min(x => Math.Min(x.Start.Y, x.End.Y));
-            var maxX = Map.Streets.Max(x => Math.Max(x.Start.X, x.End.X));
-            var maxY = Map.Streets.Max(x => Math.Max(x.Start.Y, x.End.Y));
-            var width = maxX - minX;
-            var height = maxY - minY;
-            var scale = 50;
-
-            //var rand = new Random();
-            //var col = new SolidColorBrush(Color.FromArgb(255, (byte)rand.Next(0, 255), (byte)rand.Next(0, 255), (byte)rand.Next(0, 255)));
-
-            void drawLine(Brush stroke, float strokeThickness, Vector2Int start, Vector2Int end)
-            {
-                MapCanvas.Children.Add(new Line
-                {
-                    X1 = (start.X - minX) * scale,
-                    Y1 = (maxY - start.Y) * scale,
-                    X2 = (end.X - minX) * scale,
-                    Y2 = (maxY - end.Y) * scale,
-
-                    Stroke = stroke,
-                    StrokeThickness = strokeThickness,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                });
-            }
-
-            void drawDot(Brush stroke, float strokeThickness, Vector2Int position)
-            {
-                MapCanvas.Children.Add(new Ellipse
-                {
-                    Margin = new Thickness(((position.X - minX) * scale) - (strokeThickness / 2), ((maxY - position.Y) * scale) - (strokeThickness / 2), 0, 0),
-                    Width = strokeThickness,
-                    Height = strokeThickness,
-
-                    Fill = stroke,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                });
-            }
-
-            drawDot(Brushes.DarkRed, 8, Map.Start);
-            drawDot(Brushes.DarkOrange, 8, Map.End);
-
-            foreach (var street in Map.Streets)
-            {
-                drawLine(Brushes.Black, 1, street.Start, street.End);
-            }
-
-            var bilalsPath = Map.BilalsPath(1.1f, out var shortestPath, out var shortestPathLength, out var fullTurns, out var fullDistance);
-
-            var shortestPathList = shortestPath.ToList();
-            for (int i = 0; i < shortestPathList.Count - 1; i++)
-            {
-                drawLine(Brushes.Red, 2, shortestPathList[i], shortestPathList[i + 1]);
-            }
-
-            var bilalsPathList = bilalsPath.ToList();
-            for (int i = 0; i < bilalsPathList.Count - 1; i++)
-            {
-                drawLine(Brushes.Green, 3, bilalsPathList[i], bilalsPathList[i + 1]);
-            }
-
-            foreach (var dbg in Map.DebugDots)
-            {
-                drawDot(Brushes.Purple, dbg.Item2, dbg.Item1);
-            }
-            foreach (var dbg in Map.DebugLines)
-            {
-                drawLine(Brushes.SpringGreen, dbg.Item3, dbg.Item1, dbg.Item2);
-            }
         }
 
         private void LoadMap_Click(object sender, RoutedEventArgs e)
         {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Map Files|*.txt",
+                CheckFileExists = true,
+                CheckPathExists = true,
+                ValidateNames = true,
+                Multiselect = false,
+                Title = "Select a file containing a map."
+            };
 
+            if (dialog.ShowDialog() == true)
+            {
+                Map = Map.FromText(File.ReadAllLines(dialog.FileName));
+
+                UpdateMap();
+            }
+        }
+
+        private void UpdateMap()
+        {
+            DrawMap();
+
+            UpdateShortestPath();
+            UpdateBilalsPath();
+        }
+
+        private void DrawMap()
+        {
+            MapCanvas.Children.Clear();
+
+            if (Map == null) return;
+
+            foreach (var street in Map.Streets)
+            {
+                DrawLine(MapCanvas, Brushes.Black, 1, street.Start, street.End);
+            }
+
+            DrawDot(MapCanvas, Brushes.Green, 5, Map.Start);
+            DrawDot(MapCanvas, Brushes.Red, 5, Map.End);
+        }
+
+        private void UpdateShortestPath()
+        {
+            if (Map == null) return;
+
+            ShortestPath = Map.ShortestPath(out var shortestPathLength).ToList();
+            ShortestPathTurns = ShortestPath.CountTurns();
+            ShortestPathLength = shortestPathLength;
+
+            DrawShortestPath();
+        }
+
+        private void DrawShortestPath()
+        {
+            ShortestPathCanvas.Children.Clear();
+
+            if (ShortestPath == null) return;
+
+            for (int i = 0; i < ShortestPath.Count - 1; i++)
+            {
+                DrawLine(ShortestPathCanvas, Brushes.Red, 2, ShortestPath[i], ShortestPath[i + 1]);
+            }
+        }
+
+        private void UpdateBilalsPath()
+        {
+            if (Map == null) return;
+
+            BilalsPath = Map.BilalsPath(ShortestPathLength * (float)PathLengthFactor.Value, out var bilalsPathTurns, out var bilalsPathLength)?.ToList();
+            BilalsPathTurns = bilalsPathTurns;
+            BilalsPathLength = bilalsPathLength;
+
+            DrawBilalsPath();
+        }
+
+        private void DrawBilalsPath()
+        {
+            BilalsPathCanvas.Children.Clear();
+
+            if (BilalsPath == null) return;
+
+            for (int i = 0; i < BilalsPath.Count - 1; i++)
+            {
+                DrawLine(BilalsPathCanvas, Brushes.Green, 3, BilalsPath[i], BilalsPath[i + 1]);
+            }
+        }
+
+        /// <summary>
+        /// Converts world coordinates to screen coordinates.
+        /// </summary>
+        /// <param name="vec">The <see cref="Vector2Int"/> to convert.</param>
+        /// <returns>The screen coordinates.</returns>
+        private Vector2Int WorldToScreen(Vector2Int vec) =>
+            new Vector2Int((vec.X - Map.Min.X) * _scale, (Map.Max.Y - vec.Y) * _scale);
+
+        /// <summary>
+        /// Draws a line on <paramref name="canvas"/>.
+        /// </summary>
+        /// <param name="canvas">The <see cref="Canvas"/> to draw on.</param>
+        /// <param name="brush">The stroke brush of the line.</param>
+        /// <param name="strokeThickness">The stroke thickness of the line.</param>
+        /// <param name="start">The start of the line in world coordinates.</param>
+        /// <param name="end">The end of the line in world coordinates.</param>
+        private void DrawLine(Canvas canvas, Brush brush, float strokeThickness, Vector2Int start, Vector2Int end)
+        {
+            var startScreen = WorldToScreen(start);
+            var endScreen = WorldToScreen(end);
+
+            canvas.Children.Add(new Line
+            {
+                X1 = startScreen.X,
+                Y1 = startScreen.Y,
+                X2 = endScreen.X,
+                Y2 = endScreen.Y,
+
+                Stroke = brush,
+                StrokeThickness = strokeThickness,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+            });
+        }
+
+        /// <summary>
+        /// Draws a dot on <paramref name="canvas"/>.
+        /// </summary>
+        /// <param name="canvas">The <see cref="Canvas"/> to draw on.</param>
+        /// <param name="brush">The fill brush of the dot.</param>
+        /// <param name="strokeThickness">The thickness of the dot.</param>
+        /// <param name="position">The position of the dot in world coordinates.</param>
+        private void DrawDot(Canvas canvas, Brush brush, float strokeThickness, Vector2Int position)
+        {
+            var positionScreen = WorldToScreen(position);
+
+            canvas.Children.Add(new Ellipse
+            {
+                Margin = new Thickness(positionScreen.X - strokeThickness/2, positionScreen.Y - strokeThickness / 2, 0, 0),
+                Width = strokeThickness,
+                Height = strokeThickness,
+
+                Fill = brush,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+            });
+        }
+
+        private void NumberBox_ValueChanged(ModernWpf.Controls.NumberBox sender, ModernWpf.Controls.NumberBoxValueChangedEventArgs args)
+        {
+            UpdateBilalsPath();
         }
     }
 }
