@@ -105,7 +105,7 @@
         /// </summary>
         private static readonly long[] _factorials = new long[]
         {
-            0,
+            1,
             1,
             2,
             6,

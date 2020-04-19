@@ -37,6 +37,9 @@
 
         [Option('s', "sync", HelpText = "Forces the program to run the code for different digits synchronized rather than parallel. Use if too much RAM is being consumed", Default = false)]
         public bool Sync { get; set; }
+
+        [Option('r', "fractions", HelpText = "Allow use of fractions. Massive performance hit", Default = false)]
+        public bool AllowFractions { get; set; }
     }
 
     public static class Program
@@ -56,16 +59,30 @@
         public static readonly BinaryOperator Multiplication =
             new BinaryOperator((l, r) => checked(l.Value * r.Value), (l, r) => $"({l} * {r})", (l, r) => $"\\left({l.ToLaTeX()} \\cdot {r.ToLaTeX()}\\right)");
 
-        public static readonly BinaryOperator Division =
-            new BinaryOperator((l, r) => !r.Value.IsZero ? checked(l.Value / r.Value) : (Rational?)null, (l, r) => $"({l} / {r})", (l, r) => $"\\left(\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}\\right)");
+        public static readonly BinaryOperator DivisionWithFractions =
+            new BinaryOperator((l, r) => !r.Value.IsZero ? (Rational?)(l.Value / r.Value) : (Rational?)null, (l, r) => $"({l} / {r})", (l, r) => $"\\left(\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}\\right)");
 
-        public static readonly BinaryOperator Exponentiation =
+        public static readonly BinaryOperator DivisionWithoutFractions =
+            new BinaryOperator((l, r) =>
+            {
+                if (!r.Value.IsZero)
+                {
+                    var result = checked(l.Value / r.Value);
+                    return result.IsInteger ? (Rational?)result : (Rational?)null;
+                }
+                else
+                {
+                    return (Rational?)null;
+                }
+            }, (l, r) => $"({l} / {r})", (l, r) => $"\\left(\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}\\right)");
+
+        public static BinaryOperator Exponentiation(bool allowFractions) =>
             new BinaryOperator(
                 (l, r) =>
                 {
                     if (!r.Value.IsInteger) return null;
 
-                    if (l.Value.IsZero) return r.Value.IsNegative ? (Rational?)null : Rational.Zero;
+                    if (l.Value.IsZero) return r.Value.IsPositive ? Rational.Zero : (Rational?)null; // 0^0 and 0^negative = 0/1 are both undefined => no return
                     if (l.Value == Rational.One) return Rational.One;
 
                     var exponentPositive = r.Value.IsPositive;
@@ -81,9 +98,12 @@
                     if (numerator > long.MaxValue || numerator < long.MinValue) return null;
                     if (denominator > long.MaxValue || denominator < long.MinValue) return null;
 
-                    return exponentPositive
+                    var result = exponentPositive
                         ? new Rational((long)numerator, (long)denominator)
                         : new Rational((long)denominator, (long)numerator);
+
+                    if (allowFractions) return result;
+                    return result.IsInteger ? result : (Rational?)null;
                 },
                 (l, r) => $"({l} ^ {r})",
                 (l, r) => $"\\left({{{l}}}^{{{r}}}\\right)");
@@ -114,6 +134,7 @@
                 Farm(targetsSource: targets,
                     useExponentiation: options.AllowExponentiation,
                     useFactorial: options.AllowFactorial,
+                    useFractions: options.AllowFractions,
                     digit: digit,
                     asLatex: options.OutputAsLatex,
                     @base: options.Base);
@@ -140,6 +161,7 @@
             IEnumerable<Rational> targetsSource,
             bool useExponentiation,
             bool useFactorial,
+            bool useFractions,
             long digit,
             bool asLatex = false,
             long @base = 10)
@@ -151,10 +173,10 @@
                 Addition,
                 Subtraction,
                 Multiplication,
-                Division,
+                useFractions ? DivisionWithFractions : DivisionWithoutFractions,
             };
 
-            if (useExponentiation) binaryOperators.Add(Exponentiation);
+            if (useExponentiation) binaryOperators.Add(Exponentiation(useFractions));
 
             var targets = new ConcurrentDictionary<Rational, ITerm?>();
             foreach (var target in targetsSource) targets[target] = null;
@@ -174,6 +196,7 @@
             for (int i = 1; ; i++)
             {
                 farm.GetAllOfSize(i);
+                //Console.WriteLine($"% Got all terms of size {i} for digit {digit}. Found {farm.TermsOfSize[i].Count} in total.");
 
                 if (farm.UnfoundTargets == 0)
                 {
