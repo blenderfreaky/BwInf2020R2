@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="OptimizedPriorityQueue" Version="4.2.0" />
-    <PackageReference Include="RapidPriorityQueue.Standard" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

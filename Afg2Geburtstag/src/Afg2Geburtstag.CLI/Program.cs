@@ -130,7 +130,7 @@
             if (options.OutputAsLatex)
             {
                 Console.WriteLine("\\begin{center}\n\\begin{longtable}{ | l | l | p{9.5cm} | l | l | }");
-                Console.WriteLine("\\hline \\textbf{Digit} & \\textbf{Value} & \\textbf{Term} & \\textbf{Digit Usages} & \\textbf{Time} \\endhead\\\\\\hline");
+                Console.WriteLine("\\hline \\textbf{Digit} & \\textbf{Value} & \\textbf{Term} & \\textbf{Digit Usages} & \\textbf{Time} \\\\\\hline");
             }
 
             void digitAction(int digit) =>

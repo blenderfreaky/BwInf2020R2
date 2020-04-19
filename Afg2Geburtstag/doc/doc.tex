@@ -105,7 +105,7 @@ morekeywords={partial, var, get, set, from, select, package, deref},
 emph=[0]{T,U,V,TToken},
 emphstyle=[0]{\color{types}},
 %
-emph=[1]{BigRational,BigInteger,NotSupportedException,List,HashSet,ITerm,BinaryOperation,UnaryOperation,BinaryOperator,UnaryOperator,DigitFarm},
+emph=[1]{Rational,NotSupportedException,List,HashSet,ITerm,BinaryOperation,UnaryOperation,BinaryOperator,UnaryOperator,DigitFarm},
 emphstyle=[1]{\color{turqoisetypes}},
 %
 otherkeywords={=>,<,>},
@@ -173,20 +173,18 @@ Daraufhin werden alle Terme entfernt, deren Wert schon mit kleineren oder gleich
 Um mit diesem Verfahren nun die Aufgabe zu lösen, ermittelt man solange größere Terme, bis der gesuchte Wert optimal von einem Term dargestellt wird.
 Diese Vorangehensweise erlaubt es auch, mit der gleichen Ziffer Repräsentationen für mehrere Zahlen auf einmal zu finden, ohne dass sich die Laufzeit addiert.
 Hierfür werden einfach größere und größere Terme ermittelt, bis alle Zahlen eine optimale Repräsentation erhalten haben.
-Die Laufzeit entspricht hierbei einfach der längsten Laufzeit der individuellen Zahlen.
+Die Laufzeit, um mehrere Zahlen zu repräsentieren entspricht hierbei einfach der längsten Laufzeit würde man jede Zahl individuell durch den Algorithmus laufen lassen.
+%\textcolor{red}{Was meinst Du mit der Laufzeit der individuellen Zahlen? Findet sich hier vielleicht noch eine deutlichere Formulierung? Meinst Du so etwas wie 'die Laufzeit für die betreffenden Zahlen? Oder ähnliches?}
 
 Auf ersten Blick scheint dieser Algorithmus eine stark explosive Komplexität zu besitzen, tatsächlich ist dem aber gar nicht so.
 Im folgenden wird die Komplexität dieses Verfahrens genauer betrachtet.
 
 \newcommand{\fad}{\forall d, B:\ }
-%\newcommand{\measure}[1]{\varphi_{d,b}(#1)}
 \newcommand{\measure}[1]{\Phi_{d}^{B}(#1)}
 
 \subsection{Größenmaß-Funktion}
 
-Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : \mathbb{Q} \to \mathbb{N}\) betrachtet, die die Anzahl an Instanzen der Ziffer \(d\) errechnet, die für die optimale Repräsentation beliebiger rationaler Zahlen benötigt wird, wobei Konkatenierung bezüglich der Basis \(B\) stattfindet (also z.B. \(11\) aus zwei mal der Ziffer \(1\) generieren zur Basis \(B=10\)). Für die Größenmaß-Funktion gilt Beispielsweise \(\fad\measure{d} = 1\).
-
-%\textcolor{red}{\em Anstelle von 'Verwendungen der Ziffer' vielleicht 'Instanzen der Ziffer'? Für was steht denn das 'b' in der Funktion? Könntest Du das 'b' in der Definition der Funktion auch weglassen? Würde die Sache übersichtlicher machen ... Bis zu dieser Stelle wird es mir jedenfalls nicht klar, was 'b' überhaupt ist. Geht das aus der Aufgabenstellung hervor? Aber selbst wenn dem so ist, dann solltest Du das 'b' in dem Text oben drüber nochmal irgendwie erwähnen, ansonsten fällt das hier vom Himmel.}
+Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : \mathbb{Q} \to \mathbb{N}\) betrachtet, die die Anzahl an Instanzen der Ziffer \(d\) errechnet, die für die optimale Repräsentation beliebiger rationaler Zahlen benötigt werden. Dabei ist eine Konkatenierung bezüglich der Basis \(B\) möglich. Beispielsweise wird die Zahl \(11\) aus zwei mal der Ziffer \(1\)  zur Basis \(B=10\) generiert. Für die Größenmaß-Funktion gilt insbesondere \(\fad\measure{d} = 1\).
 
 \begin{lemma}[Größenmaß für nicht-negative ganze Zahlen]\label{lemma:measure_linear_nonnegative}
     Für jede nicht-negative ganze Zahl \(n\) gilt:
@@ -196,7 +194,7 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
 \begin{proof}
     \subsubsection*{Fall 1: \(n > 0\)}
     
-    \(n > 0\) lässt sich als \(n\) mal wiederholte Summierung von \(d\) darstellen:
+    \(n > 0\) lässt sich als \(n\)-mal wiederholte Summierung von \(d\) darstellen:
     \[n = \frac{d+d+\ldots+d}{d} \implies \measure{n} \leq n + 1 < n + 2\]
 
     \subsubsection*{Fall 2: \(n = 0\)}
@@ -213,12 +211,13 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
 \begin{proof}
     \subsubsection*{Fall 1: \(n \geq 0\)}
 
-    Laut \ref{lemma:measure_linear_nonnegative} gilt:
+    Laut Lemma \ref{lemma:measure_linear_nonnegative} gilt:
     \[\measure{n} \leq n + 2 = |n| + 2 < |n| + 3\]
 
     \subsubsection*{Fall 2: \(n < 0\)}
         
-    \(n < 0\) lässt sich als Differenz aus \(0 = d-d\) und \(d\) darstellen:
+    \(n < 0\) lässt sich als Differenz aus \(0 = d-d\) und \(|n| > 0\) darstellen:
+    %\textcolor{red}{Meinst Du hier wirklich '\(0 = d-d\) und \(d\) darstellen' und nicht vielmehr aus '\(0 = d-d\) und |n|' darstellen? Der Bruch stellt doch den Betrag von $n$ dar ...}
     \[n = d - d - \frac{d+d+\ldots+d}{d} \implies \measure{n} \leq |n| + 3\]
     oder alternativ unter Verwendung von unärer Negation:
     \[n = -\frac{d+d+\ldots+d}{d} \implies \measure{n} \leq |n| + 1 < |n| + 3\]
@@ -232,7 +231,7 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
     Die Anwendung der Größenmaß-Funktion auf binäre Operationen lässt sich also immer durch Addition der Größenmaße der Operanden abschätzen.
 \end{lemma}
 \begin{proof}
-    Die natürlichen Zahlen \(a\) und \(b\) lassen sich mit \(\measure{a}\) bzw. \(\measure{b}\) Ziffern ausdrücken, also lässt sich \(a \circ b\) durch Anwendung der Operation \(\circ\) auf die Terme für \(a\) und \(b\) mit \(\measure{a} + \measure{b}\) oder weniger Ziffern ausdrücken.
+    Die rationalen Zahlen \(a\) und \(b\) lassen sich mit \(\measure{a}\) bzw. \(\measure{b}\) Ziffern ausdrücken, also lässt sich \(a \circ b\) durch Anwendung der Operation \(\circ\) auf die Terme für \(a\) und \(b\) mit \(\measure{a} + \measure{b}\) oder weniger Ziffern ausdrücken.
 \end{proof}
 
 \begin{corollary}[Größenmaß für rationale Zahlen]\label{corollary:phi_rational}
@@ -241,7 +240,7 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
     \[\measure{\frac{a}{b}} \leq \measure{a} + \measure{b}\]
 \end{corollary}
 \begin{proof}
-    \(\frac{a}{b}\) ist das Ergebnis der Anwendung des binären Divisions-Operators auf \(a\) und \(b\), somit lässt es sich laut \ref{lemma:phi_binary} mit \(\measure{a} + \measure{b}\) oder weniger Ziffern ausdrücken.
+    \(\frac{a}{b}\) ist das Ergebnis der Anwendung des binären Divisions-Operators auf \(a\) und \(b\), somit lässt es sich laut Lemma \ref{lemma:phi_binary} mit \(\measure{a} + \measure{b}\) oder weniger Ziffern ausdrücken.
 \end{proof}
 %\textcolor{red}{Das ist doch hier ein anderes 'b' als das in Deiner ursprünglichen Definition von $\varphi_{d,b}$? Ich finde, Du solltest Dein 'b' unbedingt noch erläutern.}
 \begin{theorem}[Genauere obere Grenze des Größenmaßes für positive ganze Zahlen]\label{theorem:accurate_bound}
@@ -257,9 +256,9 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
             n = a_1 + d (a_2 + d (\ldots d a_k)),\ a_i\in\mathbb{N},\ 0 \leq a_i < d
         \end{equation}
 
-    Hierbei ist es anzumerken, dass keine Basis 1 existiert und dies somit bei \(d=1\) nicht anwendbar ist.
+    Hierbei ist es anzumerken, dass keine Basis 1 existiert und dies somit für \(d=1\) nicht anwendbar ist.
     Im folgenden wird zuerst der generelle Fall betrachtet.
-    Aus \ref{eqn:horner_schema} lässt sich ablesen:
+    Aus Gleichung \ref{eqn:horner_schema} lässt sich ablesen:
 
     \begin{align*}
         \measure{n} 
@@ -268,8 +267,8 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
         &= (k-1)\cdot\measure{d} + \sum_{i=1}^k \measure{a_i} \numberthis\label{eqn:semi_accurate_bound}
     \end{align*}
     
-    Da \(0 \leq a_i < d\) gilt, folgt mit \ref{lemma:measure_linear_nonnegative} für jedes \(a_i\): \(\measure{a_i} \leq d + 2\).
-    Zusammen mit \(\measure{d} = 1\) folgt aus \ref{eqn:semi_accurate_bound}:
+    Da \(0 \leq a_i < d\) gilt, folgt mit Lemma \ref{lemma:measure_linear_nonnegative} für jedes \(a_i\): \(\measure{a_i} \leq d + 2\).
+    Zusammen mit \(\measure{d} = 1\) folgt aus Abschätzung \ref{eqn:semi_accurate_bound}:
     
 %\textcolor{red}{Bei der nachfolgenden Auflistung würde ich die erste Zeile weglassen, denn diese ist nur eine Dopplung Deiner Gleichung (2) obendrüber, fange gleich mit der nächsten Ungleichung an}
     \begin{align*}
@@ -278,39 +277,22 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
         &\leq (k-1) + k \cdot (d+2) \\
         &\leq k + k \cdot (d+2) = k \cdot (d+3) \\
     \end{align*}
-    
-    Bei der Repräsentation mit dem Horner-Schema gilt \(k = \lfloor \log_d(n) \rfloor\), somit folgt:
-
+Bei der Repräsentation mit dem Horner-Schema gilt \(k = \lfloor \log_d(n) \rfloor\), somit folgt:
         \[\measure{n} \leq k \cdot (d+3) = \lfloor \log_d(n) \rfloor \cdot (d+3) \leq \log_d(n) \cdot (d+3)\]
 
 %\textcolor{red}{Warum hier nochmal der Wechsel von $d+3$ zu $d+4$. Das erschließt sich an dieser Stelle für mich nicht.}
-
-    Betrachtet man nun noch einmal den Spezialfall \(d = 1\):
-    Um das Problem der non-existenten Basis zu umgehen, kann anstatt \(d = 1\) die Basis \(2 = 1 + 1 = d + d\) betrachtet werden.
-     
-    %\textcolor{red}{Auch hier würde ich Gleichung (2) nicht nochmal hinschreiben. Vielleicht machst Du das hier so (Deine alte Version ist auskommentiert):} 
-    
-   Betrachtet man nun \ref{eqn:semi_accurate_bound}:
-
-   \[\measure{n} \leq (k-1) \cdot \measure{d} + \sum_{i=1}^k \measure{a_i}\]
-
-   Um diese Umgehung des Problems einzubauen, muss nur \(\measure{d}\) mit \(\measure{d + d} = 2\cdot\measure{d}\) ersetzt werden:
-
-%Ausgehend von Gleichung \ref{eqn:semi_accurate_bound}, kann für eine alternative Herleitung \(\measure{d}\) einfach durch \(\measure{d + d} = 2\cdot\measure{d}\) ersetzt werden. Es ergibt sich
-
+Das Problem der non-existenten Basis für den Spezialfall \(d = 1\) kann durch den folgenden Trick umgangen werden:
+Anstelle von \(d = 1\) wird die  Basis \(2 = 1 + 1 = d + d\) betrachtet.   
+In Abschätzung \ref{eqn:semi_accurate_bound} muss dann nur \(\measure{d}\) durch \(\measure{d + d} = 2\cdot\measure{d}\) ersetzt werden:
     \[\measure{n} \leq (k-1) \cdot 2 \cdot \measure{d} + \sum_{i=1}^k \measure{a_i}\]
-
-    Somit folgt analog zu oben:
-
+und es folgt analog zu oben:
     \begin{align*}
         \measure{n} 
         &\leq k \cdot (d+4) \\
         &\leq \log_d(n) \cdot (d+4) \\
     \end{align*}
 
-    %\textcolor{red}{Auch hier nochmal: Wozu brauchst Du die 4?}
-
-    Somit gilt sowohl im generellen Fall als auch im Spezialfall die Abschätzung \(\measure{n} \leq \log_d(n) \cdot (d+4)\).
+Somit gilt sowohl im generellen Fall als auch im Spezialfall die Abschätzung \(\measure{n} \leq \log_d(n) \cdot (d+4)\).
 \end{proof}
 
 \begin{corollary}[Genauere obere Grenze des Größenmaßes für ganze Zahlen]\label{corollary:phi_bound}
@@ -319,7 +301,7 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
         \[\measure{n} \leq \log_d(n) \cdot (d+4) + 2\]
 \end{corollary}
 \begin{proof}
-    Analog zum Beweis von \ref{lemma:measure_linear}.
+    Analog zum Beweis von Lemma \ref{lemma:measure_linear}.
 \end{proof}
 
 \subsection{Anzahl an Termen}
@@ -353,7 +335,8 @@ Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(
         ; 
         \end{tikzpicture}
     \end{center}
-    Hierbei werden auch invalide Terme mit Division durch Null wie \(1 \div (1-1)\) mit betrachtet, jedoch sind alle validen Terme wie oben repräsentierbar, somit ist das folgende \textcolor{red}{Was ist denn an dieser Stelle das 'folgende'?} eine obere Abschätzung.
+    Hierbei werden auch invalide Terme mit Division durch Null wie \(1 \div (1-1)\) mit betrachtet.
+    Jedoch sind alle validen Terme wie oben repräsentierbar, so dass die Anzahl solcher Binärbäume größer als die Anzahl valider Terme ist und somit geeignet für eine obere Abschätzung.
     Nachfolgend werden zunächst nur Terme ohne Konkatenierung von Ziffern betrachtet.
 
     Betrachte man nun zuerst die Anzahl solcher Binärbäume.
@@ -363,29 +346,26 @@ Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(
     Bei \(4\) Operatoren heißt das, dass die Anzahl an Kombinationen von Operatoren \(4^{n-1}\) beträgt.
     Folglich ist die Anzahl an Binärbäumen mit Operatoren in den Knoten das Produkt dieser beiden Zahlen: \(C_n \cdot 4^{n-1}\).
 
-%\textcolor{red}{Okay, hier taucht zum ersten mal der Index 'b' auf. Es handelt sich also um eine Basis. Aber welche?}
-    Um nun noch Konkatenierung von Ziffern mitzubetrachten kann man sich einen Konkatenierungs-Operator vorstellen:
-    \[l \circ r = B \cdot l + r \quad\quad 1\circ1 = B + 1 = 10 + 1 = 11\]
-    Dieser würde natürlich auch ``unerlaubte'' Konkatenierungen erlauben:
-    \[(4+4+4) \circ (4\cdot4) = 12 \circ 16 = 12B + 16 = 120 + 16 = 136\]
+    Um nun auch die Konkatenierung von Ziffern zu berücksichtigen, kann man sich einen Konkatenierungs-Operator vorstellen:
+    \[l \circ r = B \cdot l + r \,,\quad\quad\text{bspw.: } 1\circ1 = B + 1 = 10 + 1 = 11\]
+    
+    Dieser würde natürlich auch ``unerlaubte'' Konkatenierungen erlauben, beispielsweise für \(B=10\):
+     \[(4+4+4) \circ (4\cdot4) = 12 \circ 16 = 12B + 16 = 120 + 16 = 136\]
+
     Jedoch werden so alle validen Konkatenierungen und mehr abgebildet, weshalb er für eine Abschätzung nach oben geeignet ist.
     Nun lässt sich die vorherige Herangehensweise analog durchführen, jedoch diesmal mit \(5\) Operatoren.
     Somit ist die Anzahl an Termen der Größe \(n\) kleiner gleich \(C_n \cdot 5^{n-1}\).
 \end{proof}
 
 \begin{theorem}[Anzahl zu betrachtender Terme]\label{theorem:tn_of_phi}
-    Aus \ref{corollary:phi_bound}, \ref{corollary:phi_rational} und \ref{theorem:tn_bound} folgt, dass für jede rationale Zahl \(n\in\mathbb{Q}\) gilt:
+    Aus Corollary \ref{corollary:phi_bound}, \ref{corollary:phi_rational} und Theorem \ref{theorem:tn_bound} folgt, dass für jede rationale Zahl \(n\in\mathbb{Q}\) gilt:
 
-        \[t_{\measure{n}} = \mathcal{O}(n^{\alpha}),\qquad\text{mit }\alpha=\frac{d+4}{\log_{20}(d)}\]
+        \[\sum_{i=0}^{\measure{n}} t_i \in \mathcal{O}(n^{\alpha}),\qquad\text{mit }\alpha=\frac{d+4}{\log_{20}(d)}\]
 
-    Was bedeuten mag, dass die Anzahl an Termen, die die Ziffer so oft verwenden wie minimal notwendig ist um \(n\) darzustellen, respektiv zu \(n\) polynomial abschätzbar ist.
+    Was bedeutet, dass die Anzahl an Termen, die zur Darstellung von \(n\) die Ziffer minimal verwenden, polynomial zu \(n\) abschätzbar ist.
 \end{theorem}
-
-%\stop
-
-%\textcolor{red}{Ich habe in der Darstellung '$\in$' durch '$=$' ersetzt}
 \begin{proof}
-    Laut \ref{theorem:tn_bound} gilt:
+    Laut Theorem \ref{theorem:tn_bound} gilt:
 
         \[t_n \leq C_n \cdot 5^{n-1}\]
 
@@ -393,30 +373,27 @@ Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(
 
         \[C_n < \frac{4^n}{(n+1)\sqrt{\pi n}}\]
 
-    %\textcolor{red}{Hier musst Du unbedingt noch eine Referenz einfügen, woher Du das hast ... Also einen Literaturverweis. Sonst fällt auch das vom Himmel}
-    
     Somit folgt:
 
         \[t_n \leq C_n \cdot 5^{n-1} < \frac{4^n}{(n+1)\sqrt{\pi n}} 5^{n-1} = \frac{4^n \cdot 5^n}{5(n+1)\sqrt{\pi n}} = \frac{20^n}{5(n+1)\sqrt{\pi n}}\]
 
-    Nun kann man \(\measure{n}\) für \(n\) einsetzen.
-    Mit Corollarry \ref{corollary:phi_bound} gilt nach einer ganzen Reihe von Umformungen (siehe Anhang):%(\(\measure{n} \leq \log_d(n)\cdot(d+3)+2\)) gilt:
-
-%    \begin{align*}
-%        t_{\measure{\frac{a}{b}}}
- %       &\in \mathcal{O}(n^{\frac{d+4}{\log_{20}(d)}} \cdot \underbrace{\big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}}_{\text{streng monoton fallend}}) \\
-%        &= \mathcal{O}(n^{\alpha}),\qquad\text{mit }\alpha=\frac{d+4}{\log_{20}(d)}
- %   \end{align*}
+    Nun kann man um die Anzahl der für \(n\) zu betrachtender Terme \(\measure{n}\) statt \(n\) einsetzen, um die Anzahl aller Terme zu bestimmen, die genauso viele Ziffern wie die optimale Repräsentation von \(n\) haben.
+    Mit Corollary \ref{corollary:phi_bound} gilt nach einer ganzen Reihe von Umformungen (siehe Anhang):
     
     \begin{equation}
         t_{\measure{n}}
-        = \mathcal{O}(n^{\frac{d+4}{\log_{20}(d)}} \cdot \underbrace{\big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}}_{\text{streng monoton fallend}}) \\
+        = \mathcal{O}\Big(n^{\frac{d+4}{\log_{20}(d)}} \cdot \underbrace{\big(\log_d(n) \cdot d\big)^{-\frac{3}{2}}}_{\text{streng monoton fallend}}\Big) \\
         = \mathcal{O}(n^{\alpha}),\qquad\text{mit }\alpha=\frac{d+4}{\log_{20}(d)}
     \end{equation}
-%\textcolor{red}{Schau Dir das mal so an (in einer Zeile), ich finde das besser ... Auch hier ist wieder $\in$ durch $=$ ersetzt.}
 
     Da die Ziffer \(d\) dabei immer konstant ist, ist auch \(\alpha\) konstant.
     Somit ist \(t_{\measure{n}}\) nach oben polynomial abschätzbar.
+    \pagebreak
+    
+    Da der Algorithmus induktiv arbeitet, werden zur Bestimmung der Terme von Größe \(n\) die Terme von Größe \(n-1\) benötigt.
+    Daher entspricht die Anzahl der Terme, die für eine optimale Repräsentation von \(n\) zu betrachten sind, der Summe der Anzahl aller Terme mit genauso vielen oder weniger Ziffern wie die optimale Repräsentation \(n\), also \(\sum_{i=0}^{\measure{n}} t_i\). Da die Komplexitätsklasse einer Summe von Elementen der polynomialen Komplexitätsklasse wieder die polynomiale Komplexitätsklasse ist, ist diese Summe somit auch polynomial:
+
+    \[\sum_{i=0}^{\measure{n}} t_i \in \mathcal{O}(n^{\alpha}),\qquad\text{mit }\alpha=\frac{d+4}{\log_{20}(d)}\]
 \end{proof}
 
 Da immer alle Ziffern (außer 0) verwendet werden, muss diese Komplexität für alle Ziffern addiert werden.
@@ -430,11 +407,13 @@ Da der eigentliche Algorithmus durch die Eliminierung von Duplikaten noch einmal
 
 \subsection{Exponenten und Fakultäten}
 
-Um den Algorithmus auf Exponenten und Fakultäten zu erweitern, kann zuerst Exponentiation als weiterer binärer Operator wie Addition und Multiplikation hinzugefügt werden, wobei die Komplexität analog zu vorher polynomial bleibt, nur mit einem größeren Exponenten.
-Für die Integration von Fakultäten ist dies jedoch nicht so leicht.
-Zunächst lässt sich Fakultät relativ leicht in den Algorithmus einbauen, wobei jeder neue optimale Term noch einmal mit einer Fakultät hinten zu der Liste aller optimalen Terme addiert wird.
+Um den Algorithmus auf Exponenten und Fakultäten zu erweitern, kann zuerst Exponentiation als zusätzlicher binärer Operator wie Addition und Multiplikation hinzugefügt werden.
+Dabei bleibt die Komplexität analog zu vorher polynomial, nur zu einem größeren Exponenten.
+%\textcolor{red}{Schau mal hier, ob das sinngemäß noch das ist, was Du sagen wolltest ... ich hab den Text vorweg etwas verändert}.
 
-Das Problem hierbei ist, dass Fakultät eine unäre Operation ist, weshalb sie unabhängig von der Anzahl an Instanzen der Ziffer beliebig oft verwendbar ist; beispielsweise ist \(((((d!)!)!)!)!\) in der Theorie erlaubt.
+Für die Hinzunahme von Fakultäten ist dies jedoch nicht so leicht.
+Zunächst lässt sich Fakultät relativ leicht in den Algorithmus einbauen, wobei jeder neue optimale Term noch einmal mit einer Fakultät hinten zu der Liste aller optimalen Terme addiert wird.
+Das Problem besteht allerdings darin, dass Fakultät eine unäre Operation ist, weshalb sie unabhängig von der Anzahl an Instanzen der Ziffer beliebig oft verwendbar ist; beispielsweise ist \(((((d!)!)!)!)!\) in der Theorie erlaubt.
 Betrachtet man jedoch die Werte der Fakultäts-Funktion, so fällt auf, dass dort sehr schnell immens große Werte entstehen; beispielsweise ist \((5!)!=120!\), was eine Zahl mit 199 Ziffern ist.
 Dass diese Werte nur sehr selten brauchbar sind, ist relativ offensichtlich.
 
@@ -446,11 +425,11 @@ Dabei muss man jedoch noch darauf achten, dass keine Endlosschleifen auftauchen:
 
 Es lässt sich erkennen, dass hierbei höchstens zwei Fakultäten in Reihe auftreten können.
 Das bedeutet, dass für jeden neu gefundenen optimalen Term noch (höchstens) zwei weitere Terme addiert werden.
-Dies bedeutet, dass sich die Rechenzeit (höchstens) verdreifacht, und somit immernoch polynomial ist.
+Dies bedeutet, dass sich die Rechenzeit (höchstens) verdreifacht, und somit immer noch polynomial ist.
 
-Im Hinblick auf Fakultäten ist noch interessant, dass nun auch die Ziffer \(0\) verwendet werden kann:
+Im Hinblick auf Fakultäten ist noch bemerkenswert, dass nun auch die Ziffer \(0\) verwendet werden kann:
 \(0! = 1\).
-Die Beispiele unten enthalten somit auch Lösungen mit der Ziffer \(0\).
+Die Beispiele unten enthalten daher auch Lösungen mit der Ziffer \(0\).
 
 \section{Umsetzung}
 
@@ -481,15 +460,17 @@ Für Informationen zur Verwendung des Programms kann ~Afg2Geburtstag.exe --help~
 
 \subsection{Ohne Exponenten und Fakultäten}
 
+Argumente:
 ~--targets 2020, 2030, 2080, 2980 --digits 1,2,3,4,5,6,7,8,9 --sync --latex~
 
 % Targets: 2020, 2030, 2080, 2980
 % Digits: 1, 2, 3, 4, 5, 6, 7, 8, 9
 % Base: 10
 %
+%\textcolor{red}{beim Header sind die senkrechten Striche teilweise zu kurz, bzw. die ersten beiden zu lang.}
 \begin{center}
     \begin{longtable}{ | l | l | p{9.5cm} | l | l | }
-    \hline \textbf{Digit} & \textbf{Value} & \textbf{Term} & \textbf{Digit Usages} & \textbf{Time} \endhead\\\hline
+    \hline \textbf{Digit} & \textbf{Value} & \textbf{Term} & \textbf{Digit Usages} & \textbf{Time} \\\hline
         1 & 2020 & \( \left(\left(1 + 1\right) \cdot \left(\frac{\left(11111 - 1\right)}{11}\right)\right) \) & 10 & 0.092s \\\hline
         1 & 2020 & \( \left(\frac{\left(\left(1 + 1\right) \cdot \left(11111 - 1\right)\right)}{11}\right) \) & 10 & 0.092s \\\hline
         1 & 2080 & \( \left(\left(1 + \left(\left(\left(1 + 1\right) \cdot \left(1 - 111\right)\right) + 11\right)\right) \cdot \left(1 - 11\right)\right) \) & 12 & 0.124s \\\hline
@@ -531,7 +512,10 @@ Für Informationen zur Verwendung des Programms kann ~Afg2Geburtstag.exe --help~
 
 \subsection{Mit Exponenten und Fakultäten}
 
-~--targets 2020, 2030, 2080, 2980 --digits 0,1,2,3,4,5,6,7,8,9 --exponentiation --factorial --sync --latex~
+Argumente:
+~--targets 2020, 2030, 2080, 2980~
+~--digits 0,1,2,3,4,5,6,7,8,9~\\
+~--exponentiation --factorial --sync --latex~
 
 % Targets: 2020, 2030, 2080, 2980
 % Digits: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -539,7 +523,7 @@ Für Informationen zur Verwendung des Programms kann ~Afg2Geburtstag.exe --help~
 % Exponentiation Factorial
 \begin{center}
     \begin{longtable}{ | l | l | p{9.5cm} | l | l | }
-    \hline \textbf{Digit} & \textbf{Value} & \textbf{Term} & \textbf{Digit Usages} & \textbf{Time} \endhead  \\\hline
+    \hline \textbf{Digit} & \textbf{Value} & \textbf{Term} & \textbf{Digit Usages} & \textbf{Time} \\\hline
         0 & 2980 & \( \left(\left(\left(0!\right) + \left(\left(0!\right) + \left(\left(0!\right) + \left(0!\right)\right)\right)\right) \mnl\quad\cdot \left(\left(0!\right) + \left(\left((((0!) + (0!)) + ((0!) + (0!)))!\right) \nldelims{\nldelims{\mnl}}\ \ + \left(((((0!) + (0!)) + (0!))!)!\right)\right)\right)\right) \) & 24 & 0.476s \\\hline
         0 & 2080 & \( \left(\left({((0!) + (0!))}^{(((((0!) + (0!)) + (0!))!) - (0!))}\right) \mnl\quad\cdot \left(\left(0!\right) + \left({((0!) + (0!))}^{((((0!) + (0!)) + (0!))!)}\right)\right)\right) \) & 24 & 0.487s \\\hline
         0 & 2020 & \( \left(\left(\left(0!\right) + \left(0!\right)\right) \cdot \left(\left(0!\right) + \left(\left(0!\right) \nldelims{\nldelims{\mnl}}\ \ - \left(\frac{\left(((0!) + ((((0!) + (0!)) + (0!))!))!\right)}{\left(\left(0!\right) - \left((((0!) + (0!)) + (0!))!\right)\right)}\right)\right)\right)\right) \) & 24 & 0.490s \\\hline
@@ -589,17 +573,14 @@ TBD
 
 \section{Anhang}
 
-\subsection{Rechnung zu \ref{theorem:tn_of_phi}}
+\subsection{Rechnung zu Theorem \ref{theorem:tn_of_phi}}
 
 %\textcolor{red}{Hier braucht es noch einen Anknüpfungspunkt. Greife mal noch die Ausgangsgleichung  wieder auf, etwa so:}
 Der Beweis von Theorem \ref{theorem:tn_of_phi} führt auf folgende Abschätzung
     \[t_n \leq C_n \cdot 5^{n-1} < \frac{4^n}{(n+1)\sqrt{\pi n}} 5^{n-1} =  \frac{20^n}{5(n+1)\sqrt{\pi n}}\]
 
-Hier kann \(n\) durch \(\measure{n}\) ersetzt werden.
-Unter Verwendung der Abschätzung \(\measure{n} \leq \log_d(n) \cdot (d+4) + 2\) aus Corollarry \ref{corollary:phi_bound} ergeben sich folgende Umformungen:
-
-%\textcolor{red}{Hier habe ich aber ein Verständnisproblem: Du ersetzt in Deiner ursprünglichen Beschreibung erstmal das $n$ in $20^n$ durch $\measure{\frac{a}{b}} $... warum? Danach wiederum ersetzt Du das $\frac{a}{b}$ im Zähler rechts wieder durch $n$, was dann doch wohl ein anderes $n$ ist??? Da steht ja dann $20^{\log_d(n)\cdot(d+4)+2}$ und nicht $20^{\log_d(\frac{a}{b})\cdot(d+4)+2}$.
-%Dagegen steht links \(t_{\measure{n}}\), also eine Darstellung mit \(a\) und \(b\). Kriege ich gerade nicht klar. Die Rechnung danach muss ich nochmal im Detail durchgehen...}
+Nun kann man um die Anzahl der fürnzu betrachtender Terme \(\measure{n}\) statt \(n\) einsetzen, um die Anzahl aller Terme zu bestimmen, die genauso viele Ziffern wie die optimale Repräsentation von \(n\) haben.
+Unter Verwendung der Abschätzung \(\measure{n} \leq \log_d(n) \cdot (d+4) + 2\) aus Corollary \ref{corollary:phi_bound} ergeben sich folgende Umformungen:
 
 \begin{align*}
     t_{\measure{\frac{a}{b}}}

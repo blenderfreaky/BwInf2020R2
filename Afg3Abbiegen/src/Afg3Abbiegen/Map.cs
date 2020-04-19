@@ -67,7 +67,8 @@
             // Adds a street to the intersection at its starting point
             void registerStreet(Street street)
             {
-                var reachableIntersections = ReachableFromIntersection.GetOrCreateValue(street.Start);
+                if (!ReachableFromIntersection.TryGetValue(street.Start, out var reachableIntersections)) ReachableFromIntersection[street.Start] = reachableIntersections = new List<(Vector2Int Target, Vector2Int Bidirection, float Distance)>();
+
                 reachableIntersections.Add((street.End, street.Path.Bidirection, street.Path.Length));
 
                 Intersections.Add(street.Start);
@@ -175,6 +176,31 @@
             public static bool operator !=(Cost left, Cost right) => !(left == right);
         }
 
+        protected class Path
+        {
+            public readonly int Turns;
+            public readonly float Distance;
+            public readonly Vector2Int End;
+            public readonly Vector2Int Direction;
+            public readonly Path Previous;
+
+            public Path(int turns, float distance, Vector2Int end, Vector2Int direction, Path? previous = null)
+            {
+                Turns = turns;
+                Distance = distance;
+                End = end;
+                Direction = direction;
+                Previous = previous ?? this;
+            }
+
+            public int CompareTo(Cost other)
+            {
+                var turnsComp = Turns.CompareTo(other.Turns);
+                if (turnsComp != 0) return turnsComp;
+                return Distance.CompareTo(other.Distance);
+            }
+        }
+
         /// <summary>
         /// Gets bilals path, meaning the path with least turns shorter in length then <paramref name="maxLength"/>.
         /// Returns <c>null</c> if no such path was found.
@@ -185,14 +211,11 @@
         /// <returns>The path from starting point to ending point, including those points.</returns>
         public IEnumerable<Vector2Int>? BilalsPath(float maxLength, out int fullTurns, out float fullDistance)
         {
-            var paths = new Dictionary<DirectedVector2Int, DirectedVector2Int>();
-            var distances = new Dictionary<DirectedVector2Int, float>();
-            var turns = new Dictionary<DirectedVector2Int, int>();
+            var paths = new Dictionary<Vector2Int, DirectedVector2Int>();
+            var distances = new Dictionary<Vector2Int, float>();
+            var turns = new Dictionary<Vector2Int, int>();
 
-            var priorityQueue = new SimplePriorityQueue<DirectedVector2Int, Cost>();
-
-            var starts = new HashSet<DirectedVector2Int>();
-            var ends = new HashSet<DirectedVector2Int>();
+            var priorityQueue = new SimplePriorityQueue<Vector2Int, Cost>();
 
             foreach (var intersection in ReachableFromIntersection)
             {
@@ -200,92 +223,74 @@
 
                 foreach (var (_, bidirection, _) in intersection.Value)
                 {
-                    var priority = new Cost(int.MaxValue, float.PositiveInfinity);
-                    var street = new DirectedVector2Int(streetStart, bidirection);
+                    var priority = streetStart == Start
+                        ? new Cost(0, 0)
+                        : new Cost(int.MaxValue, float.PositiveInfinity);
 
-                    if (streetStart == Start)
-                    {
-                        priority = new Cost(0, 0);
-                        starts.Add(street);
-                    }
-
-                    if (streetStart == End)
-                    {
-                        ends.Add(street);
-                    }
-
-                    priorityQueue.EnqueueWithoutDuplicates(street, priority);
-                    turns[street] = priority.Turns;
-                    distances[street] = priority.Distance;
+                    priorityQueue.EnqueueWithoutDuplicates(streetStart, priority);
+                    turns[streetStart] = priority.Turns;
+                    distances[streetStart] = priority.Distance;
                 }
             }
 
-            var maxCost = int.MaxValue;
-            var bestEnd = ends.First(); // Arbitrarily choose the first one just to have some value
-
-            while (ends.Any(priorityQueue.Contains)) // While there are ends that have not gotten any path to them discovered
+            while (true)
             {
                 var head = priorityQueue.Dequeue();
-                var headCost = turns[head];
+                var headTurns = turns[head];
                 var headDistance = distances[head];
 
-                if (headCost > maxCost) break;
-
-                if (ends.Contains(head))
+                if (head == End)
                 {
-                    maxCost = headCost;
-
-                    if (headDistance < distances[bestEnd]) bestEnd = head;
+                    fullTurns = headTurns;
+                    fullDistance = headDistance;
+                    break;
                 }
 
-                var reachableStreets = ReachableFromIntersection[head.Position];
+                var reachableStreets = ReachableFromIntersection[head];
+                paths.TryGetValue(head, out var headPath);
 
                 foreach (var (target, bidirection, distance) in reachableStreets)
                 {
                     var newDistance = headDistance + distance;
-                    if (newDistance > maxLength + 1E-5) continue; // Add 1E-5 as an epsilon to avoid floating point errors
+                    //if (newDistance > maxLength + 1E-5) continue; // Add 1E-5 as an epsilon to avoid floating point errors
 
-                    var directedTarget = new DirectedVector2Int(target, bidirection);
+                    var oldTurns = turns[target];
+                    var newTurns = headTurns + (headPath.Direction == default || bidirection == headPath.Direction ? 0 : 1);
 
-                    var oldTurns = turns[directedTarget];
-                    var newTurns = headCost + (bidirection == head.Direction ? 0 : 1);
+                    var oldDistance = distances[target];
 
-                    var oldDistance = distances[directedTarget];
-
-                    if (newTurns == oldTurns && newDistance > oldDistance) continue;
-                    if (newTurns > oldTurns) continue;
+                    if (newDistance > oldDistance) continue;
+                    //if (newTurns == oldTurns && newDistance > oldDistance) continue;
+                    //if (newTurns > oldTurns) continue;
 
                     var newCost = new Cost(newTurns, newDistance);
-                    if (!priorityQueue.TryUpdatePriority(directedTarget, newCost)) priorityQueue.Enqueue(directedTarget, newCost);
+                    if (!priorityQueue.TryUpdatePriority(target, newCost)) priorityQueue.Enqueue(target, newCost);
 
-                    paths[directedTarget] = head;
-                    turns[directedTarget] = newTurns;
-                    distances[directedTarget] = newDistance;
+                    paths[target] = new DirectedVector2Int(head, bidirection);
+                    turns[target] = newTurns;
+                    distances[target] = newDistance;
                 }
             }
 
             var path = new List<Vector2Int>();
 
-            if (!paths.ContainsKey(bestEnd))
-            {
-                fullDistance = float.PositiveInfinity;
-                fullTurns = int.MaxValue;
-                return null;
-            }
+            //if (!paths.ContainsKey(bestEnd))
+            //{
+            //    fullDistance = float.PositiveInfinity;
+            //    fullTurns = int.MaxValue;
+            //    return null;
+            //}
 
-            var current = bestEnd;
-            for (; current.Position != Start; current = paths[current]) path.Add(current.Position);
+            for (var current = End; current != Start; current = paths[current].Position) path.Add(current);
             path.Add(Start);
             path.Reverse();
-
-            fullDistance = distances[bestEnd];
-            fullTurns = maxCost;
 
             return path;
         }
 
         /// <summary>
         /// Gets bilals path, meaning the path with least turns shorter in length then <paramref name="distanceFactor"/> times the length of the shortest path.
+        /// Returns <c>null</c> if no such path was found.
         /// </summary>
         /// <param name="distanceFactor">The factor to apply to the length of the shortest path.</param>
         /// <param name="shortestPath">The shortest path. Same as output of <see cref="ShortestPath(out float)"/>.</param>
@@ -293,7 +298,7 @@
         /// <param name="fullTurns">The amount of turns in the computed path.</param>
         /// <param name="fullDistance">The length of the computed path.</param>
         /// <returns>The path from starting point to ending point, including those points.</returns>
-        public IEnumerable<Vector2Int> BilalsPath(float distanceFactor, out IEnumerable<Vector2Int> shortestPath, out float shortestPathLength, out int fullTurns, out float fullDistance)
+        public IEnumerable<Vector2Int>? BilalsPath(float distanceFactor, out IEnumerable<Vector2Int> shortestPath, out float shortestPathLength, out int fullTurns, out float fullDistance)
         {
             shortestPath = ShortestPath(out shortestPathLength);
             return BilalsPath(distanceFactor * shortestPathLength, out fullTurns, out fullDistance);

@@ -15,10 +15,8 @@
 %\usepackage{csquotes}
 
 \usepackage{tikz}
-\usetikzlibrary{chains}
-\usetikzlibrary{matrix,positioning,calc}
-\usetikzlibrary{decorations.pathreplacing}
-\usetikzlibrary {positioning}
+\usetikzlibrary{fit}
+%\usetikzlibrary{positioning, fit, calc}
 
 \usepackage{cite}
 
@@ -68,17 +66,89 @@
 \theoremsymbol{\ensuremath{\color{lightgray}\blacksquare}}
 \newtheorem{proof}{Beweis}
 
+%\usepackage{courier}
+%\setmonofont{Consolas} %to be used with XeLaTeX or LuaLaTeX
+\definecolor{bluekeywords}{rgb}{0,0,1}
+\definecolor{greencomments}{rgb}{0,0.5,0}
+\definecolor{redstrings}{rgb}{0.64,0.08,0.08}
+\definecolor{xmlcomments}{rgb}{0.5,0.5,0.5}
+\definecolor{types}{rgb}{0.17,0.57,0.68}
+\definecolor{turqoisetypes}{rgb}{0.01,0.60,0.3}
+\definecolor{background}{rgb}{0.95,0.95,0.95}
+%\definecolor{background}{rgb}{.97,.97,.97}
+
+\newcommand{\codesize}{\small}
+
+\lstdefinelanguage{CSharp}{ % Better C# highlighting
+language=[Sharp]C,
+frame=lrbt,
+%language=general,
+backgroundcolor=\color{background},
+captionpos=b,
+numbers=left,
+numberstyle=\tiny,
+showspaces=false,
+showtabs=false,
+breaklines=true,
+showstringspaces=false,
+breakatwhitespace=true,
+escapeinside={(*@}{@*)},
+commentstyle=\color{greencomments},
+morekeywords={partial, var, get, set, from, select, package, deref},
+%
+emph=[0]{T,U,V,TToken},
+emphstyle=[0]{\color{types}},
+%
+emph=[1]{NotSupportedException,List,HashSet,Map,Street,Vector2Int,DirectedVector2Int,StreetParser},
+emphstyle=[1]{\color{turqoisetypes}},
+%
+otherkeywords={=>,<,>},
+emph=[2]{=>,<,>},
+emphstyle=[2]{\bfseries},
+%
+emph=[3]{ParserResult},
+emph=[3]{\color{turqoisetypes}\bfseries},
+%
+keywordstyle=\color{bluekeywords},
+stringstyle=\color{redstrings},
+basicstyle=\codesize\ttfamily,
+literate=%
+    {Ö}{{\"O}}1
+    {Ä}{{\"A}}1
+    {Ü}{{\"U}}1
+    {ß}{{\ss}}1
+    {ü}{{\"u}}1
+    {ä}{{\"a}}1
+    {ö}{{\"o}}1
+    {~}{{\textasciitilde}}1
+}
+
+\lstMakeShortInline[
+  language=CSharp,
+  columns=fixed,]~
+
+  \lstnewenvironment{lstcs}[1][]
+  {\lstset{
+      language=CSharp,
+      breaklines=true,
+      columns=fullflexible,
+      caption={#1}
+  }}
+{}
+
+\usepackage{hyperref}
+\usepackage{cleveref}
+
 \begin{document}
     
 \section{Lösungsidee}
 
 Die Lösungsidee besteht darin, den Dijkstra Algorithmus derart umzugestalten, dass er den Weg mit der geringsten Zahl an Abbiegungen statt der geringsten Länge sucht.
-
-Zuerst wird der kürzeste Weg berechnet, woraufhin dessen Länge und die Anzahl der darinenthaltenen Abbiegungen bestimmt wird. Daraufhin beginnt die Ermittlung des endgültigem Wegs.
+Zuerst wird der kürzeste Weg berechnet, woraufhin dessen Länge und die Anzahl der darin enthaltenen Abbiegungen bestimmt wird. Daraufhin beginnt die Ermittlung des endgültigen Weges.
 
 Grundlegend verläuft dieser Prozess wie der normale Dijkstra Algorithmus, jedoch mit ein paar kleinen Unterschieden:
 Der erste Unterschied besteht darin, dass der Algorithmus alle Wege mit einer Länge größer der Länge des kürzesten Wegs plus die erlaubte Extrastrecke (also +15\% oder +30\%) eliminiert.
-Der Hauptunterschied ist, dass Dijkstra hierbei nicht nach Länge, sondern nach Anzahl an Abbiegungen optimiert.
+Der Hauptunterschied besteht jedoch darin, dass Dijkstra hierbei nicht nach Länge, sondern nach Anzahl an Abbiegungen optimiert.
 
 \subsection{Modifizierter Dijkstra im Detail}
 
@@ -86,21 +156,23 @@ Um Dijkstra im Hinblick auf die minimale Anzahl an Abbiegungen umzudefinieren, k
 Dabei fällt auf, dass zur Berechnung der Kosten für eine Kante auch die im Weg vorangehende Kante betrachtet werden muss.
 Dies bedeutet aber, dass Dijkstra nicht in seiner ursprünglichen Form verwendet werden kann. Es könnte ansonsten der Fall auftreten, dass Knoten des Graphen von einem anderen Weg aus erneut besucht würden, was die Kosten der Kanten verändern würde, die mit dem Knoten verbunden sind.
 
-\begin {center}
-\begin {tikzpicture}[-latex, auto, node distance =4 cm and 5cm, on grid,semithick,
-state/.style={ circle, draw, minimum width =1 cm}]
-\node[state] (A1)                 {};
-\node[state] (2) [right = of    A1] {};
-\node[state] (A3) [right = of 2] {};
-
-\node[state] (B1) [below = of A1] {};
-\node[state] (B3) [right = of 2] {};
-
-\path (A1) edge node[below =0.15 cm] {$0$} (2);
-\path (2) edge node[below =0.15 cm] {$0$} (A3);
-
-\path (B1) edge node[below =0.15 cm] {$0$} (2);
-\path (2) edge node[below =0.15 cm] {$0$} (B3);
+\begin{center}
+\begin{tikzpicture}
+    \node (A) at (1, 1){A};
+    \coordinate (AB) at (6,1);
+    \node (D) at (11, 1){D};
+    
+    \node (C) at (1, 5){C};
+    \coordinate (CD) at (6, 5) {};
+    \node (B) at (11, 5){B};
+    
+    \coordinate (ABCD) at (6, 3);
+    \node [draw,dashed,inner sep=10pt, circle,yscale=.7, fit={(ABCD)}] {};
+    
+    \draw[-, thick] (A) to node[midway, sloped, above] {A--Cross}  (ABCD);
+    \draw[-, thick] (ABCD) to node[midway, sloped, above] {Cross--D}  (D);
+    \draw[-, thick] (C) to node[midway, sloped, above] {C--Cross}  (ABCD);
+    \draw[-, thick] (ABCD) to node[midway, sloped, above] {Cross--B}  (B);
 \end{tikzpicture}
 \end{center}
 
@@ -108,30 +180,64 @@ Um dieses Problem zu umgehen, wird der Graph verändert: Zwar werden
 Kreuzungen innerhalb des Graphen immer noch als Knoten dargestellt, jedoch gibt es für jede Kreuzung mehrere Knoten, nämlich jeweils einen für jede geradlinige Straße, die in der Kreuzung vorhanden ist.
 Alle Knoten einer Kreuzung sind dabei verbunden durch Kanten mit Kosten von 1.
 
-\textcolor{red}{Das verstehe ich leider auch nicht genau, wo sind denn die mehreren Knoten für eine Kreuzung in dem Bild?}
-
-%TODO: Remove arrows
-\begin {center}
-\begin {tikzpicture}[-latex, auto, node distance =4 cm and 5cm, on grid,semithick,
-state/.style={ circle, draw, minimum width =1 cm}]
-\node[state] (A1)                 {};
-\node[state] (A2) [right = of A1] {};
-\node[state] (A3) [right = of A2] {};
-
-\node[state] (B1) [below = of A1] {};
-\node[state] (B2) [right = of B1] {};
-\node[state] (B3) [right = of B2] {};
-
-\path (A1) edge node[below =0.15 cm] {$0$} (A2);
-\path (A2) edge node[below =0.15 cm] {$0$} (A3);
-
-\path (B1) edge node[below =0.15 cm] {$0$} (B2);
-\path (B2) edge node[below =0.15 cm] {$0$} (B3);
-
-\path (A2) edge node[right =0.15 cm] {$1$} (B2);
+\begin{center}
+\begin{tikzpicture}
+    \node (A) at (1, 1) {A};
+    \coordinate (AB) at (6,2);
+    \node (B) at (11, 1) {B};
+    
+    \node (C) at (1, 5){C};
+    \coordinate (CD) at (6, 4) {};
+    \node (D) at (11, 5){D};
+    
+    \node [rotate=90][draw,dashed,inner sep=5pt, circle,yscale=.6, fit={(AB) (CD)}] {};
+    
+    \draw[-, thick] (A) to node[midway, sloped, above] {A--Cross}  (AB);
+    \draw[-, thick] (A) to node[midway, sloped, above] {0}  (AB);
+    \draw[-, thick] (AB) to node[midway, sloped, above] {Cross--B}  (B);
+    \draw[-, thick] (AB) to node[midway, sloped, above] {0}  (B);
+    \draw[-, thick] (C) to node[midway, sloped, above] {C--Cross}  (CD);
+    \draw[-, thick] (C) to node[midway, sloped, above] {0}  (CD);
+    \draw[-, thick] (CD) to node[midway, sloped, above] {Cross--D}  (D);
+    \draw[-, thick] (CD) to node[midway, sloped, above] {0}  (D);
+    
+    \draw[-, thick] (AB) to node[midway, sloped, above] {Extra} (CD);
+    \draw[-, thick] (AB) to node[midway, sloped, below] {1} (CD);
 \end{tikzpicture}
 \end{center}
 
-Der 
+Die Priority-Queue des Dijkstra-Algorithmus ist hierbei primär nach Anzahl an Abbiegungen und sekundär nach Länge sortiert.
+
+\section{Umsetzung}
+
+Der Algorithmus wurde in C\# 8.0 mit .NET Core 3.1 implementiert.
+Es wurde als Library OptimizedPriorityQueue\footnote{https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp} verwendet. Diese implementiert eine Priority Queue, die in Dijkstra verwendet wird.
+Der Code ist in zwei Projekte geteilt;
+~Afg3Abbiegen.GUI~ und ~Afg3Abbiegen~.
+
+~Afg3Abbiegen.GUI~ kümmert sich um das User-Interface und ruft ~Afg3Abbiegen~ auf, das den eigentlichen Algorithmus enthält.
+~Afg3Abbiegen~ definiert einige Typen:
+
+\begin{description}
+    \item[Vector2Int] stellt einen zweidimensionalen Vektor mit Integerkomponenten dar.
+    \item[DirectedVector2Int] stellt die Kombination einer ~Vector2Int~ Position und einer genormten Richtung dar.
+    \item[Street] definiert eine Straße zwischen zwei ~Vector2Int~ Endpunkten.
+    \item[StreetParser] ist zuständig für das Einlesen der Beispieldateien.
+    \item[EnumerableExtensions] definiert eine Erweiterungsmethode für ~IEnumerable<Vector2Int>~, die die Anzahl an Abbiegung zählt.
+    \item[Map] stellt eine Ansammlung aus Straßen mit Start und Ende dar und enthält den Hauptalgorithmus. 
+\end{description}
+
+~Map~ definiert dabei zwei Hauptmethoden
+~ShortestPath~ und ~BilalsPath~.
+~ShortestPath~ ermittlet via Dijkstra den kürzesten Weg zwischen Start und Ende.
+~BilalsPath~ ermittelt via dem obigen Algorithmus den in der Aufgabenstellung beschriebenen Weg.
+
+\section{Beispiele}
+
+TBD
+
+\section{Code}
+
+TBD
 
 \end{document}
