@@ -2,14 +2,16 @@
 {
     using Priority_Queue;
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
 
+    /// <summary>
+    /// Represents a map.
+    /// </summary>
     public class Map
     {
         /// <summary>
-        /// All streets.
+        /// The list of all streets.
         /// </summary>
         public List<Street> Streets { get; }
 
@@ -51,7 +53,7 @@
 
         public static Map FromText(string[] text)
         {
-            if (!StreetParser.TryParse(text, out var start, out var end, out var streets)) throw new ArgumentException(nameof(text));
+            if (!MapParser.TryParse(text, out var start, out var end, out var streets)) throw new FormatException();
 
             return new Map(streets, start, end);
         }
@@ -83,6 +85,7 @@
                 registerStreet(street.Flipped);
             }
 
+            // Save these for the UI
             Min = new Vector2Int(
                 Streets.Min(x => Math.Min(x.Start.X, x.End.X)),
                 Streets.Min(x => Math.Min(x.Start.Y, x.End.Y)));

@@ -3,8 +3,6 @@
 namespace Afg3Abbiegen.GUI
 {
     using Microsoft.Win32;
-    using ModernWpf;
-    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
@@ -56,20 +54,23 @@ namespace Afg3Abbiegen.GUI
             {
                 Map = Map.FromText(File.ReadAllLines(dialog.FileName));
 
+                // Don't run this on the UI thread
                 Task.Run(UpdateMap);
             }
         }
 
-        private void _propertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-
         private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
         {
+            // Don't run this on the UI thread
             Task.Run(UpdateBilalsPath);
         }
 
+        private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
         private void UpdateMap()
         {
-            _propertyChanged(nameof(Map));
+            // Just call these directly to avoid creating backing fields etc.
+            OnPropertyChanged(nameof(Map));
             Dispatcher.Invoke(DrawMap);
 
             UpdateShortestPath();
@@ -99,9 +100,9 @@ namespace Afg3Abbiegen.GUI
             ShortestPathTurns = ShortestPath.CountTurns();
             ShortestPathLength = shortestPathLength;
 
-            _propertyChanged(nameof(ShortestPath));
-            _propertyChanged(nameof(ShortestPathTurns));
-            _propertyChanged(nameof(ShortestPathLength));
+            OnPropertyChanged(nameof(ShortestPath));
+            OnPropertyChanged(nameof(ShortestPathTurns));
+            OnPropertyChanged(nameof(ShortestPathLength));
 
             Dispatcher.Invoke(DrawShortestPath);
         }
@@ -129,9 +130,9 @@ namespace Afg3Abbiegen.GUI
             BilalsPathTurns = bilalsPathTurns;
             BilalsPathLength = bilalsPathLength;
 
-            _propertyChanged(nameof(BilalsPath));
-            _propertyChanged(nameof(BilalsPathTurns));
-            _propertyChanged(nameof(BilalsPathLength));
+            OnPropertyChanged(nameof(BilalsPath));
+            OnPropertyChanged(nameof(BilalsPathTurns));
+            OnPropertyChanged(nameof(BilalsPathLength));
 
             Dispatcher.Invoke(DrawBilalsPath);
         }

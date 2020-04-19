@@ -6,7 +6,10 @@
     using System.Windows.Input;
     using System.Windows.Media;
 
-    // Stolen from https://stackoverflow.com/questions/741956/pan-zoom-image
+    // Credit: https://stackoverflow.com/questions/741956/pan-zoom-image
+    /// <summary>
+    /// Draws a border, background, or both around another element which supports panning and zooming using the cursor.
+    /// </summary>
     public class ZoomBorder : Border
     {
         private UIElement _child = null;
@@ -39,7 +42,7 @@
         public void Initialize(UIElement element)
         {
             _child = element;
-            
+
             if (_child == null) return;
 
             var group = new TransformGroup();
@@ -143,6 +146,6 @@
             }
         }
 
-        #endregion
+        #endregion Child Events
     }
 }

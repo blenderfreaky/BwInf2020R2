@@ -62,15 +62,8 @@
         }
 
         /// <summary>
-        /// Returns a <see cref="Vector2Int"/> uniquely describing the direction of the vector in a way that is invariant to scale and flipping (scaling by -1).
+        /// The length of the vector.
         /// </summary>
-        /// <example>
-        /// The two <see cref="Vector2Int"/> instances <c>(1, 2)</c> and <c>(2, 4)</c> have the same <see cref="Bidirection"/> value.
-        /// <c>(1, 2)</c> and <c>(1, 3)</c> do not.
-        /// <c>(1, 0)</c> and <c>(-2, 0)</c> do however, as they only differ by flipping and scale.
-        /// </example>
-        public readonly Vector2Int Bidirection => X != 0 ? Direction * Math.Sign(X) : new Vector2Int(0, 1);
-
         public readonly float Length => MathF.Sqrt((X * X) + (Y * Y));
 
         /// <inheritdoc/>
@@ -82,38 +75,21 @@
         /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(X, Y);
 
-        /// <inheritdoc/>
         public static bool operator ==(Vector2Int left, Vector2Int right) => left.Equals(right);
 
-        /// <inheritdoc/>
         public static bool operator !=(Vector2Int left, Vector2Int right) => !(left == right);
 
-        /// <inheritdoc/>
         public static Vector2Int operator +(Vector2Int lhs, Vector2Int rhs)
             => new Vector2Int(lhs.X + rhs.X, lhs.Y + rhs.Y);
 
-        /// <inheritdoc/>
         public static Vector2Int operator -(Vector2Int lhs, Vector2Int rhs)
             => new Vector2Int(lhs.X - rhs.X, lhs.Y - rhs.Y);
 
-        /// <inheritdoc/>
         public static Vector2Int operator *(Vector2Int lhs, int rhs)
             => new Vector2Int(lhs.X * rhs, lhs.Y * rhs);
 
-        /// <inheritdoc/>
         public static Vector2Int operator -(Vector2Int vec)
             => new Vector2Int(-vec.X, -vec.Y);
-
-        public bool IsParallel(Vector2Int other, double epsilon = 1E-5)
-        {
-            if (X == 0) return other.X == 0;
-            if (other.X == 0) return X == 0;
-
-            var dir = Y / X;
-            var otherDir = other.Y / other.X;
-
-            return Math.Abs(dir - otherDir) < epsilon;
-        }
 
         /// <inheritdoc/>
         public override readonly string ToString() => $"({X}, {Y})";
