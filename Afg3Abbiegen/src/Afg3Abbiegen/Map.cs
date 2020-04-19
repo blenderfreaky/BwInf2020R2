@@ -160,9 +160,7 @@
         /// <returns>The path from starting point to ending point, including those points.</returns>
         public IEnumerable<Vector2Int>? BilalsPath(float maxLength, out int fullTurns, out float fullDistance)
         {
-            var paths = new Dictionary<DirectedVector2Int, DirectedVector2Int>();
-            var distances = new Dictionary<DirectedVector2Int, float>();
-            var costs = new Dictionary<DirectedVector2Int, int>();
+            var paths = new Dictionary<DirectedVector2Int, (DirectedVector2Int Source, float Distance, int Cost)>();
 
             // TODO: Try FastPriorityQueue
             var priorityQueue = new SimplePriorityQueue<DirectedVector2Int, int>();
@@ -182,12 +180,8 @@
                     if (streetStart == Start)
                     {
                         priority = 0;
-                        distances[street] = 0;
+                        paths[street] = (street, 0, 0);
                         starts.Add(street);
-                    }
-                    else
-                    {
-                        distances[street] = float.PositiveInfinity;
                     }
 
                     if (streetStart == End)
@@ -196,7 +190,6 @@
                     }
 
                     priorityQueue.EnqueueWithoutDuplicates(street, priority);
-                    costs[street] = priority;
                 }
             }
 
@@ -206,17 +199,15 @@
             while (priorityQueue.Any()) // While there are ends that have not gotten any path to them discovered
             {
                 var head = priorityQueue.Dequeue();
-                var headCost = costs[head];
+                var headPath = paths[head];
 
-                var headDistance = distances[head];
-
-                if (headCost > maxCost) break;
+                if (headPath.Cost > maxCost) break;
 
                 if (ends.Contains(head))
                 {
-                    maxCost = headCost;
+                    maxCost = headPath.Cost;
 
-                    if (headDistance < distances[bestEnd]) bestEnd = head;
+                    if (headPath.Distance < paths[bestEnd].Distance) bestEnd = head;
                 }
 
                 var reachableStreets = ReachableFromIntersection[head.Position];

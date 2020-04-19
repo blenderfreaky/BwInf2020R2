@@ -7,7 +7,7 @@
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
 
-    using RationalSet = System.Collections.Concurrent.ConcurrentDictionary<BigRational, byte>;
+    using RationalSet = System.Collections.Concurrent.ConcurrentDictionary<Rational, byte>;
     using TermSet = System.Collections.Concurrent.ConcurrentDictionary<ITerm, byte>;
 
     public class DigitFarm
@@ -21,14 +21,14 @@
         public long Digit { get; }
         public long Base { get; }
 
-        public ConcurrentDictionary<BigRational, ITerm?> HitTargets { get; }
+        public ConcurrentDictionary<Rational, ITerm?> HitTargets { get; }
         public int UnfoundTargets { get; private set; }
         public Action<ITerm, int> OnFound { get; }
 
         public DigitFarm(
             List<BinaryOperator> binaryOperators,
             UnaryOperator? unaryOperator,
-            ConcurrentDictionary<BigRational, ITerm?> hitTargets,
+            ConcurrentDictionary<Rational, ITerm?> hitTargets,
             Action<ITerm, int> onFound,
             long digit,
             long @base = 10)
@@ -51,10 +51,10 @@
             else if (TermsOfSize.Count > size) return;
             var currentTerms = new TermSet();
 
-            var element = new BigInteger(Digit);
+            var element = Digit;
             for (int i = 1; i < size; i++) element = (element * Base) + Digit;
 
-            RegisterTerm(currentTerms, new BigRational(element), size);
+            RegisterTerm(currentTerms, new Rational(element), size);
 
             Parallel.For(1, size, i =>
             {

@@ -435,7 +435,8 @@ Das Problem hierbei ist, dass Fakultät eine unäre Operation ist, weshalb sie u
 Betrachtet man jedoch die Werte der Fakultäts-Funktion, so fällt auf, dass dort sehr schnell immens große Werte entstehen; beispielsweise ist \((5!)!=120!\), was eine Zahl mit 199 Ziffern ist.
 Dass diese Werte nur sehr selten brauchbar sind, ist relativ offensichtlich.
 
-Zur Umgehung dieses Problems habe ich daher ein Limit eingefügt, das Fakultäten von Zahlen größer der arbiträr gewählten Grenze \(80\) verbietet.
+Zur Umgehung dieses Problems habe ich daher ein Limit eingefügt, das Fakultäten von Zahlen größer \(20\) verbietet, wobei \(20!\) die größte durch signierte 64-Bit Integer darsellbare Fakultät ist.
+%Zur Umgehung dieses Problems habe ich daher ein Limit eingefügt, das Fakultäten von Zahlen größer der arbiträr gewählten Grenze \(80\) verbietet.
 Somit ist \((4!)!\) gerade noch erlaubt, jedoch \((5!)!\) verboten.
 Dies lässt sich auch leicht implementieren, wobei jeder neue Term mit Wert \(x < 80\) den neuen Term \(x!\) rekursiv einfügt.
 Dabei muss man jedoch noch darauf achten, dass keine Endlosschleifen auftauchen: \(1 = 1! = \ldots = ((1!)!)!\)

@@ -3,18 +3,18 @@
     using System.Collections.Generic;
     using System.Diagnostics;
 
-    [DebuggerDisplay("{Term}")]
+    [DebuggerDisplay("{ToString()}")]
     public sealed class UnaryOperation : ITerm
     {
         public UnaryOperator Operator { get; }
 
         public ITerm Operand { get; }
 
-        public BigRational Value { get; }
+        public Rational Value { get; }
 
         public long HashCode { get; }
 
-        private UnaryOperation(UnaryOperator @operator, ITerm operand, BigRational value)
+        private UnaryOperation(UnaryOperator @operator, ITerm operand, Rational value)
         {
             Operator = @operator;
             Operand = operand;

@@ -2,7 +2,7 @@
 {
     public interface ITerm
     {
-        BigRational Value { get; }
+        Rational Value { get; }
         string ToString();
         string ToLaTeX();
     }

@@ -1,9 +1,10 @@
 ﻿namespace Afg2Geburtstag
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
 
-    [DebuggerDisplay("{Term} = {Value}")]
+    [DebuggerDisplay("{ToString()} = {Value}")]
     public sealed class BinaryOperation : ITerm
     {
         public BinaryOperator Operator { get; }
@@ -11,11 +12,11 @@
         public ITerm Lhs { get; }
         public ITerm Rhs { get; }
 
-        public BigRational Value { get; }
+        public Rational Value { get; }
 
         public long HashCode { get; }
 
-        private BinaryOperation(BinaryOperator @operator, ITerm lhs, ITerm rhs, BigRational value)
+        private BinaryOperation(BinaryOperator @operator, ITerm lhs, ITerm rhs, Rational value)
         {
             Operator = @operator;
             Lhs = lhs;
@@ -31,11 +32,18 @@
 
         public static BinaryOperation? Create(BinaryOperator @operator, ITerm lhs, ITerm rhs)
         {
-            var value = @operator.Evaluate(lhs, rhs);
+            try
+            {
+                var value = @operator.Evaluate(lhs, rhs);
 
-            return value.HasValue
-                ? new BinaryOperation(@operator, lhs, rhs, value.Value)
-                : null;
+                return value.HasValue
+                    ? new BinaryOperation(@operator, lhs, rhs, value.Value)
+                    : null;
+            }
+            catch (OverflowException)
+            {
+                return null;
+            }
         }
 
         public override string ToString() => Operator.OperationToString(Lhs, Rhs);

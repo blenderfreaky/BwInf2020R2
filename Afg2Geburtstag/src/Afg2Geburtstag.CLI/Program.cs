@@ -48,48 +48,55 @@
         }
 
         public static readonly BinaryOperator Addition =
-            new BinaryOperator((l, r) => l.Value + r.Value, (l, r) => $"({l} + {r})", (l, r) => $"\\left({l.ToLaTeX()} + {r.ToLaTeX()}\\right)");
+            new BinaryOperator((l, r) => checked(l.Value + r.Value), (l, r) => $"({l} + {r})", (l, r) => $"\\left({l.ToLaTeX()} + {r.ToLaTeX()}\\right)");
 
         public static readonly BinaryOperator Subtraction =
-            new BinaryOperator((l, r) => l.Value - r.Value, (l, r) => $"({l} - {r})", (l, r) => $"\\left({l.ToLaTeX()} - {r.ToLaTeX()}\\right)");
+            new BinaryOperator((l, r) => checked(l.Value - r.Value), (l, r) => $"({l} - {r})", (l, r) => $"\\left({l.ToLaTeX()} - {r.ToLaTeX()}\\right)");
 
         public static readonly BinaryOperator Multiplication =
-            new BinaryOperator((l, r) => l.Value * r.Value, (l, r) => $"({l} * {r})", (l, r) => $"\\left({l.ToLaTeX()} \\cdot {r.ToLaTeX()}\\right)");
+            new BinaryOperator((l, r) => checked(l.Value * r.Value), (l, r) => $"({l} * {r})", (l, r) => $"\\left({l.ToLaTeX()} \\cdot {r.ToLaTeX()}\\right)");
 
         public static readonly BinaryOperator Division =
-            new BinaryOperator((l, r) => !r.Value.IsZero ? l.Value / r.Value : (BigRational?)null, (l, r) => $"({l} / {r})", (l, r) => $"\\left(\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}\\right)");
+            new BinaryOperator((l, r) => !r.Value.IsZero ? checked(l.Value / r.Value) : (Rational?)null, (l, r) => $"({l} / {r})", (l, r) => $"\\left(\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}\\right)");
 
         public static readonly BinaryOperator Exponentiation =
             new BinaryOperator(
                 (l, r) =>
                 {
                     if (!r.Value.IsInteger) return null;
+
+                    if (l.Value.IsZero) return r.Value.IsNegative ? (Rational?)null : Rational.Zero;
+                    if (l.Value == Rational.One) return Rational.One;
+
                     var exponentPositive = r.Value.IsPositive;
                     var exponentBig = r.Value.Absolute;
-                    if (exponentBig > 100) return null;
+                    if (exponentBig > 64) return null; // 2^64 can't be stored by int64, much less any bigger value ^64
                     var exponent = (int)exponentBig.Numerator;
 
-                    if (exponent == 0) return BigRational.One;
+                    if (exponent == 0) return Rational.One;
 
                     var numerator = BigInteger.Pow(l.Value.Numerator, exponent);
                     var denominator = BigInteger.Pow(l.Value.Denominator, exponent);
 
+                    if (numerator > long.MaxValue || numerator < long.MinValue) return null;
+                    if (denominator > long.MaxValue || denominator < long.MinValue) return null;
+
                     return exponentPositive
-                        ? new BigRational(numerator, denominator)
-                        : new BigRational(denominator, numerator);
+                        ? new Rational((long)numerator, (long)denominator)
+                        : new Rational((long)denominator, (long)numerator);
                 },
                 (l, r) => $"({l} ^ {r})",
                 (l, r) => $"\\left({{{l}}}^{{{r}}}\\right)");
 
         public static readonly UnaryOperator Factorial =
             new UnaryOperator(
-                x => BigRational.Factorial(x.Value, 80),
+                x => Rational.Factorial(x.Value),
                 x => $"({x}!)",
                 x => $"\\left({x}!\\right)");
 
         private static void RunWithArguments(Options options)
         {
-            var targets = options.Targets!.CleanStrings().Select(BigRational.Parse).ToList();
+            var targets = options.Targets!.CleanStrings().Select(Rational.Parse).ToList();
             var digits = options.Digits!.CleanStrings().Select(int.Parse).ToList();
 
             Console.WriteLine($"% Targets: {string.Join(", ", targets)}");
@@ -130,7 +137,7 @@
             .Select(x => x.Trim().Replace(",", ""));
 
         public static void Farm(
-            IEnumerable<BigRational> targetsSource,
+            IEnumerable<Rational> targetsSource,
             bool useExponentiation,
             bool useFactorial,
             long digit,
@@ -149,7 +156,7 @@
 
             if (useExponentiation) binaryOperators.Add(Exponentiation);
 
-            var targets = new ConcurrentDictionary<BigRational, ITerm?>();
+            var targets = new ConcurrentDictionary<Rational, ITerm?>();
             foreach (var target in targetsSource) targets[target] = null;
 
             var stopwatch = Stopwatch.StartNew();
