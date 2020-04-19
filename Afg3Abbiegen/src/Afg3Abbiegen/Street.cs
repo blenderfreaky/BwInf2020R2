@@ -11,6 +11,7 @@
         /// The start of the street.
         /// </summary>
         public readonly Vector2Int Start;
+
         /// <summary>
         /// The end of the street.
         /// </summary>

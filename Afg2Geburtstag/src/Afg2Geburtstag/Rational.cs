@@ -162,6 +162,7 @@
         public static Rational Parse(string text) => ToFraction(double.Parse(text));
 
         public override string ToString() => Numerator.ToString() + (IsInteger ? string.Empty : "/" + Denominator.ToString());
+
         public string ToLaTeX() => IsInteger
             ? Numerator.ToString()
             : $"\\frac{{{Numerator}}}{{{Denominator}}}";

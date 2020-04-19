@@ -1,15 +1,11 @@
 ﻿namespace Afg2Geburtstag.CLI
 {
     using Afg2Geburtstag;
-    using Colorful;
     using CommandLine;
     using System;
-    using System.Buffers.Text;
-    using System.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Drawing;
     using System.Linq;
     using System.Numerics;
     using System.Threading.Tasks;
@@ -150,6 +146,7 @@
                 Console.WriteLine("\\end{longtable}\n\\end{center}");
             }
         }
+
         /// <summary>
         /// CommandLineParser produces weird outputs for Option Lists sometimes. This cleans them up by removing empty/null strings and removing trailing commas.
         /// </summary>

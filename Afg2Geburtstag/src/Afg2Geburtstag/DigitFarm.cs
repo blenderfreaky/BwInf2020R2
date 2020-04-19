@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Numerics;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
 
@@ -80,6 +79,12 @@
             TermsOfSize.Add(currentTerms);
         }
 
+        /// <summary>
+        /// Adds the
+        /// </summary>
+        /// <param name="terms"></param>
+        /// <param name="term"></param>
+        /// <param name="digits"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RegisterTerm(TermSet terms, ITerm? term, int digits)
         {

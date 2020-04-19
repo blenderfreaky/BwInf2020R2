@@ -15,6 +15,7 @@
         /// </summary>
         /// <returns>A string that represents the current object.</returns>
         string ToString();
+
         /// <summary>
         /// Returns a string that represents the current object as latex code.
         /// </summary>

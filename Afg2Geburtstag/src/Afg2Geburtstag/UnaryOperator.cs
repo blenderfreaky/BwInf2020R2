@@ -28,6 +28,7 @@
         }
 
         public static bool operator ==(UnaryOperator? left, UnaryOperator? right) => EqualityComparer<UnaryOperator>.Default.Equals(left, right);
+
         public static bool operator !=(UnaryOperator? left, UnaryOperator? right) => !(left == right);
     }
 }

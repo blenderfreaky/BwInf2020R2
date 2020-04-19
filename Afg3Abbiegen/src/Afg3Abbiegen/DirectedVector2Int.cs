@@ -11,6 +11,7 @@
         /// The position.
         /// </summary>
         public readonly Vector2Int Position;
+
         /// <summary>
         /// The direction.
         /// </summary>

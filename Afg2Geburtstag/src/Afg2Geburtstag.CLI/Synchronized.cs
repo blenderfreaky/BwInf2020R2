@@ -12,6 +12,7 @@
         {
             for (int i = inclusiveStart; i < exclusiveEnd; i++) action(i);
         }
+
         public static void ForEach<T>(IEnumerable<T> enumerable, Action<T> action)
         {
             foreach (var elem in enumerable) action(elem);
