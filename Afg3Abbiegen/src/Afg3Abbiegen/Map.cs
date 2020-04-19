@@ -150,6 +150,31 @@
         public static List<(Vector2Int, float)> DebugDots = new List<(Vector2Int, float)>();
         public static List<(Vector2Int,Vector2Int, float)> DebugLines = new List<(Vector2Int, Vector2Int, float)>();
 
+        protected readonly struct Cost : IComparable<Cost>
+        {
+            public readonly int Turns;
+            public readonly float Distance;
+
+            public Cost(int turns, float distance)
+            {
+                Turns = turns;
+                Distance = distance;
+            }
+
+            public int CompareTo(Cost other)
+            {
+                var turnsComp = Turns.CompareTo(other.Turns);
+                if (turnsComp != 0) return turnsComp;
+                return Distance.CompareTo(other.Distance);
+            }
+
+            public override bool Equals(object? obj) => obj is Cost cost && Turns == cost.Turns && Distance == cost.Distance;
+            public override int GetHashCode() => HashCode.Combine(Turns, Distance);
+
+            public static bool operator ==(Cost left, Cost right) => left.Equals(right);
+            public static bool operator !=(Cost left, Cost right) => !(left == right);
+        }
+
         /// <summary>
         /// Gets bilals path, meaning the path with least turns shorter in length then <paramref name="maxLength"/>.
         /// Returns <c>null</c> if no such path was found.
@@ -160,10 +185,11 @@
         /// <returns>The path from starting point to ending point, including those points.</returns>
         public IEnumerable<Vector2Int>? BilalsPath(float maxLength, out int fullTurns, out float fullDistance)
         {
-            var paths = new Dictionary<DirectedVector2Int, (DirectedVector2Int Source, float Distance, int Cost)>();
+            var paths = new Dictionary<DirectedVector2Int, DirectedVector2Int>();
+            var distances = new Dictionary<DirectedVector2Int, float>();
+            var turns = new Dictionary<DirectedVector2Int, int>();
 
-            // TODO: Try FastPriorityQueue
-            var priorityQueue = new SimplePriorityQueue<DirectedVector2Int, int>();
+            var priorityQueue = new SimplePriorityQueue<DirectedVector2Int, Cost>();
 
             var starts = new HashSet<DirectedVector2Int>();
             var ends = new HashSet<DirectedVector2Int>();
@@ -174,13 +200,12 @@
 
                 foreach (var (_, bidirection, _) in intersection.Value)
                 {
-                    var priority = int.MaxValue;
+                    var priority = new Cost(int.MaxValue, float.PositiveInfinity);
                     var street = new DirectedVector2Int(streetStart, bidirection);
 
                     if (streetStart == Start)
                     {
-                        priority = 0;
-                        paths[street] = (street, 0, 0);
+                        priority = new Cost(0, 0);
                         starts.Add(street);
                     }
 
@@ -190,24 +215,27 @@
                     }
 
                     priorityQueue.EnqueueWithoutDuplicates(street, priority);
+                    turns[street] = priority.Turns;
+                    distances[street] = priority.Distance;
                 }
             }
 
             var maxCost = int.MaxValue;
             var bestEnd = ends.First(); // Arbitrarily choose the first one just to have some value
 
-            while (priorityQueue.Any()) // While there are ends that have not gotten any path to them discovered
+            while (ends.Any(priorityQueue.Contains)) // While there are ends that have not gotten any path to them discovered
             {
                 var head = priorityQueue.Dequeue();
-                var headPath = paths[head];
+                var headCost = turns[head];
+                var headDistance = distances[head];
 
-                if (headPath.Cost > maxCost) break;
+                if (headCost > maxCost) break;
 
                 if (ends.Contains(head))
                 {
-                    maxCost = headPath.Cost;
+                    maxCost = headCost;
 
-                    if (headPath.Distance < paths[bestEnd].Distance) bestEnd = head;
+                    if (headDistance < distances[bestEnd]) bestEnd = head;
                 }
 
                 var reachableStreets = ReachableFromIntersection[head.Position];
@@ -215,23 +243,23 @@
                 foreach (var (target, bidirection, distance) in reachableStreets)
                 {
                     var newDistance = headDistance + distance;
-                    if (newDistance > maxLength + 1E-5)
-                        continue; // Add 1E-5 as an epsilon to avoid floating point errors
+                    if (newDistance > maxLength + 1E-5) continue; // Add 1E-5 as an epsilon to avoid floating point errors
 
                     var directedTarget = new DirectedVector2Int(target, bidirection);
-                    var oldCost = costs[directedTarget];
 
-                    var newCost = headCost + (bidirection == head.Direction ? 0 : 1);
+                    var oldTurns = turns[directedTarget];
+                    var newTurns = headCost + (bidirection == head.Direction ? 0 : 1);
 
                     var oldDistance = distances[directedTarget];
 
-                    if (newCost == oldCost && newDistance > oldDistance) continue;
-                    if (newCost > oldCost) continue;
+                    if (newTurns == oldTurns && newDistance > oldDistance) continue;
+                    if (newTurns > oldTurns) continue;
 
+                    var newCost = new Cost(newTurns, newDistance);
                     if (!priorityQueue.TryUpdatePriority(directedTarget, newCost)) priorityQueue.Enqueue(directedTarget, newCost);
 
                     paths[directedTarget] = head;
-                    costs[directedTarget] = newCost;
+                    turns[directedTarget] = newTurns;
                     distances[directedTarget] = newDistance;
                 }
             }

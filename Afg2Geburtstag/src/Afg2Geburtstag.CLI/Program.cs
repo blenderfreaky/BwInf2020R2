@@ -50,17 +50,20 @@
                 .WithParsed(RunWithArguments);
         }
 
+        public static readonly string Left = "\\left(";
+        public static readonly string Right = "\\right)";
+
         public static readonly BinaryOperator Addition =
-            new BinaryOperator((l, r) => checked(l.Value + r.Value), (l, r) => $"({l} + {r})", (l, r) => $"\\left({l.ToLaTeX()} + {r.ToLaTeX()}\\right)");
+            new BinaryOperator((l, r) => checked(l.Value + r.Value), (l, r) => $"({l} + {r})", (l, r) => $"{Left}{l.ToLaTeX()} + {r.ToLaTeX()}{Right}");
 
         public static readonly BinaryOperator Subtraction =
-            new BinaryOperator((l, r) => checked(l.Value - r.Value), (l, r) => $"({l} - {r})", (l, r) => $"\\left({l.ToLaTeX()} - {r.ToLaTeX()}\\right)");
+            new BinaryOperator((l, r) => checked(l.Value - r.Value), (l, r) => $"({l} - {r})", (l, r) => $"{Left}{l.ToLaTeX()} - {r.ToLaTeX()}{Right}");
 
         public static readonly BinaryOperator Multiplication =
-            new BinaryOperator((l, r) => checked(l.Value * r.Value), (l, r) => $"({l} * {r})", (l, r) => $"\\left({l.ToLaTeX()} \\cdot {r.ToLaTeX()}\\right)");
+            new BinaryOperator((l, r) => checked(l.Value * r.Value), (l, r) => $"({l} * {r})", (l, r) => $"{Left}{l.ToLaTeX()} \\cdot {r.ToLaTeX()}{Right}");
 
         public static readonly BinaryOperator DivisionWithFractions =
-            new BinaryOperator((l, r) => !r.Value.IsZero ? (Rational?)(l.Value / r.Value) : (Rational?)null, (l, r) => $"({l} / {r})", (l, r) => $"\\left(\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}\\right)");
+            new BinaryOperator((l, r) => !r.Value.IsZero ? (Rational?)(l.Value / r.Value) : null, (l, r) => $"({l} / {r})", (l, r) => $"{Left}\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}{Right}");
 
         public static readonly BinaryOperator DivisionWithoutFractions =
             new BinaryOperator((l, r) =>
@@ -68,13 +71,13 @@
                 if (!r.Value.IsZero)
                 {
                     var result = checked(l.Value / r.Value);
-                    return result.IsInteger ? (Rational?)result : (Rational?)null;
+                    return result.IsInteger ? (Rational?)result : null;
                 }
                 else
                 {
-                    return (Rational?)null;
+                    return null;
                 }
-            }, (l, r) => $"({l} / {r})", (l, r) => $"\\left(\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}\\right)");
+            }, (l, r) => $"({l} / {r})", (l, r) => $"{Left}\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}{Right}");
 
         public static BinaryOperator Exponentiation(bool allowFractions) =>
             new BinaryOperator(
@@ -106,13 +109,13 @@
                     return result.IsInteger ? result : (Rational?)null;
                 },
                 (l, r) => $"({l} ^ {r})",
-                (l, r) => $"\\left({{{l}}}^{{{r}}}\\right)");
+                (l, r) => $"{Left}{{{l}}}^{{{r}}}{Right}");
 
         public static readonly UnaryOperator Factorial =
             new UnaryOperator(
                 x => Rational.Factorial(x.Value),
                 x => $"({x}!)",
-                x => $"\\left({x}!\\right)");
+                x => $"{Left}{x}!{Right}");
 
         private static void RunWithArguments(Options options)
         {
@@ -122,12 +125,12 @@
             Console.WriteLine($"% Targets: {string.Join(", ", targets)}");
             Console.WriteLine($"% Digits: {string.Join(", ", digits)}");
             Console.WriteLine($"% Base: {options.Base}");
-            Console.WriteLine($"% {(options.AllowExponentiation ? "Exponentiation " : "")}{(options.AllowFactorial ? "Factorial " : "")}");
+            Console.WriteLine($"% {(options.AllowExponentiation ? "Exponentiation " : "")}{(options.AllowFactorial ? "Factorial" : "")}");
 
             if (options.OutputAsLatex)
             {
-                Console.WriteLine("\\begin{center}\n\\begin{tabular}{ | l | l | p{7cm} | l | l | }");
-                Console.WriteLine("\\hline Digit & Value & Term & Digit Usages & Time \\\\\\hline");
+                Console.WriteLine("\\begin{center}\n\\begin{longtable}{ | l | l | p{9.5cm} | l | l | }");
+                Console.WriteLine("\\hline \\textbf{Digit} & \\textbf{Value} & \\textbf{Term} & \\textbf{Digit Usages} & \\textbf{Time} \\endhead\\\\\\hline");
             }
 
             void digitAction(int digit) =>
@@ -144,7 +147,7 @@
 
             if (options.OutputAsLatex)
             {
-                Console.WriteLine("\\end{tabular}\n\\end{center}");
+                Console.WriteLine("\\end{longtable}\n\\end{center}");
             }
         }
         /// <summary>
@@ -185,6 +188,7 @@
 
             Action<ITerm, int> onFound = asLatex
                 ? (term, digits) =>
+                    //Console.WriteLine($"\t{digit} & {term.Value} & \\(\\begin{{multlined}} {term.ToLaTeX()} \\end{{multlined}}\\) & {digits} & {stopwatch.Elapsed.TotalSeconds:0.000}s \\\\\\hline")
                     Console.WriteLine($"\t{digit} & {term.Value} & \\( {term.ToLaTeX()} \\) & {digits} & {stopwatch.Elapsed.TotalSeconds:0.000}s \\\\\\hline")
                 : (Action<ITerm, int>)((term, digits) =>
                     Console.WriteLine($"Found solution for {term.Value} with {digit} with {digits} digits [{stopwatch.Elapsed.TotalSeconds:0.000}s]:\n  {term.Value} = {term}\n"));

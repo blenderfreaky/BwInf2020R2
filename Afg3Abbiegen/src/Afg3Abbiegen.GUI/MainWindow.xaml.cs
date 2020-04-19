@@ -169,9 +169,9 @@
 
             canvas.Children.Add(new Ellipse
             {
-                Margin = new Thickness(positionScreen.X - strokeThickness/2, positionScreen.Y - strokeThickness / 2, 0, 0),
+                Margin = new Thickness(positionScreen.X - (strokeThickness / 2), positionScreen.Y - (strokeThickness / 2), 0, 0),
                 Width = strokeThickness,
-                Height = strokeThickness,
+                //Height = strokeThickness,
 
                 Fill = brush,
                 VerticalAlignment = VerticalAlignment.Center,
