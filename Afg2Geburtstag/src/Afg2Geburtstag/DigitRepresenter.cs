@@ -42,6 +42,7 @@
         /// All targets to find representations for, along with their optimal representation, if one was found.
         /// </summary>
         public ConcurrentDictionary<Rational, ITerm?> Targets { get; }
+
         /// <summary>
         /// The number of targets for which no optimal representation has been found yet.
         /// </summary>
@@ -102,10 +103,10 @@
                             var term = BinaryOperation.Create(@operator, lhs.Key, rhs.Key);
 
                             RegisterTerm(currentTerms, term, size);
+
+                            if (UnfoundTargets == 0) return;
                         }
                     }
-
-                    if (UnfoundTargets == 0) return;
                 }
             });
 

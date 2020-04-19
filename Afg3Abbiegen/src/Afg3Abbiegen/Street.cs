@@ -40,7 +40,7 @@
         public override bool Equals(object obj) => obj is Street street && Equals(street);
 
         /// <inheritdoc/>
-        public readonly bool Equals(Street other) => (other.Start, other.End) == (Start, End) || (other.End, other.Start) == (Start, End);
+        public readonly bool Equals(Street other) => (other.Start, other.End) == (Start, End);
 
         /// <inheritdoc/>
         public override int GetHashCode() => HashCode.Combine(Start, End) * HashCode.Combine(End, Start);

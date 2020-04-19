@@ -20,8 +20,7 @@
 
 \usepackage{breqn}
 
-\usepackage{longtable,array}
-\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\usepackage{longtable}
 
 \usepackage{cite}
 
@@ -43,20 +42,6 @@
 \setlength{\parskip}{.8em} 
 \setlength{\parindent}{0pt}
 
-% Für Algorithmen
-\usepackage{algpseudocode}
-\usepackage{algorithm}
-%\usepackage{pxfonts}
-
-\algnewcommand\algorithmicforeach{\textbf{for each}}
-\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
-
-%
-% Für Quelltext
-\usepackage{listings}
-\usepackage{xcolor}
-
-\usepackage{url}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{corollary}{Corollary}[theorem]
@@ -71,6 +56,12 @@
 \theoremsymbol{\ensuremath{\color{lightgray}\blacksquare}}
 \newtheorem{proof}{Beweis}
 
+%
+% Für Quelltext
+\usepackage{listings}
+\usepackage{xcolor}
+
+\usepackage{url}
 
 %\usepackage{courier}
 %\setmonofont{Consolas} %to be used with XeLaTeX or LuaLaTeX
@@ -105,7 +96,7 @@ morekeywords={partial, var, get, set, from, select, package, deref},
 emph=[0]{T,U,V,TToken},
 emphstyle=[0]{\color{types}},
 %
-emph=[1]{Rational,NotSupportedException,List,HashSet,ITerm,BinaryOperation,UnaryOperation,BinaryOperator,UnaryOperator,DigitRepresenter},
+emph=[1]{Parser,LexemeString,Lexeme,ParserSuccess,ParserError,IParserResult,NotSupportedException,Token,Predicate,EqualityComparer,List,TempleLang,Intermediate,Binder,Bound,CodeGenerator,NASM,Transformer,Abstractions},
 emphstyle=[1]{\color{turqoisetypes}},
 %
 otherkeywords={=>,<,>},
@@ -129,17 +120,20 @@ literate=%
     {~}{{\textasciitilde}}1
 }
 
+\usepackage{hyperref}
+\usepackage{cleveref}
+
 \lstMakeShortInline[
   language=CSharp,
   columns=fixed,]~
 
-  \lstnewenvironment{lstcs}[1][]
-  {\lstset{
-      language=CSharp,
-      breaklines=true,
-      columns=fullflexible,
-      caption={#1}
-  }}
+\lstnewenvironment{lstcs}[1][]
+    {\lstset{
+        language=CSharp,
+        breaklines=true,
+        columns=fullflexible,
+        caption={#1}
+    }}
 {}
 
 \newcommand{\sidenote}[1]{&&|\ \text{#1}.}
@@ -162,8 +156,6 @@ literate=%
 
 \begin{document}
 
-%\textcolor{red}{Ich habe mal Deine Funktion von $\varphi_{d,b}$ auf $\Phi_d$ geändert und das $b$ darin weggelassen, dessen Bedeutung sich mir an dieser Stelle noch nicht erschließt. Kuck mal, ob Dir das so gefällt. Ich finde es besser. Wenn nicht: Ich habe Deine alte Definition auskommentiert, dann einfach meine wieder löschen. Wenn das $b$ wichtig ist, könntest Du vielleicht auch $\Phi_d^b$ nehmen, das finde ich noch besser leserlich als $\varphi_{d,b}$.}
-
 \section{Lösungsidee}
 
 Die Kernidee des Algorithmus besteht darin, alle Terme zu ermitteln, die durch \(n\)-fache Verwendung der gegebenen Ziffer und deren Verknüpfung mit sich selbst (wie in der Aufgabenstellung beschrieben) optimal ihren Wert darstellen.
@@ -174,7 +166,6 @@ Um mit diesem Verfahren nun die Aufgabe zu lösen, ermittelt man solange größe
 Diese Vorangehensweise erlaubt es auch, mit der gleichen Ziffer Repräsentationen für mehrere Zahlen auf einmal zu finden, ohne dass sich die Laufzeit addiert.
 Hierfür werden einfach größere und größere Terme ermittelt, bis alle Zahlen eine optimale Repräsentation erhalten haben.
 Die Laufzeit, um mehrere Zahlen zu repräsentieren entspricht hierbei einfach der längsten Laufzeit, bei dem jede Zahl individuell durch den Algorithmus läuft.
-%\textcolor{red}{Was meinst Du mit der Laufzeit der individuellen Zahlen? Findet sich hier vielleicht noch eine deutlichere Formulierung? Meinst Du so etwas wie 'die Laufzeit für die betreffenden Zahlen? Oder ähnliches?}
 
 Auf ersten Blick scheint dieser Algorithmus eine exponentielle Komplexität zu besitzen, tatsächlich ist dem aber gar nicht so.
 Im Folgenden wird die Komplexität dieses Verfahrens genauer betrachtet.
@@ -217,7 +208,6 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
     \subsubsection*{Fall 2: \(n < 0\)}
         
     \(n < 0\) lässt sich als Differenz aus \(0 = d-d\) und \(|n| > 0\) darstellen:
-    %\textcolor{red}{Meinst Du hier wirklich '\(0 = d-d\) und \(d\) darstellen' und nicht vielmehr aus '\(0 = d-d\) und |n|' darstellen? Der Bruch stellt doch den Betrag von $n$ dar ...}
     \[n = d - d - \frac{d+d+\ldots+d}{d} \implies \measure{n} \leq |n| + 3\]
     oder alternativ unter Verwendung von unärer Negation:
     \[n = -\frac{d+d+\ldots+d}{d} \implies \measure{n} \leq |n| + 1 < |n| + 3\]
@@ -242,7 +232,7 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
 \begin{proof}
     \(\frac{a}{b}\) ist das Ergebnis der Anwendung des binären Divisions-Operators auf \(a\) und \(b\), somit lässt es sich laut Lemma \ref{lemma:phi_binary} mit \(\measure{a} + \measure{b}\) oder weniger Ziffern ausdrücken.
 \end{proof}
-%\textcolor{red}{Das ist doch hier ein anderes 'b' als das in Deiner ursprünglichen Definition von $\varphi_{d,b}$? Ich finde, Du solltest Dein 'b' unbedingt noch erläutern.}
+
 \begin{theorem}[Genauere obere Grenze des Größenmaßes für positive ganze Zahlen]\label{theorem:accurate_bound}
     Für jede positive ganze Zahl \(n\) gilt:
     
@@ -270,7 +260,6 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
     Da \(0 \leq a_i < d\) gilt, folgt mit Lemma \ref{lemma:measure_linear_nonnegative} für jedes \(a_i\): \(\measure{a_i} \leq d + 2\).
     Zusammen mit \(\measure{d} = 1\) folgt aus Abschätzung \ref{eqn:semi_accurate_bound}:
     
-%\textcolor{red}{Bei der nachfolgenden Auflistung würde ich die erste Zeile weglassen, denn diese ist nur eine Dopplung Deiner Gleichung (2) obendrüber, fange gleich mit der nächsten Ungleichung an}
     \begin{align*}
         \measure{n} 
         &\leq (k-1) \cdot 1 + \sum_{i=1}^k (d+2) \\
@@ -280,7 +269,6 @@ Zur Berechnung der Komplexität wird die Größenmaß-Funktion \(\Phi_{d}^{B} : 
 Bei der Repräsentation mit dem Horner-Schema gilt \(k = \lfloor \log_d(n) \rfloor\), somit folgt:
         \[\measure{n} \leq k \cdot (d+3) = \lfloor \log_d(n) \rfloor \cdot (d+3) \leq \log_d(n) \cdot (d+3)\]
 
-%\textcolor{red}{Warum hier nochmal der Wechsel von $d+3$ zu $d+4$. Das erschließt sich an dieser Stelle für mich nicht.}
 Das Problem der non-existenten Basis für den Spezialfall \(d = 1\) kann durch den folgenden Trick umgangen werden:
 Anstelle von \(d = 1\) wird die  Basis \(2 = 1 + 1 = d + d\) betrachtet.   
 In Abschätzung \ref{eqn:semi_accurate_bound} muss dann nur \(\measure{d}\) durch \(\measure{d + d} = 2\cdot\measure{d}\) ersetzt werden:
@@ -401,7 +389,6 @@ Somit ist die Komplexität eine Summe aus Potenzen, also ebenfalls eine Potenz:
 
 \[t_{\measure{n}} \in \mathcal{O}(n^{\alpha}),\qquad\text{mit }\alpha=\max_{0 < d \leq 9}\frac{d+4}{\log_{20}(d)}\]
 
-%All das mag heißen, dass auch wenn quasi purer Brute-Force verwendet wird, die Komplexität polynomial ist und somit auch die Komplexität des obigen Algorithmus.
 Auch wenn quasi purer Brute-Force verwendet wird, so belegen diese Überlegungen dennoch, dass eine polynomiale Komplexität vorliegt.
 Da der eigentliche Algorithmus durch die Eliminierung von Duplikaten noch einmal stärker optimiert ist, ist dessen Komplexität natürlich auch polynomial.
 
@@ -409,7 +396,6 @@ Da der eigentliche Algorithmus durch die Eliminierung von Duplikaten noch einmal
 
 Um den Algorithmus auf Exponenten und Fakultäten zu erweitern, kann zuerst Exponentiation als zusätzlicher binärer Operator wie Addition und Multiplikation hinzugefügt werden.
 Dabei bleibt die Komplexität analog zu vorher polynomial, nur zu einem größeren Exponenten.
-%\textcolor{red}{Schau mal hier, ob das sinngemäß noch das ist, was Du sagen wolltest ... ich hab den Text vorweg etwas verändert}.
 
 Für die Hinzunahme von Fakultäten ist dies jedoch nicht so leicht.
 Zunächst lässt sich Fakultät relativ leicht in den Algorithmus einbauen, wobei jeder neue optimale Term noch einmal mit einer Fakultät hinten zu der Liste aller optimalen Terme addiert wird.
@@ -418,7 +404,6 @@ Betrachtet man jedoch die Werte der Fakultäts-Funktion, so fällt auf, dass dor
 Dass diese Werte nur sehr selten brauchbar sind, ist relativ offensichtlich.
 
 Zur Umgehung dieses Problems habe ich daher ein Limit eingefügt, das Fakultäten von Zahlen größer \(20\) verbietet, wobei \(20!\) die größte durch signierte 64-Bit Integer darsellbare Fakultät ist.
-%Zur Umgehung dieses Problems habe ich daher ein Limit eingefügt, das Fakultäten von Zahlen größer der arbiträr gewählten Grenze \(80\) verbietet.
 Somit ist \((4!)!\) gerade noch erlaubt, jedoch \((5!)!\) verboten.
 Dies lässt sich auch leicht implementieren, wobei jeder neue Term mit Wert \(x < 80\) den neuen Term \(x!\) rekursiv einfügt.
 Dabei muss man jedoch noch darauf achten, dass keine Endlosschleifen auftauchen: \(1 = 1! = \ldots = ((1!)!)!\)
@@ -434,6 +419,7 @@ Die Beispiele unten enthalten daher auch Lösungen mit der Ziffer \(0\).
 \section{Umsetzung}
 
 Der Algorithmus wurde in C\# 8.0 mit .NET Core 3.1 implementiert.
+Es wurde als Library CommandLineParser\footnote{https://github.com/commandlineparser/commandline} verwendet. Diese implementiert Methoden um Unix-Style Konsolenargumente entgegenzunehmen.
 Der Code ist in zwei Projekte geteilt;
 ~Afg2Geburtstag.CLI~ und ~Afg2Geburtstag~.
 ~Afg2Geburtstag.CLI~ kümmert sich um das Konsolen-Interface und ruft ~Afg2Geburtstag~ auf, was den eigentlichen Algorithmus enthält.
@@ -441,8 +427,10 @@ Der Code ist in zwei Projekte geteilt;
 
 \begin{description}
     \item[Rational] definiert rationale Zahlen und Operationen auf diesen.
-    \item[ITerm] repräsentiert eine Schnittstelle für beliebige Terme mit einem ~BigRational~ Wert. Wird von ~BigRational~ implementiert.
+    \item[ITerm] repräsentiert eine Schnittstelle für beliebige Terme mit einem ~Rational~ Wert. Wird von ~Rational~ implementiert.
+    \item[UnaryOperator] repräsentiert einen unären Operator der zur Erstellung einer ~UnaryOperation~ verwendet werden kann.
     \item[UnaryOperation] repräsentiert eine unäre Operation auf einem ~ITerm~ und implementiert selbst ~ITerm~.
+    \item[BinaryOperator] repräsentiert einen binären Operator der zur Erstellung einer ~BinaryOperation~ verwendet werden kann.
     \item[BinaryOperation] repräsentiert eine binäre Operation zwischen zwei ~ITerm~s und implementiert selbst ~ITerm~.
     \item[DigitRepresenter] enthält den Kernalgorithmus für eine Ziffer und mehrere Zielzahlen.
 \end{description}
@@ -569,7 +557,201 @@ Argumente:
 
 \section{Code}
 
-TBD
+\begin{lstcs}[]
+/// <summary>
+/// Represents an arbitrary mathematical teerm.
+/// </summary>
+public interface ITerm
+{
+    /// <summary>
+    /// The value of the term.
+    /// </summary>
+    Rational Value { get; }
+
+    /// <summary>
+    /// Returns a string that represents the current object.
+    /// </summary>
+    /// <returns>A string that represents the current object.</returns>
+    string ToString();
+
+    /// <summary>
+    /// Returns a string that represents the current object as latex code.
+    /// </summary>
+    /// <returns>A string that represents the current object as latex code.</returns>
+    string ToLaTeX();
+}
+\end{lstcs}
+
+\begin{lstcs}[]
+using RationalSet = System.Collections.Concurrent.ConcurrentDictionary<Rational, byte>;
+using TermSet = System.Collections.Concurrent.ConcurrentDictionary<ITerm, byte>;
+
+/// <summary>
+/// Contains the main algorithm.
+/// </summary>
+public class DigitRepresenter
+{
+    /// <summary>
+    /// All binary operators available.
+    /// </summary>
+    public List<BinaryOperator> BinaryOperators { get; }
+
+    /// <summary>
+    /// Contains a unary operator. <c>null</c> if no unary operator is to be used.
+    /// Multiple unary operators are no supported.
+    /// </summary>
+    public UnaryOperator? UnaryOperator { get; }
+
+    /// <summary>
+    /// All calculated terms, where the set at index i contains all the terms which use the digit i times.
+    /// </summary>
+    public List<TermSet> TermsOfSize { get; }
+
+    /// <summary>
+    /// Contains all values of all terms.
+    /// </summary>
+    public RationalSet AllValues { get; }
+
+    public long Digit { get; }
+    public long Base { get; }
+
+    /// <summary>
+    /// All targets to find representations for, along with their optimal representation, if one was found.
+    /// </summary>
+    public ConcurrentDictionary<Rational, ITerm?> Targets { get; }
+
+    /// <summary>
+    /// The number of targets for which no optimal representation has been found yet.
+    /// </summary>
+    public int UnfoundTargets { get; private set; }
+
+    /// <summary>
+    /// An action to execute once an optimal representation for any given target was found.
+    /// </summary>
+    public Action<ITerm, int> OnFound { get; }
+
+    public DigitRepresenter(
+        List<BinaryOperator> binaryOperators,
+        UnaryOperator? unaryOperator,
+        ConcurrentDictionary<Rational, ITerm?> hitTargets,
+        Action<ITerm, int> onFound,
+        long digit,
+        long @base = 10)
+    {
+        TermsOfSize = new List<TermSet>() { new TermSet() };
+        AllValues = new RationalSet();
+        BinaryOperators = binaryOperators;
+        UnaryOperator = unaryOperator;
+        Digit = digit;
+        Base = @base;
+
+        Targets = hitTargets;
+        UnfoundTargets = hitTargets.Count;
+        OnFound = onFound;
+    }
+
+    /// <summary>
+    /// Calculates all terms of size.
+    /// </summary>
+    /// <param name="size">The size of the terms to calculate.</param>
+    public void CalculateAllOfSize(int size)
+    {
+        if (TermsOfSize.Count < size) CalculateAllOfSize(size - 1);
+        else if (TermsOfSize.Count > size) return;
+        var currentTerms = new TermSet();
+
+        // The digit concatenated with itself <size> times
+        var repeatedDigit = Digit;
+        for (int i = 1; i < size; i++) repeatedDigit = (repeatedDigit * Base) + Digit;
+        RegisterTerm(currentTerms, new Rational(repeatedDigit), size);
+
+        // Execute all different ways of combining the smaller terms to terms of size <size> in parallel
+        Parallel.For(1, size, i =>
+        {
+            var allLhs = TermsOfSize[i];
+            var allRhs = TermsOfSize[size - i];
+
+            foreach (var lhs in allLhs)
+            {
+                foreach (var rhs in allRhs)
+                {
+                    foreach (var @operator in BinaryOperators)
+                    {
+                        var term = BinaryOperation.Create(@operator, lhs.Key, rhs.Key);
+
+                        RegisterTerm(currentTerms, term, size);
+
+                        if (UnfoundTargets == 0) return;
+                    }
+                }
+            }
+        });
+
+        TermsOfSize.Add(currentTerms);
+    }
+
+    /// <summary>
+    /// Adds <paramref name="term"/> and repeated applications of <see cref="UnaryOperator"/> upon it
+    /// to <paramref name="termSet"/>if the terms are optimal representations of their values.
+    /// </summary>
+    /// <param name="termSet">The set of terms to add the terms to.</param>
+    /// <param name="term">The term.</param>
+    /// <param name="digitCount">The amount of times the digit is used in <paramref name="term"/>.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void RegisterTerm(TermSet termSet, ITerm? term, int digitCount)
+    {
+        if (term == null) return;
+        if (AddTermIfNew(termSet, term, digitCount)) return;
+
+        if (UnaryOperator == null) return;
+
+        // Apply the unary operator repeatedly until either
+        //  - The value stops changing
+        //  - The unary operator cannot be applied anymore (values too big, trying to compute (-1)! etc.)
+        do
+        {
+            var newTerm = UnaryOperation.Create(UnaryOperator, term);
+            if (newTerm == null || newTerm.Value == term.Value) break;
+            term = newTerm;
+        }
+        while (AddTermIfNew(termSet, term, digitCount));
+    }
+
+    /// <summary>
+    /// Adds <paramref name="term"/> to <paramref name="termSet"/> if the term are optimal representations of
+    /// their values and their values are not yet represented by any other term.
+    /// If the term is the value of a target <see cref="OnFound"/> is called
+    /// and the term is stored as its optimal representation.
+    /// </summary>
+    /// <param name="termSet">The set of terms to add the term to.</param>
+    /// <param name="term">The term.</param>
+    /// <param name="digitCount">The amount of times the digit is used in <paramref name="term"/>.</param>
+    /// <returns>Whether the value was added.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool AddTermIfNew(TermSet termSet, ITerm? term, int digitCount)
+    {
+        // Don't add null or exisitng values
+        if (term == null || AllValues.ContainsKey(term.Value))
+        {
+            return false;
+        }
+
+        // Check if the terms value is a target
+        if (Targets.TryGetValue(term.Value, out var otherTerm) && otherTerm == null)
+        {
+            Targets[term.Value] = term;
+            UnfoundTargets--;
+            OnFound(term, digitCount);
+        }
+
+        // Add the term as key with value 0, as the value is ignored
+        AllValues.TryAdd(term.Value, 0);
+        termSet.TryAdd(term, 0);
+
+        return true;
+    }
+}
+\end{lstcs}
 
 \section{Anhang}
 
