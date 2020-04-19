@@ -68,10 +68,7 @@
             void registerStreet(Street street)
             {
                 // Get the existing list or add a new one for key street.Start
-                if (!ReachableFromIntersection.TryGetValue(street.Start, out var reachableIntersections))
-                {
-                    ReachableFromIntersection[street.Start] = reachableIntersections = new List<(Vector2Int Target, Vector2Int Bidirection, float Distance)>();
-                }
+                var reachableIntersections = ReachableFromIntersection.GetOrCreateValue(street.Start);
 
                 reachableIntersections.Add((street.End, street.Path.Direction, street.Path.Length));
 
@@ -186,20 +183,6 @@
 
             /// <summary>
             /// Returns a new <see cref="Path"/> instance with <see cref="Previous"/> set to this and <see cref="End"/> set to <paramref name="next"/>.
-            /// All other values are adjusted accordingly.
-            /// </summary>
-            /// <param name="next">The <see cref="End"/> of the new <see cref="Path"/> instance.</param>
-            /// <returns>The new <see cref="Path"/> instance.</returns>
-            public Path ContinueTo(Vector2Int next)
-            {
-                var pathToNext = next - End;
-                var nextDirection = pathToNext.Bidirection;
-                return ContinueTo(next, nextDirection, pathToNext.Length);
-            }
-
-            /// <summary>
-            /// Like <see cref="ContinueTo(Vector2Int)"/> but with precomputed direction and distance.
-            /// Returns a new <see cref="Path"/> instance with <see cref="Previous"/> set to this and <see cref="End"/> set to <paramref name="next"/>.
             /// </summary>
             /// <param name="next">The <see cref="End"/> of the new <see cref="Path"/> instance.</param>
             /// <param name="direction">The <see cref="Vector2Int.Direction"/> value of the path between <see cref="End"/> and <paramref cref="next"/>.</param>
@@ -224,10 +207,11 @@
             public override bool Equals(object? obj) => obj is Path path && Equals(path);
 
             /// <inheritdoc/>
-            public bool Equals(Path path) => Turns == path.Turns && Distance == path.Distance && End.Equals(path.End) && Direction.Equals(path.Direction) && EqualityComparer<Path>.Default.Equals(Previous, path.Previous);
+            public bool Equals(Path path) => End.Equals(path.End)
+                && EqualityComparer<Path?>.Default.Equals(Previous, path.Previous);
 
             /// <inheritdoc/>
-            public override int GetHashCode() => HashCode.Combine(Turns, Distance, End, Direction, Previous);
+            public override int GetHashCode() => HashCode.Combine(End, Previous);
 
             public override string ToString() => (Previous == null ? string.Empty : Previous.ToString() + " -> ")
                 + $"[{End}, T: {Turns}, D: {Distance}]";
@@ -245,7 +229,7 @@
         {
             // Path implements the priority comparisons itself => use it as key and priority type
             var priorityQueue = new SimplePriorityQueue<Path, Path>();
-            var oldPaths = new HashSet<Path>();
+            var paths = new Dictionary<DirectedVector2Int, Dictionary<int, Path>>();
 
             var start = new Path(Start);
             priorityQueue.Enqueue(start, start);
@@ -255,7 +239,6 @@
             while (priorityQueue.Any())
             {
                 var head = priorityQueue.Dequeue();
-                oldPaths.Add(head);
 
                 if (head.End == End)
                 {
@@ -270,12 +253,25 @@
                     var newPath = head.ContinueTo(target, direction, distance);
 
                     if (newPath.Distance > maxLength
-                        || newPath.Turns > maxTurns
-                        || oldPaths.Contains(newPath))
+                        || newPath.Turns > maxTurns)
                     {
                         continue;
                     }
 
+                    var directedTarget = new DirectedVector2Int(target, direction);
+                    var pathsToTarget = paths.GetOrCreateValue(directedTarget);
+
+                    if (!pathsToTarget.TryGetValue(newPath.Turns, out var oldPath))
+                    {
+                        pathsToTarget[newPath.Turns] = newPath;
+                        priorityQueue.EnqueueWithoutDuplicates(newPath, newPath);
+                        continue;
+                    }
+
+                    if (oldPath.Turns < newPath.Turns) continue;
+                    if (oldPath.Turns == newPath.Turns && oldPath.Distance < newPath.Distance) continue;
+
+                    pathsToTarget[newPath.Turns] = newPath;
                     priorityQueue.EnqueueWithoutDuplicates(newPath, newPath);
                 }
             }
