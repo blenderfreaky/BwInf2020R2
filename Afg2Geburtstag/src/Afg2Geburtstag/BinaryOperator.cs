@@ -3,10 +3,24 @@
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Represents a unary operator.
+    /// </summary>
     public class BinaryOperator
     {
+        /// <summary>
+        /// Evaluates the value of applying the operator to the given <see cref="ITerm"/> operands.
+        /// </summary>
         public Func<ITerm, ITerm, Rational?> Evaluate { get; }
+
+        /// <summary>
+        /// Generates a string describing the application of the operator to the given <see cref="ITerm"/> operands.
+        /// </summary>
         public Func<ITerm, ITerm, string> OperationToString { get; }
+
+        /// <summary>
+        /// Generates a string as LaTeX code describing the application of the operator to the given <see cref="ITerm"/> operands.
+        /// </summary>
         public Func<ITerm, ITerm, string> OperationToLaTeX { get; }
 
         public BinaryOperator(Func<ITerm, ITerm, Rational?> evaluate, Func<ITerm, ITerm, string> operationToString, Func<ITerm, ITerm, string> operationToLaTeX)
@@ -27,7 +41,7 @@
             return hashCode;
         }
 
-        public static bool operator ==(BinaryOperator? left, BinaryOperator? right) => EqualityComparer<BinaryOperator>.Default.Equals(left, right);
+        public static bool operator ==(BinaryOperator? left, BinaryOperator? right) => EqualityComparer<BinaryOperator?>.Default.Equals(left, right);
 
         public static bool operator !=(BinaryOperator? left, BinaryOperator? right) => !(left == right);
     }

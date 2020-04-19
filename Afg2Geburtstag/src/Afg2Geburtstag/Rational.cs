@@ -11,6 +11,7 @@
         public readonly long Numerator;
         public readonly long Denominator;
 
+        /// <inheritdoc/>
         Rational ITerm.Value => this;
 
         public Rational(long numerator, long denominator, bool validate = true)
@@ -51,6 +52,18 @@
             }
         }
 
+        public Rational(long numerator)
+        {
+            Numerator = numerator;
+            Denominator = 1;
+        }
+
+        /// <summary>
+        /// Calculates the greatest common divisor between two positive <see cref="long"/>s.
+        /// </summary>
+        /// <param name="a">The first <see cref="long"/>.</param>
+        /// <param name="b">The second <see cref="long"/>.</param>
+        /// <returns>The greatest common divisior.</returns>
         private static long GCD(long a, long b)
         {
             while (a != 0 && b != 0)
@@ -62,36 +75,12 @@
             return a == 0 ? b : a;
         }
 
-        public Rational(long numerator)
-        {
-            Numerator = numerator;
-            Denominator = 1;
-        }
-
         public static readonly Rational Zero = 0;
         public static readonly Rational One = 1;
 
         public static implicit operator Rational(long @int) => new Rational(@int);
 
         public static implicit operator Rational(int @int) => new Rational(@int);
-
-        public static Rational operator +(Rational lhs, Rational rhs) =>
-            new Rational((lhs.Numerator * rhs.Denominator) + (rhs.Numerator * lhs.Denominator), lhs.Denominator * rhs.Denominator);
-
-        public static Rational operator -(Rational lhs, Rational rhs) =>
-            new Rational((lhs.Numerator * rhs.Denominator) - (rhs.Numerator * lhs.Denominator), lhs.Denominator * rhs.Denominator);
-
-        public static Rational operator *(Rational lhs, Rational rhs) =>
-            new Rational(lhs.Numerator * rhs.Numerator, lhs.Denominator * rhs.Denominator);
-
-        public static Rational operator /(Rational lhs, Rational rhs) =>
-            new Rational(lhs.Numerator * rhs.Denominator, lhs.Denominator * rhs.Numerator);
-
-        public static bool operator >(Rational lhs, Rational rhs) =>
-            lhs.Numerator * rhs.Denominator > rhs.Numerator * lhs.Denominator;
-
-        public static bool operator <(Rational lhs, Rational rhs) =>
-            lhs.Numerator * rhs.Denominator < rhs.Numerator * lhs.Denominator;
 
         public Rational Absolute => new Rational((IsNegative ? -1 : 1) * Numerator, Denominator, false);
 
@@ -128,16 +117,27 @@
             2432902008176640000,
         };
 
-        public static Rational? Factorial(Rational rational, long limit = 20)
+        /// <summary>
+        /// Computes the fatorial of <paramref name="operand"/>.
+        /// If <paramref name="operand"/> is negative, non-integer or bigger than <paramref name="limit"/> <c>null</c> is returned.
+        /// </summary>
+        /// <param name="operand">The operand to apply factorial to.</param>
+        /// <param name="limit">The size of the biggest allowed operand.</param>
+        /// <returns>The result of applying factorial or <c>null</c>.</returns>
+        public static Rational? Factorial(Rational operand, long limit = 20)
         {
-            if (!rational.IsInteger) return null;
-            if (rational.Numerator < 0) return null;
-            if (rational.Numerator > limit || rational.Numerator > 20) return null;
+            if (!operand.IsInteger) return null;
+            if (operand.Numerator < 0) return null;
+            if (operand.Numerator > limit || operand.Numerator > 20) return null;
 
-            return new Rational(_factorials[rational.Numerator]);
+            return new Rational(_factorials[operand.Numerator]);
         }
 
-        public static Rational ToFraction(double value)
+        /// <summary>
+        /// Converts a <see cref="double"/> to a <see cref="Rational"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="double"/> to convert.</param>
+        public static explicit operator Rational(double value)
         {
             if (value % 1 == 0) // Return whole numbers directly
             {
@@ -153,24 +153,41 @@
                 var (integerComponent, fractionalComponent) = (components[0], components[1]);
 
                 var numerator = long.Parse(integerComponent + fractionalComponent);
-                var denominator = fractionalComponent.Length;
+                var denominator = 1;
+                for (var i = 0; i < fractionalComponent.Length; i++) denominator *= 10;
 
                 return new Rational(numerator, denominator);
             }
         }
 
-        public static Rational Parse(string text) => ToFraction(double.Parse(text));
+        /// <summary>
+        /// Converts the string representation of a number to its <see cref="Rational"/> equivalent.
+        /// </summary>
+        /// <param name="text">The string representation.</param>
+        /// <returns>The <see cref="Rational"/> equivalent.</returns>
+        public static Rational Parse(string text)
+        {
+            var components = text.Split('/');
+            if (components.Length == 1) return (Rational)(double.Parse(text));
+            if (components.Length != 2) throw new FormatException("Too many slashes");
+            return new Rational(int.Parse(components[0]), int.Parse(components[1]));
+        }
 
+        /// <inheritdoc/>
         public override string ToString() => Numerator.ToString() + (IsInteger ? string.Empty : "/" + Denominator.ToString());
 
+        /// <inheritdoc/>
         public string ToLaTeX() => IsInteger
             ? Numerator.ToString()
             : $"\\frac{{{Numerator}}}{{{Denominator}}}";
 
+        /// <inheritdoc/>
         public bool Equals(Rational other) => other.Numerator == Numerator && other.Denominator == Denominator;
 
+        /// <inheritdoc/>
         public override bool Equals(object obj) => obj is Rational rational && Equals(rational);
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             var hashCode = 1503752452;
@@ -178,6 +195,24 @@
             hashCode = (hashCode * -1521134295) + Denominator.GetHashCode();
             return hashCode;
         }
+
+        public static Rational operator +(Rational lhs, Rational rhs) =>
+            new Rational((lhs.Numerator * rhs.Denominator) + (rhs.Numerator * lhs.Denominator), lhs.Denominator * rhs.Denominator);
+
+        public static Rational operator -(Rational lhs, Rational rhs) =>
+            new Rational((lhs.Numerator * rhs.Denominator) - (rhs.Numerator * lhs.Denominator), lhs.Denominator * rhs.Denominator);
+
+        public static Rational operator *(Rational lhs, Rational rhs) =>
+            new Rational(lhs.Numerator * rhs.Numerator, lhs.Denominator * rhs.Denominator);
+
+        public static Rational operator /(Rational lhs, Rational rhs) =>
+            new Rational(lhs.Numerator * rhs.Denominator, lhs.Denominator * rhs.Numerator);
+
+        public static bool operator >(Rational lhs, Rational rhs) =>
+            lhs.Numerator * rhs.Denominator > rhs.Numerator * lhs.Denominator;
+
+        public static bool operator <(Rational lhs, Rational rhs) =>
+            lhs.Numerator * rhs.Denominator < rhs.Numerator * lhs.Denominator;
 
         public static bool operator ==(Rational left, Rational right) => left.Equals(right);
 

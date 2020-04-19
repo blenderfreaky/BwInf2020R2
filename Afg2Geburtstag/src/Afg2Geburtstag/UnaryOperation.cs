@@ -3,7 +3,10 @@
     using System.Collections.Generic;
     using System.Diagnostics;
 
-    [DebuggerDisplay("{ToString()}")]
+    /// <summary>
+    /// Represents the application of a unary operator on an <see cref="ITerm"/> operand.
+    /// </summary>
+    [DebuggerDisplay("{ToString()} = {Value}")]
     public sealed class UnaryOperation : ITerm
     {
         public UnaryOperator Operator { get; }
@@ -58,7 +61,7 @@
             && EqualityComparer<UnaryOperator>.Default.Equals(Operator, operation.Operator)
             && EqualityComparer<ITerm>.Default.Equals(Operand, operation.Operand);
 
-        /// <inheritdoc/>
+        /// <inheritdoc/> A                      
         public override int GetHashCode() => (int)(HashCode % int.MaxValue);
     }
 }

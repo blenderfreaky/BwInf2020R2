@@ -105,7 +105,7 @@ morekeywords={partial, var, get, set, from, select, package, deref},
 emph=[0]{T,U,V,TToken},
 emphstyle=[0]{\color{types}},
 %
-emph=[1]{Rational,NotSupportedException,List,HashSet,ITerm,BinaryOperation,UnaryOperation,BinaryOperator,UnaryOperator,DigitFarm},
+emph=[1]{Rational,NotSupportedException,List,HashSet,ITerm,BinaryOperation,UnaryOperation,BinaryOperator,UnaryOperator,DigitRepresenter},
 emphstyle=[1]{\color{turqoisetypes}},
 %
 otherkeywords={=>,<,>},
@@ -173,11 +173,11 @@ Daraufhin werden alle Terme entfernt, deren Wert schon mit kleineren oder gleich
 Um mit diesem Verfahren nun die Aufgabe zu lösen, ermittelt man solange größere Terme, bis der gesuchte Wert optimal von einem Term dargestellt wird.
 Diese Vorangehensweise erlaubt es auch, mit der gleichen Ziffer Repräsentationen für mehrere Zahlen auf einmal zu finden, ohne dass sich die Laufzeit addiert.
 Hierfür werden einfach größere und größere Terme ermittelt, bis alle Zahlen eine optimale Repräsentation erhalten haben.
-Die Laufzeit, um mehrere Zahlen zu repräsentieren entspricht hierbei einfach der längsten Laufzeit würde man jede Zahl individuell durch den Algorithmus laufen lassen.
+Die Laufzeit, um mehrere Zahlen zu repräsentieren entspricht hierbei einfach der längsten Laufzeit, bei dem jede Zahl individuell durch den Algorithmus läuft.
 %\textcolor{red}{Was meinst Du mit der Laufzeit der individuellen Zahlen? Findet sich hier vielleicht noch eine deutlichere Formulierung? Meinst Du so etwas wie 'die Laufzeit für die betreffenden Zahlen? Oder ähnliches?}
 
-Auf ersten Blick scheint dieser Algorithmus eine stark explosive Komplexität zu besitzen, tatsächlich ist dem aber gar nicht so.
-Im folgenden wird die Komplexität dieses Verfahrens genauer betrachtet.
+Auf ersten Blick scheint dieser Algorithmus eine exponentielle Komplexität zu besitzen, tatsächlich ist dem aber gar nicht so.
+Im Folgenden wird die Komplexität dieses Verfahrens genauer betrachtet.
 
 \newcommand{\fad}{\forall d, B:\ }
 \newcommand{\measure}[1]{\Phi_{d}^{B}(#1)}
@@ -444,14 +444,14 @@ Der Code ist in zwei Projekte geteilt;
     \item[ITerm] repräsentiert eine Schnittstelle für beliebige Terme mit einem ~BigRational~ Wert. Wird von ~BigRational~ implementiert.
     \item[UnaryOperation] repräsentiert eine unäre Operation auf einem ~ITerm~ und implementiert selbst ~ITerm~.
     \item[BinaryOperation] repräsentiert eine binäre Operation zwischen zwei ~ITerm~s und implementiert selbst ~ITerm~.
-    \item[DigitFarm] enthält den Kernalgorithmus für eine Ziffer und mehrere Zielzahlen.
+    \item[DigitRepresenter] enthält den Kernalgorithmus für eine Ziffer und mehrere Zielzahlen.
 \end{description}
 
 ~UnaryOperation~ und ~BinaryOperation~ speichern als Optimierung ihren berechneten Wert und Hashcode.
 Weiterhin sind die Operanden der beiden Typen ~ITerm~ Instanzen und somit Referenztypen.
 Dies bedeutet, dass jede Operation nur einmal gespeichert wird und nicht in anderen Operationen, die sie verwenden, gedoppelt wird.
 
-In ~DigitFarm~, worin der Hauptalgorithmus implementiert wird, werden an vielen Stellen Hashsets verwendet, um schnelle Lookups zu erlauben.
+In ~DigitRepresenter~, worin der Hauptalgorithmus implementiert wird, werden an vielen Stellen Hashsets verwendet, um schnelle Lookups zu erlauben.
 Spezifischer, da ~HashSet<T>~ nicht Thread-Safe ist, verwendet der Code ~ConcurrentDictionary<T, byte>~, wobei der ~byte~-Wert ignoriert wird.
 
 Für Informationen zur Verwendung des Programms kann ~Afg2Geburtstag.exe --help~ ausgeführt werden.
@@ -579,7 +579,7 @@ TBD
 Der Beweis von Theorem \ref{theorem:tn_of_phi} führt auf folgende Abschätzung
     \[t_n \leq C_n \cdot 5^{n-1} < \frac{4^n}{(n+1)\sqrt{\pi n}} 5^{n-1} =  \frac{20^n}{5(n+1)\sqrt{\pi n}}\]
 
-Nun kann man um die Anzahl der fürnzu betrachtender Terme \(\measure{n}\) statt \(n\) einsetzen, um die Anzahl aller Terme zu bestimmen, die genauso viele Ziffern wie die optimale Repräsentation von \(n\) haben.
+Nun kann man um die Anzahl der zu betrachtender Terme \(\measure{n}\) statt \(n\) einsetzen, um die Anzahl aller Terme zu bestimmen, die genauso viele Ziffern wie die optimale Repräsentation von \(n\) haben.
 Unter Verwendung der Abschätzung \(\measure{n} \leq \log_d(n) \cdot (d+4) + 2\) aus Corollary \ref{corollary:phi_bound} ergeben sich folgende Umformungen:
 
 \begin{align*}

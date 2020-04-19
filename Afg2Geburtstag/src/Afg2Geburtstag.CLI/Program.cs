@@ -9,7 +9,6 @@
     using System.Linq;
     using System.Numerics;
     using System.Threading.Tasks;
-    using Console = Colorful.Console;
 
     public class Options
     {
@@ -23,10 +22,10 @@
         public int Base { get; set; }
 
         [Option('f', "factorial", HelpText = "Allow usage of factorial", Default = false)]
-        public bool AllowFactorial { get; set; }
+        public bool UseFactorial { get; set; }
 
         [Option('e', "exponentiation", HelpText = "Allow usage of exponentiation", Default = false)]
-        public bool AllowExponentiation { get; set; }
+        public bool UseExponentiation { get; set; }
 
         [Option('l', "latex", HelpText = "Output as source code for a latex table", Default = false)]
         public bool OutputAsLatex { get; set; }
@@ -35,7 +34,7 @@
         public bool Sync { get; set; }
 
         [Option('r', "fractions", HelpText = "Allow use of fractions. Massive performance hit", Default = false)]
-        public bool AllowFractions { get; set; }
+        public bool UseFractions { get; set; }
     }
 
     public static class Program
@@ -46,20 +45,27 @@
                 .WithParsed(RunWithArguments);
         }
 
-        public static readonly string Left = "\\left(";
-        public static readonly string Right = "\\right)";
+        /// <summary>
+        /// Latex code for left parenthesis.
+        /// </summary>
+        public static readonly string LatexLParens = "\\left(";
+        /// <summary>
+        /// Latex code for right parenthesis.
+        /// </summary>
+        public static readonly string LatexRParens = "\\right)";
 
         public static readonly BinaryOperator Addition =
-            new BinaryOperator((l, r) => checked(l.Value + r.Value), (l, r) => $"({l} + {r})", (l, r) => $"{Left}{l.ToLaTeX()} + {r.ToLaTeX()}{Right}");
+            new BinaryOperator((l, r) => checked(l.Value + r.Value), (l, r) => $"({l} + {r})", (l, r) => $"{LatexLParens}{l.ToLaTeX()} + {r.ToLaTeX()}{LatexRParens}");
 
         public static readonly BinaryOperator Subtraction =
-            new BinaryOperator((l, r) => checked(l.Value - r.Value), (l, r) => $"({l} - {r})", (l, r) => $"{Left}{l.ToLaTeX()} - {r.ToLaTeX()}{Right}");
+            new BinaryOperator((l, r) => checked(l.Value - r.Value), (l, r) => $"({l} - {r})", (l, r) => $"{LatexLParens}{l.ToLaTeX()} - {r.ToLaTeX()}{LatexRParens}");
 
         public static readonly BinaryOperator Multiplication =
-            new BinaryOperator((l, r) => checked(l.Value * r.Value), (l, r) => $"({l} * {r})", (l, r) => $"{Left}{l.ToLaTeX()} \\cdot {r.ToLaTeX()}{Right}");
+            new BinaryOperator((l, r) => checked(l.Value * r.Value), (l, r) => $"({l} * {r})", (l, r) => $"{LatexLParens}{l.ToLaTeX()} \\cdot {r.ToLaTeX()}{LatexRParens}");
 
         public static readonly BinaryOperator DivisionWithFractions =
-            new BinaryOperator((l, r) => !r.Value.IsZero ? (Rational?)(l.Value / r.Value) : null, (l, r) => $"({l} / {r})", (l, r) => $"{Left}\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}{Right}");
+            new BinaryOperator((l, r) => !r.Value.IsZero ? (Rational?)(l.Value / r.Value) : null,
+                (l, r) => $"({l} / {r})", (l, r) => $"{LatexLParens}\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}{LatexRParens}");
 
         public static readonly BinaryOperator DivisionWithoutFractions =
             new BinaryOperator((l, r) =>
@@ -73,7 +79,7 @@
                 {
                     return null;
                 }
-            }, (l, r) => $"({l} / {r})", (l, r) => $"{Left}\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}{Right}");
+            }, (l, r) => $"({l} / {r})", (l, r) => $"{LatexLParens}\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}{LatexRParens}");
 
         public static BinaryOperator Exponentiation(bool allowFractions) =>
             new BinaryOperator(
@@ -82,7 +88,7 @@
                     if (!r.Value.IsInteger) return null;
 
                     if (l.Value.IsZero) return r.Value.IsPositive ? Rational.Zero : (Rational?)null; // 0^0 and 0^negative = 0/1 are both undefined => no return
-                    if (l.Value == Rational.One) return Rational.One;
+                    if (l.Value == Rational.One) return Rational.One; // 1^x = 1 for all x
 
                     var exponentPositive = r.Value.IsPositive;
                     var exponentBig = r.Value.Absolute;
@@ -105,13 +111,13 @@
                     return result.IsInteger ? result : (Rational?)null;
                 },
                 (l, r) => $"({l} ^ {r})",
-                (l, r) => $"{Left}{{{l}}}^{{{r}}}{Right}");
+                (l, r) => $"{LatexLParens}{{{l}}}^{{{r}}}{LatexRParens}");
 
         public static readonly UnaryOperator Factorial =
             new UnaryOperator(
                 x => Rational.Factorial(x.Value),
                 x => $"({x}!)",
-                x => $"{Left}{x}!{Right}");
+                x => $"{LatexLParens}{x}!{LatexRParens}");
 
         private static void RunWithArguments(Options options)
         {
@@ -121,7 +127,7 @@
             Console.WriteLine($"% Targets: {string.Join(", ", targets)}");
             Console.WriteLine($"% Digits: {string.Join(", ", digits)}");
             Console.WriteLine($"% Base: {options.Base}");
-            Console.WriteLine($"% {(options.AllowExponentiation ? "Exponentiation " : "")}{(options.AllowFactorial ? "Factorial" : "")}");
+            Console.WriteLine($"% {(options.UseExponentiation ? "Exponentiation " : "")}{(options.UseFactorial ? "Factorial" : "")}");
 
             if (options.OutputAsLatex)
             {
@@ -130,13 +136,12 @@
             }
 
             void digitAction(int digit) =>
-                Farm(targetsSource: targets,
-                    useExponentiation: options.AllowExponentiation,
-                    useFactorial: options.AllowFactorial,
-                    useFractions: options.AllowFractions,
+                FindOptimalRepresentations(targetsSource: targets,
+                    useExponentiation: options.UseExponentiation,
+                    useFactorial: options.UseFactorial,
+                    useFractions: options.UseFractions,
                     digit: digit,
-                    asLatex: options.OutputAsLatex,
-                    @base: options.Base);
+                    outputAsLatex: options.OutputAsLatex);
 
             if (options.Sync) Synchronized.ForEach(digits, digitAction);
             else Parallel.ForEach(digits, digitAction);
@@ -157,16 +162,27 @@
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Select(x => x.Trim().Replace(",", ""));
 
-        public static void Farm(
+        /// <summary>
+        /// Runs the main algorithm for one digit
+        /// </summary>
+        /// <param name="targetsSource">The targets to repesent.</param>
+        /// <param name="useExponentiation">Whether to use exponentiation</param>
+        /// <param name="useFactorial"></param>
+        /// <param name="useFractions"></param>
+        /// <param name="digit"></param>
+        /// <param name="base"></param>
+        /// <param name="outputAsLatex"></param>
+        public static void FindOptimalRepresentations(
             IEnumerable<Rational> targetsSource,
             bool useExponentiation,
             bool useFactorial,
             bool useFractions,
+            bool outputAsLatex,
             long digit,
-            bool asLatex = false,
             long @base = 10)
         {
-            if (!useFactorial && !useExponentiation && digit == 0) return;
+            // Without factorial 0 cannot be used
+            if (!useFactorial && digit == 0) return;
 
             var binaryOperators = new List<BinaryOperator>
             {
@@ -183,24 +199,25 @@
 
             var stopwatch = Stopwatch.StartNew();
 
-            Action<ITerm, int> onFound = asLatex
-                ? (term, digits) =>
-                    //Console.WriteLine($"\t{digit} & {term.Value} & \\(\\begin{{multlined}} {term.ToLaTeX()} \\end{{multlined}}\\) & {digits} & {stopwatch.Elapsed.TotalSeconds:0.000}s \\\\\\hline")
-                    Console.WriteLine($"\t{digit} & {term.Value} & \\( {term.ToLaTeX()} \\) & {digits} & {stopwatch.Elapsed.TotalSeconds:0.000}s \\\\\\hline")
-                : (Action<ITerm, int>)((term, digits) =>
-                    Console.WriteLine($"Found solution for {term.Value} with {digit} with {digits} digits [{stopwatch.Elapsed.TotalSeconds:0.000}s]:\n  {term.Value} = {term}\n"));
+            var onFound = outputAsLatex
+                ? (Action<ITerm, int>)((term, digits) =>
+                     Console.WriteLine($"\t{digit} & {term.Value} & \\( {term.ToLaTeX()} \\) & {digits} & {stopwatch.Elapsed.TotalSeconds:0.000}s \\\\\\hline"))
+                : ((term, digits) =>
+                      Console.WriteLine($"Found solution for {term.Value} with {digit} with {digits} digits [{stopwatch.Elapsed.TotalSeconds:0.000}s]:\n  {term.Value} = {term}\n"));
 
-            var farm = new DigitFarm(binaryOperators, useFactorial ? Factorial : null, targets,
+            var farm = new DigitRepresenter(binaryOperators, useFactorial ? Factorial : null, targets,
                 onFound,
                 digit, @base);
 
+            // Iterate all sizes until all targets are found
             for (int i = 1; ; i++)
             {
-                farm.GetAllOfSize(i);
+                farm.CalculateAllOfSize(i);
                 //Console.WriteLine($"% Got all terms of size {i} for digit {digit}. Found {farm.TermsOfSize[i].Count} in total.");
 
                 if (farm.UnfoundTargets == 0)
                 {
+                    // Do some light cleanup
                     stopwatch.Stop();
                     farm = null!;
                     GC.Collect();

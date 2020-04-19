@@ -4,6 +4,9 @@
     using System.Collections.Generic;
     using System.Diagnostics;
 
+    /// <summary>
+    /// Represents the application of a binary operator on two <see cref="ITerm"/> operands.
+    /// </summary>
     [DebuggerDisplay("{ToString()} = {Value}")]
     public sealed class BinaryOperation : ITerm
     {
