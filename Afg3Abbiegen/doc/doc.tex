@@ -169,10 +169,10 @@ Dies bedeutet aber, dass Dijkstra nicht in seiner ursprünglichen Form verwendet
     \coordinate (ABCD) at (6, 3);
     \node [draw,dashed,inner sep=10pt, circle,yscale=.7, fit={(ABCD)}] {};
     
-    \draw[-, thick] (A) to node[midway, sloped, above] {A--Cross}  (ABCD);
-    \draw[-, thick] (ABCD) to node[midway, sloped, above] {Cross--D}  (D);
-    \draw[-, thick] (C) to node[midway, sloped, above] {C--Cross}  (ABCD);
-    \draw[-, thick] (ABCD) to node[midway, sloped, above] {Cross--B}  (B);
+    \draw[-, thick] (A) to node[midway, sloped, above] {}  (ABCD);
+    \draw[-, thick] (ABCD) to node[midway, sloped, above] {}  (D);
+    \draw[-, thick] (C) to node[midway, sloped, above] {}  (ABCD);
+    \draw[-, thick] (ABCD) to node[midway, sloped, above] {}  (B);
 \end{tikzpicture}
 \end{center}
 
@@ -192,14 +192,14 @@ Alle Knoten einer Kreuzung sind dabei verbunden durch Kanten mit Kosten von 1.
     
     \node [rotate=90][draw,dashed,inner sep=5pt, circle,yscale=.6, fit={(AB) (CD)}] {};
     
-    \draw[-, thick] (A) to node[midway, sloped, above] {A--Cross}  (AB);
-    \draw[-, thick] (A) to node[midway, sloped, above] {0}  (AB);
-    \draw[-, thick] (AB) to node[midway, sloped, above] {Cross--B}  (B);
-    \draw[-, thick] (AB) to node[midway, sloped, above] {0}  (B);
-    \draw[-, thick] (C) to node[midway, sloped, above] {C--Cross}  (CD);
-    \draw[-, thick] (C) to node[midway, sloped, above] {0}  (CD);
-    \draw[-, thick] (CD) to node[midway, sloped, above] {Cross--D}  (D);
-    \draw[-, thick] (CD) to node[midway, sloped, above] {0}  (D);
+    %\draw[-, thick] (A) to node[midway, sloped, above] {A--Cross}  (AB);
+    \draw[-, thick] (A) to node[midway, sloped, below] {0}  (AB);
+    %\draw[-, thick] (AB) to node[midway, sloped, above] {Cross--B}  (B);
+    \draw[-, thick] (AB) to node[midway, sloped, below] {0}  (B);
+    %\draw[-, thick] (C) to node[midway, sloped, above] {C--Cross}  (CD);
+    \draw[-, thick] (C) to node[midway, sloped, below] {0}  (CD);
+    %\draw[-, thick] (CD) to node[midway, sloped, above] {Cross--D}  (D);
+    \draw[-, thick] (CD) to node[midway, sloped, below] {0}  (D);
     
     \draw[-, thick] (AB) to node[midway, sloped, above] {Extra} (CD);
     \draw[-, thick] (AB) to node[midway, sloped, below] {1} (CD);
@@ -207,6 +207,17 @@ Alle Knoten einer Kreuzung sind dabei verbunden durch Kanten mit Kosten von 1.
 \end{center}
 
 Die Priority-Queue des Dijkstra-Algorithmus ist hierbei primär nach Anzahl an Abbiegungen und sekundär nach Länge sortiert.
+
+Der endgültige Algorithmus geht dann wie folgt vor:
+
+\begin{enumerate}
+    \item Initialisiere eine leere Priority-Queue von Wegen.
+    \item Füge den Startpunkt als Weg ohne Länge und Abbiegungen hinzu.
+    \item Nehme den obersten Weg aus der Priority-Queue (mit den wenigsten Abbiegungen und kürzester Länge).
+    \item Ermittle alle Wege, die aus diesem entspringen und noch nicht vorher betrachtet wurden.
+    \item Speichere alle Wege zu einer Kreuzung (inklusive Richtung, in der diese befahren wird), die besser als die bisherigen Wege sind und füge diese der Priority-Queue hinzu. Dabei werden eingefügte Elemente primär nach Abbiegung und sekundär nach Weglänge sortiert werden.
+    \item Wiederhole 3-5, bis das Ziel an der Spitze der Priority-Queue ist.
+\end{enumerate}
 
 \section{Umsetzung}
 
@@ -231,6 +242,9 @@ Der Code ist in zwei Projekte geteilt;
 ~ShortestPath~ und ~BilalsPath~.
 ~ShortestPath~ ermittlet via Dijkstra den kürzesten Weg zwischen Start und Ende.
 ~BilalsPath~ ermittelt via dem obigen Algorithmus den in der Aufgabenstellung beschriebenen Weg.
+
+Zur Verwendung des Programms gibt es ein GUI.
+Zuerst muss mit ``Load Map'' eine der Beispieldateien geladen werden, danach kann unter ``Factor by which the path may be longer'' der Faktor, um den Bilals Weg länger als der kürzeste Weg sein darf eingegeben werden, also \(1.15\) für \(+15\%\) oder \(1.30\) für \(+30\%\).
 
 \section{Beispiele}
 

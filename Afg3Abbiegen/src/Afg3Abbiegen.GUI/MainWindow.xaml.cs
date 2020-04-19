@@ -1,10 +1,15 @@
-﻿namespace Afg3Abbiegen.GUI
+﻿using ModernWpf.Controls;
+
+namespace Afg3Abbiegen.GUI
 {
     using Microsoft.Win32;
+    using ModernWpf;
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
@@ -13,7 +18,7 @@
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         public Map Map { get; private set; }
 
@@ -27,9 +32,12 @@
 
         private const int _scale = 50;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = this;
         }
 
         private void LoadMap_Click(object sender, RoutedEventArgs e)
@@ -48,13 +56,21 @@
             {
                 Map = Map.FromText(File.ReadAllLines(dialog.FileName));
 
-                UpdateMap();
+                Task.Run(UpdateMap);
             }
+        }
+
+        private void _propertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+        {
+            Task.Run(UpdateBilalsPath);
         }
 
         private void UpdateMap()
         {
-            DrawMap();
+            _propertyChanged(nameof(Map));
+            Dispatcher.Invoke(DrawMap);
 
             UpdateShortestPath();
             UpdateBilalsPath();
@@ -68,11 +84,11 @@
 
             foreach (var street in Map.Streets)
             {
-                DrawLine(MapCanvas, Brushes.Black, 1, street.Start, street.End);
+                DrawLine(MapCanvas, Brushes.White, 1, street.Start, street.End);
             }
 
-            DrawDot(MapCanvas, Brushes.Green, 5, Map.Start);
-            DrawDot(MapCanvas, Brushes.Red, 5, Map.End);
+            DrawDot(MapCanvas, Brushes.Green, 10, Map.Start);
+            DrawDot(MapCanvas, Brushes.Red, 10, Map.End);
         }
 
         private void UpdateShortestPath()
@@ -83,7 +99,11 @@
             ShortestPathTurns = ShortestPath.CountTurns();
             ShortestPathLength = shortestPathLength;
 
-            DrawShortestPath();
+            _propertyChanged(nameof(ShortestPath));
+            _propertyChanged(nameof(ShortestPathTurns));
+            _propertyChanged(nameof(ShortestPathLength));
+
+            Dispatcher.Invoke(DrawShortestPath);
         }
 
         private void DrawShortestPath()
@@ -102,11 +122,18 @@
         {
             if (Map == null) return;
 
-            BilalsPath = Map.BilalsPath(ShortestPathLength * (float)PathLengthFactor.Value, out var bilalsPathTurns, out var bilalsPathLength)?.ToList();
+            var factor = 0f;
+            Dispatcher.Invoke(() => factor = (float)PathLengthFactor.Value);
+
+            BilalsPath = Map.BilalsPath(ShortestPathTurns, ShortestPathLength * factor, out var bilalsPathTurns, out var bilalsPathLength)?.ToList();
             BilalsPathTurns = bilalsPathTurns;
             BilalsPathLength = bilalsPathLength;
 
-            DrawBilalsPath();
+            _propertyChanged(nameof(BilalsPath));
+            _propertyChanged(nameof(BilalsPathTurns));
+            _propertyChanged(nameof(BilalsPathLength));
+
+            Dispatcher.Invoke(DrawBilalsPath);
         }
 
         private void DrawBilalsPath()
@@ -153,6 +180,9 @@
                 StrokeThickness = strokeThickness,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
+
+                StrokeStartLineCap = PenLineCap.Round,
+                StrokeEndLineCap = PenLineCap.Round,
             });
         }
 
@@ -171,17 +201,12 @@
             {
                 Margin = new Thickness(positionScreen.X - (strokeThickness / 2), positionScreen.Y - (strokeThickness / 2), 0, 0),
                 Width = strokeThickness,
-                //Height = strokeThickness,
+                Height = strokeThickness,
 
                 Fill = brush,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
             });
-        }
-
-        private void NumberBox_ValueChanged(ModernWpf.Controls.NumberBox sender, ModernWpf.Controls.NumberBoxValueChangedEventArgs args)
-        {
-            UpdateBilalsPath();
         }
     }
 }

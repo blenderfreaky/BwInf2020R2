@@ -7,9 +7,10 @@
         xmlns:ui="http://schemas.modernwpf.com/2019"
         mc:Ignorable="d"
         ui:WindowHelper.UseModernWindowStyle="True"
+        ui:ThemeManager.RequestedTheme="Dark"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <local:ZoomBorder x:Name="border" ClipToBounds="True" Background="white">
+        <local:ZoomBorder x:Name="border" Panel.ZIndex="500" ClipToBounds="True" Background="Black">
             <Grid>
                 <Canvas x:Name="MapCanvas"/>
                 <Canvas x:Name="DebugCanvas"/>
@@ -18,9 +19,29 @@
             </Grid>
         </local:ZoomBorder>
 
-        <ui:SimpleStackPanel Margin="12" Spacing="24" Panel.ZIndex="100">
+        <ui:SimpleStackPanel Margin="12" Spacing="24" Panel.ZIndex="1000" HorizontalAlignment="Left" VerticalAlignment="Top">
             <Button Content="Load Map" Click="LoadMap_Click" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
             <ui:NumberBox x:Name="PathLengthFactor" Header="Factor by which the path may be longer:" Value="1.30" SmallChange="0.01" SpinButtonPlacementMode="Compact" Minimum="0" LargeChange="0.1" AcceptsExpression="True" ValueChanged="NumberBox_ValueChanged"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Grid.Row="0">Shortest Distance</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="1">Shortest Turns</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="2">Bilals Distance</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="3">Bilals Turns</TextBlock>
+                <TextBlock Grid.Column="1" Grid.Row="0" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Text="{Binding ShortestPathLength}"/>
+                <TextBlock Grid.Column="1" Grid.Row="1" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Text="{Binding ShortestPathTurns}"/>
+                <TextBlock Grid.Column="1" Grid.Row="2" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Text="{Binding BilalsPathLength}"/>
+                <TextBlock Grid.Column="1" Grid.Row="3" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Text="{Binding BilalsPathTurns}"/>
+            </Grid>
         </ui:SimpleStackPanel>
     </Grid>
 </Window>
