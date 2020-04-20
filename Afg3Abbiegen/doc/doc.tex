@@ -25,8 +25,8 @@
 \pagestyle{fancy}
 
 \newcommand{\Fpage}{\thepage{}/\pageref{LastPage}}
-\newcommand{\Ftitle}{Aufgabe 2 Geburtstag}
-\newcommand{\Fauthor}{Nikolas Kilian}
+\newcommand{\Ftitle}{Aufgabe 3: Abbiegen}
+\newcommand{\Fauthor}{Nikolas Kilian | Teilnahme ID: 48313}
 
 \lhead{\Fauthor}
 \rhead{\Ftitle}
@@ -35,36 +35,12 @@
 \rfoot{}
 \cfoot{\Fpage}
 
-\setlength{\parskip}{.8em} 
-\setlength{\parindent}{0pt}
-
-% Für Algorithmen
-\usepackage{algpseudocode}
-\usepackage{algorithm}
-%\usepackage{pxfonts}
-
-\algnewcommand\algorithmicforeach{\textbf{for each}}
-\algdef{S}[FOR]{ForEach}[1]{\algorithmicforeach\ #1\ \algorithmicdo}
-
 %
 % Für Quelltext
 \usepackage{listings}
 \usepackage{xcolor}
 
 \usepackage{url}
-
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{corollary}{Corollary}[theorem]
-\newtheorem{lemma}[theorem]{Lemma}
-
-\theoremstyle{nonumberplain}
-\theoremheaderfont{\itshape}
-\theorembodyfont{\normalfont}
-\theoremseparator{.\,—}
-\theoremsymbol{}
-\newtheorem{proof-wo}{Beweis}
-\theoremsymbol{\ensuremath{\color{lightgray}\blacksquare}}
-\newtheorem{proof}{Beweis}
 
 %\usepackage{courier}
 %\setmonofont{Consolas} %to be used with XeLaTeX or LuaLaTeX
@@ -106,9 +82,6 @@ otherkeywords={=>,<,>},
 emph=[2]{=>,<,>},
 emphstyle=[2]{\bfseries},
 %
-emph=[3]{ParserResult},
-emph=[3]{\color{turqoisetypes}\bfseries},
-%
 keywordstyle=\color{bluekeywords},
 stringstyle=\color{redstrings},
 basicstyle=\codesize\ttfamily,
@@ -120,12 +93,12 @@ literate=%
     {ü}{{\"u}}1
     {ä}{{\"a}}1
     {ö}{{\"o}}1
-    {~}{{\textasciitilde}}1
+    {!}{{\textasciitilde}}1
 }
 
 \lstMakeShortInline[
   language=CSharp,
-  columns=fixed,]~
+  columns=fixed,]!
 
   \lstnewenvironment{lstcs}[1][]
   {\lstset{
@@ -139,8 +112,18 @@ literate=%
 \usepackage{hyperref}
 \usepackage{cleveref}
 
+\setlength{\parskip}{.8em} 
+\setlength{\parindent}{0pt}
+
 \begin{document}
+
+\title{\Ftitle}
+\author{\Fauthor}
     
+\maketitle
+
+\tableofcontents
+
 \section{Lösungsidee}
 
 Die Lösungsidee besteht darin, den Dijkstra Algorithmus derart umzugestalten, dass er den Weg mit der geringsten Zahl an Abbiegungen statt der geringsten Länge sucht.
@@ -169,10 +152,10 @@ Dies bedeutet aber, dass Dijkstra nicht in seiner ursprünglichen Form verwendet
     \coordinate (ABCD) at (6, 3);
     \node [draw,dashed,inner sep=10pt, circle,yscale=.7, fit={(ABCD)}] {};
     
-    \draw[-, thick] (A) to node[midway, sloped, above] {}  (ABCD);
-    \draw[-, thick] (ABCD) to node[midway, sloped, above] {}  (D);
-    \draw[-, thick] (C) to node[midway, sloped, above] {}  (ABCD);
-    \draw[-, thick] (ABCD) to node[midway, sloped, above] {}  (B);
+    \draw[-, thick] (A) to node[midway, sloped, above] {0 \(\mid\) 1}  (ABCD);
+    \draw[-, thick] (ABCD) to node[midway, sloped, above] {1 \(\mid\) 0}  (D);
+    \draw[-, thick] (C) to node[midway, sloped, above] {1 \(\mid\) 0}  (ABCD);
+    \draw[-, thick] (ABCD) to node[midway, sloped, above] {0 \(\mid\) 1}  (B);
 \end{tikzpicture}
 \end{center}
 
@@ -206,7 +189,8 @@ Alle Knoten einer Kreuzung sind dabei verbunden durch Kanten mit Kosten von 1.
 \end{tikzpicture}
 \end{center}
 
-Die Priority-Queue des Dijkstra-Algorithmus ist hierbei primär nach Anzahl an Abbiegungen und sekundär nach Länge sortiert.
+Die Priority-Queue des Dijkstra-Algorithmus ist hierbei primär nach Anzahl an Abbiegungen und sekundär nach Länge sortiert, sodass zu jeder Kreuzung (inklusive Richtung, in der diese befahren wird) für jede Anzahl an Abbiegungen mit der dieser erreicht werden kann der kürzeste Weg ermittelt wird.
+Ist hierbei das Ziel an der Spitze der Priority-Queue, so ist der gespeicherte Weg dahin der am wenigsten abbiegende Weg dahin und dazu der kürzeste mit so vielen Abbiegungen.
 
 Der endgültige Algorithmus geht dann wie folgt vor:
 
@@ -224,24 +208,24 @@ Der endgültige Algorithmus geht dann wie folgt vor:
 Der Algorithmus wurde in C\# 8.0 mit .NET Core 3.1 implementiert.
 Es wurde als Library OptimizedPriorityQueue\footnote{https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp} verwendet. Diese implementiert eine Priority Queue, die in Dijkstra verwendet wird.
 Der Code ist in zwei Projekte geteilt;
-~Afg3Abbiegen.GUI~ und ~Afg3Abbiegen~.
+!Afg3Abbiegen.GUI! und !Afg3Abbiegen!.
 
-~Afg3Abbiegen.GUI~ kümmert sich um das User-Interface und ruft ~Afg3Abbiegen~ auf, das den eigentlichen Algorithmus enthält.
-~Afg3Abbiegen~ definiert einige Typen:
+!Afg3Abbiegen.GUI! kümmert sich um das User-Interface und ruft !Afg3Abbiegen! auf, das den eigentlichen Algorithmus enthält.
+!Afg3Abbiegen! definiert einige Typen:
 
 \begin{description}
     \item[Vector2Int] stellt einen zweidimensionalen Vektor mit Integerkomponenten dar.
-    \item[DirectedVector2Int] stellt die Kombination einer ~Vector2Int~ Position und einer genormten Richtung dar.
-    \item[Street] definiert eine Straße zwischen zwei ~Vector2Int~ Endpunkten.
+    \item[DirectedVector2Int] stellt die Kombination einer !Vector2Int! Position und einer genormten Richtung dar.
+    \item[Street] definiert eine Straße zwischen zwei !Vector2Int! Endpunkten.
     \item[MapParser] ist zuständig für das Einlesen der Beispieldateien.
-    \item[EnumerableExtensions] definiert eine Erweiterungsmethode für ~IEnumerable<Vector2Int>~, die die Anzahl an Abbiegung zählt und eine, die die .
+    \item[EnumerableExtensions] definiert eine Erweiterungsmethode für !IEnumerable<Vector2Int>!, die die Anzahl an Abbiegung zählt und eine, die die .
     \item[Map] stellt eine Ansammlung aus Straßen mit Start und Ende dar und enthält den Hauptalgorithmus. 
 \end{description}
 
-~Map~ definiert dabei zwei Hauptmethoden
-~ShortestPath~ und ~BilalsPath~.
-~ShortestPath~ ermittlet via Dijkstra den kürzesten Weg zwischen Start und Ende.
-~BilalsPath~ ermittelt via dem obigen Algorithmus den in der Aufgabenstellung beschriebenen Weg.
+!Map! definiert dabei zwei Hauptmethoden
+!ShortestPath! und !BilalsPath!.
+!ShortestPath! ermittlet via Dijkstra den kürzesten Weg zwischen Start und Ende.
+!BilalsPath! ermittelt via dem obigen Algorithmus den in der Aufgabenstellung beschriebenen Weg.
 
 Zur Verwendung des Programms gibt es ein GUI.
 Zuerst muss mit ``Load Map'' eine der Beispieldateien geladen werden, danach kann unter ``Factor by which the path may be longer'' der Faktor, um den Bilals Weg länger als der kürzeste Weg sein darf eingegeben werden, also \(1.15\) für \(+15\%\) oder \(1.30\) für \(+30\%\).
@@ -250,13 +234,7 @@ Der Startpunkt ist grün markiert, das Ziel rot.
 
 \section{Beispiele}
 
-\newcommand{\incgra}[1]{
-    \begin{center}
-        \makebox[\textwidth]{\includegraphics[width=\paperwidth]{#1}}
-    \end{center}
-}
-
-\subsection{}
+\subsection{abbiegen0}
 
 \begin{center}
 \includegraphics[width=\textwidth]{examples/0_10.png}
@@ -264,14 +242,14 @@ Der Startpunkt ist grün markiert, das Ziel rot.
 \includegraphics[width=\textwidth]{examples/0_30.png}
 \end{center}
 
-\subsection{}
+\subsection{abbiegen1}
 
 \begin{center}
 \includegraphics[width=\textwidth]{examples/1_10.png}
 \includegraphics[width=\textwidth]{examples/1_30.png}
 \end{center}
 
-\subsection{}
+\subsection{abbiegen2}
 
 \begin{center}
 \includegraphics[width=\textwidth]{examples/2_15.png}
@@ -279,7 +257,7 @@ Der Startpunkt ist grün markiert, das Ziel rot.
 \includegraphics[width=\textwidth]{examples/2_50.png}
 \end{center}
 
-\subsection{}
+\subsection{abbiegen3}
 
 \begin{center}
 \includegraphics[width=\textwidth]{examples/3_02.png}

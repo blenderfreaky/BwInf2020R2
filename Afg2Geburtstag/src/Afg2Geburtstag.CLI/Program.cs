@@ -111,13 +111,13 @@
                     return result.IsInteger ? result : (Rational?)null;
                 },
                 (l, r) => $"({l} ^ {r})",
-                (l, r) => $"{LatexLParens}{{{l}}}^{{{r}}}{LatexRParens}");
+                (l, r) => $"{LatexLParens}{{{l.ToLaTeX()}}}^{{{r.ToLaTeX()}}}{LatexRParens}");
 
         public static readonly UnaryOperator Factorial =
             new UnaryOperator(
                 x => Rational.Factorial(x.Value),
                 x => $"({x}!)",
-                x => $"{LatexLParens}{x}!{LatexRParens}");
+                x => $"{LatexLParens}{x.ToLaTeX()}!{LatexRParens}");
 
         private static void RunWithArguments(Options options)
         {

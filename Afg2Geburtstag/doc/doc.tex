@@ -29,8 +29,8 @@
 \pagestyle{fancy}
 
 \newcommand{\Fpage}{\thepage{}/\pageref{LastPage}}
-\newcommand{\Ftitle}{Aufgabe 2 Geburtstag}
-\newcommand{\Fauthor}{Nikolas Kilian}
+\newcommand{\Ftitle}{Aufgabe 2: Geburtstag}
+\newcommand{\Fauthor}{Nikolas Kilian | Teilnahme ID: 48313}
 
 \lhead{\Fauthor}
 \rhead{\Ftitle}
@@ -38,10 +38,6 @@
 \lfoot{}
 \rfoot{}
 \cfoot{\Fpage}
-
-\setlength{\parskip}{.8em} 
-\setlength{\parindent}{0pt}
-
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{corollary}{Corollary}[theorem]
@@ -117,12 +113,7 @@ literate=%
     {ü}{{\"u}}1
     {ä}{{\"a}}1
     {ö}{{\"o}}1
-    {~}{{\textasciitilde}}1
 }
-
-\usepackage{hyperref}
-\usepackage{cleveref}
-
 \lstMakeShortInline[
   language=CSharp,
   columns=fixed,]~
@@ -130,7 +121,7 @@ literate=%
 \lstnewenvironment{lstcs}[1][]
     {\lstset{
         language=CSharp,
-        breaklines=true,
+        breaklines=true, 
         columns=fullflexible,
         caption={#1}
     }}
@@ -143,18 +134,20 @@ literate=%
 
 \delimitershortfall=-1pt
 
-% \let\svlp(
-% \catcode`(=\active %
-% \def(#1){\svlp#1)}
-% \catcode`(=12 %
-% \newcommand\pactive{\catcode`(=\active }
-% \everymath{\pactive}
-% \everydisplay{\pactive}
-
 \usepackage{hyperref}
 \usepackage{cleveref}
 
+\setlength{\parskip}{.8em} 
+\setlength{\parindent}{0pt}
+
 \begin{document}
+
+\title{\Ftitle}
+\author{\Fauthor}
+
+\maketitle
+
+\tableofcontents
 
 \section{Lösungsidee}
 
@@ -307,7 +300,7 @@ Bei Größe \(0\) gibt es beispielsweise \(t_0 = 0\) Terme, bei \(1\) gibt es \(
     Terme von Größe \(n\) können als volle Binärbäume mit \(n\) Blättern aufgefasst werden, wobei jedes Blatt eine Ziffer oder eine Wiederholung der Ziffer darstellt und jeder Knoten eine binäre Operation zwischen seinen zwei Kindern darstellt.
     Am Beispiel für \(6 = (1+1)\cdot(1+(1+1))\):
     \begin{center}
-        \begin{tikzpicture}[level/.style={sibling distance = 4cm/#1,  level distance = 0.8cm}] 
+        \begin{tikzpicture}[level/.style={sibling distance = 4cm,  level distance = 0.8cm}] 
         \node [circle,draw] {$\cdot$}
             child{ node  [circle,draw] {$+$}
                 child{ node  [circle,draw] {$1$}} 
@@ -455,47 +448,46 @@ Argumente:
 % Digits: 1, 2, 3, 4, 5, 6, 7, 8, 9
 % Base: 10
 %
-%\textcolor{red}{beim Header sind die senkrechten Striche teilweise zu kurz, bzw. die ersten beiden zu lang.}
 \begin{center}
     \begin{longtable}{ | l | l | p{9.5cm} | l | l | }
     \hline \textbf{Digit} & \textbf{Value} & \textbf{Term} & \textbf{Digit Usages} & \textbf{Time} \\\hline
-        1 & 2020 & \( \left(\left(1 + 1\right) \cdot \left(\frac{\left(11111 - 1\right)}{11}\right)\right) \) & 10 & 0.092s \\\hline
-        1 & 2020 & \( \left(\frac{\left(\left(1 + 1\right) \cdot \left(11111 - 1\right)\right)}{11}\right) \) & 10 & 0.092s \\\hline
-        1 & 2080 & \( \left(\left(1 + \left(\left(\left(1 + 1\right) \cdot \left(1 - 111\right)\right) + 11\right)\right) \cdot \left(1 - 11\right)\right) \) & 12 & 0.124s \\\hline
-        1 & 2030 & \( \left(\left(11 - 1\right) \cdot \left(1 + \left(\left(1 + 1\right) \cdot \left(1 - \left(11 - 111\right)\right)\right)\right)\right) \) & 12 & 0.126s \\\hline
-        2 & 2020 & \( \left(2 \cdot \left(\left(\left(2 + \left(2 \cdot 22\right)\right) \cdot 22\right) - 2\right)\right) \) & 8 & 0.008s \\\hline
-        2 & 2080 & \( \left(\left(2 \cdot \left(2 \cdot \left(22 - 2\right)\right)\right) \cdot \left(2 + \left(2 + 22\right)\right)\right) \) & 9 & 0.010s \\\hline
-        2 & 2030 & \( \left(\left(2 \cdot \left(2 + \left(\left(2 + \left(2 \cdot 22\right)\right) \cdot 22\right)\right)\right) + 2\right) \) & 9 & 0.024s \\\hline
-        2 & 2980 & \( \left(\left(2 - \left(\left(2 + 22\right) \cdot \left(\left(2 \cdot \left(2 - 22\right)\right) - 22\right)\right)\right) \cdot 2\right) \) & 11 & 0.133s \\\hline
-        3 & 2020 & \( \left(\left(\left(3 + 333\right) \cdot \left(3 + 3\right)\right) + \left(3 + \left(\frac{3}{3}\right)\right)\right) \) & 9 & 0.009s \\\hline
-        3 & 2080 & \( \left(\left(33 \cdot \left(33 + \left(33 - 3\right)\right)\right) + \left(\frac{3}{3}\right)\right) \) & 9 & 0.014s \\\hline
-        3 & 2030 & \( \left(33 - \left(\left(\frac{3}{3}\right) - \left(333 \cdot \left(3 + 3\right)\right)\right)\right) \) & 9 & 0.015s \\\hline
-        3 & 2980 & \( \left(\left(\frac{3}{3}\right) + \left(3 \cdot \left(3 + \left(33 \cdot \left(33 - 3\right)\right)\right)\right)\right) \) & 9 & 0.026s \\\hline
-        4 & 2080 & \( \left(\left(44 - 4\right) \cdot \left(4 + \left(4 + 44\right)\right)\right) \) & 7 & 0.002s \\\hline
-        4 & 2020 & \( \left(4 - \left(\left(4 + 4\right) \cdot \left(4 - \left(4 \cdot \left(4 \cdot \left(4 \cdot 4\right)\right)\right)\right)\right)\right) \) & 8 & 0.004s \\\hline
-        4 & 2980 & \( \left(4 - \left(\left(4 \cdot 4\right) - \left(\left(4 + \left(4 \cdot \left(4 \cdot 4\right)\right)\right) \cdot 44\right)\right)\right) \) & 9 & 0.009s \\\hline
-        4 & 2030 & \( \left(\left(4 \cdot \left(\left(4 \cdot \left(4 \cdot \left(4 \cdot \left(4 + 4\right)\right)\right)\right) - 4\right)\right) - \left(\frac{\left(4 + 4\right)}{4}\right)\right) \) & 10 & 0.192s \\\hline
-        5 & 2080 & \( \left(\left(5 + \left(\frac{55}{5}\right)\right) \cdot \left(5 + \left(5 \cdot \left(5 \cdot 5\right)\right)\right)\right) \) & 8 & 0.004s \\\hline
-        5 & 2980 & \( \left(\left(5 + \left(5 + \left(55 \cdot 55\right)\right)\right) - 55\right) \) & 8 & 0.004s \\\hline
-        5 & 2030 & \( \left(\left(5 \cdot \left(5 + \left(\left(\left(5 \cdot 5\right) + 55\right) \cdot 5\right)\right)\right) + 5\right) \) & 8 & 0.007s \\\hline
-        5 & 2020 & \( \left(\left(5 \cdot \left(5 + \left(\left(\left(5 \cdot 5\right) + 55\right) \cdot 5\right)\right)\right) - 5\right) \) & 8 & 0.007s \\\hline
-        6 & 2080 & \( \left(\left(\left(\frac{\left(6 + 6\right)}{6}\right) + \left(\left(6 \cdot 6\right) - 6\right)\right) \cdot \left(66 - \left(\frac{6}{6}\right)\right)\right) \) & 10 & 0.068s \\\hline
-        6 & 2030 & \( \left(\left(\left(\frac{6}{6}\right) - 6\right) \cdot \left(\left(\frac{\left(6 - 66\right)}{6}\right) - \left(6 \cdot 66\right)\right)\right) \) & 10 & 0.073s \\\hline
-        6 & 2020 & \( \left(\left(6 - \left(\frac{6}{6}\right)\right) \cdot \left(\left(\frac{\left(6 + 6\right)}{6}\right) + \left(6 + \left(6 \cdot 66\right)\right)\right)\right) \) & 10 & 0.132s \\\hline
-        6 & 2980 & \( \left(\left(\left(6 + \left(\frac{6}{6}\right)\right) \cdot \left(\left(6 \cdot \left(6 \cdot \left(6 + 6\right)\right)\right) - 6\right)\right) - \left(\frac{\left(6 + 6\right)}{6}\right)\right) \) & 11 & 0.466s \\\hline
-        7 & 2030 & \( \left(\left(7 \cdot \left(7 + \left(7 \cdot \left(\left(7 \cdot 7\right) - 7\right)\right)\right)\right) - 77\right) \) & 8 & 0.013s \\\hline
-        7 & 2020 & \( \left(\left(\frac{77}{7}\right) + \left(7 \cdot \left(\left(7 \cdot \left(\left(7 \cdot 7\right) - 7\right)\right) - 7\right)\right)\right) \) & 9 & 0.015s \\\hline
-        7 & 2080 & \( \left(\frac{\left(7 + \left(77 \cdot \left(\left(\left(7 + 7\right) \cdot \left(7 + 7\right)\right) - 7\right)\right)\right)}{7}\right) \) & 9 & 0.029s \\\hline
-        7 & 2980 & \( \left(\left(\left(7 \cdot \left(7 + \left(77 + \left(7 \cdot \left(7 \cdot 7\right)\right)\right)\right)\right) - \left(\frac{\left(7 + 7\right)}{7}\right)\right) - 7\right) \) & 11 & 0.505s \\\hline
-        8 & 2080 & \( \left(\left(8 + \left(8 + \left(8 + 8\right)\right)\right) \cdot \left(\left(\frac{8}{8}\right) + \left(8 \cdot 8\right)\right)\right) \) & 8 & 0.004s \\\hline
-        8 & 2020 & \( \left(\frac{\left(8 - \left(8 \cdot \left(8 - \left(8 \cdot \left(8 \cdot 8\right)\right)\right)\right)\right)}{\left(\frac{\left(8 + 8\right)}{8}\right)}\right) \) & 9 & 0.023s \\\hline
-        8 & 2030 & \( \left(\left(\frac{\left(8 - 88\right)}{8}\right) - \left(8 - \left(8 \cdot \left(\left(8 + 8\right) \cdot \left(8 + 8\right)\right)\right)\right)\right) \) & 10 & 0.106s \\\hline
-        8 & 2980 & \( \left(\left(\frac{8}{8}\right) + \left(\frac{\left(8 + \left(\left(8 \cdot \left(8 \cdot \left(8 \cdot 8\right)\right)\right) \cdot \left(8 \cdot 8\right)\right)\right)}{88}\right)\right) \) & 11 & 0.345s \\\hline
-        9 & 2080 & \( \left(\left(\frac{9}{9}\right) + \left(\left(9 + \left(\frac{\left(9 + 99\right)}{9}\right)\right) \cdot 99\right)\right) \) & 9 & 0.014s \\\hline
-        9 & 2020 & \( \left(\frac{\left(\left(\left(\frac{99}{9}\right) + 999\right) \cdot \left(9 + 9\right)\right)}{9}\right) \) & 9 & 0.016s \\\hline
-        9 & 2980 & \( \left(\left(\frac{9}{9}\right) + \left(\left(\left(9 \cdot \left(9 + \left(\left(9 + 9\right) \cdot \left(9 + 9\right)\right)\right)\right) - 9\right) - 9\right)\right) \) & 10 & 0.049s \\\hline
-        9 & 2030 & \( \left(\left(\left(9 \cdot 9\right) - \left(\frac{99}{9}\right)\right) \cdot \left(9 + \left(9 + \left(\frac{99}{9}\right)\right)\right)\right) \) & 10 & 0.088s \\\hline
-\end{longtable}
+            1 & 2020 & \( \left(\left(1 + 1\right) \cdot \left(\frac{\left(11111 - 1\right)}{11}\right)\right) \) & 10 & 0.075s \\\hline
+            1 & 2030 & \( \left(\left(11 - 1\right) \cdot \left(\left(\left(1 + 1\right) \cdot \left(1 - \left(11 - 111\right)\right)\right) + 1\right)\right) \) & 12 & 0.102s \\\hline
+            1 & 2080 & \( \left(\left(11 - 1\right) \cdot \left(\left(11 \cdot \left(\left(\left(1 + 1\right) \cdot \left(11 - 1\right)\right) - 1\right)\right) - 1\right)\right) \) & 12 & 0.105s \\\hline
+            1 & 2980 & \( \left(\left(11 - 1\right) \cdot \left(1 - \left(\left(1 - \left(11 - 1\right)\right) \cdot \left(11 \cdot \left(1 + \left(1 + 1\right)\right)\right)\right)\right)\right) \) & 13 & 0.154s \\\hline
+            2 & 2020 & \( \left(2 \cdot \left(\left(\left(2 + \left(2 \cdot 22\right)\right) \cdot 22\right) - 2\right)\right) \) & 8 & 0.002s \\\hline
+            2 & 2080 & \( \left(\left(2 \cdot \left(2 \cdot \left(22 - 2\right)\right)\right) \cdot \left(2 + \left(2 + 22\right)\right)\right) \) & 9 & 0.005s \\\hline
+            2 & 2030 & \( \left(2 + \left(2 \cdot \left(2 + \left(\left(2 + \left(2 \cdot 22\right)\right) \cdot 22\right)\right)\right)\right) \) & 9 & 0.011s \\\hline
+            2 & 2980 & \( \left(2 \cdot \left(2 - \left(\left(2 + 22\right) \cdot \left(\left(2 \cdot \left(2 - 22\right)\right) - 22\right)\right)\right)\right) \) & 11 & 0.152s \\\hline
+            3 & 2020 & \( \left(\left(\left(3 + 333\right) \cdot \left(3 + 3\right)\right) + \left(3 + \left(\frac{3}{3}\right)\right)\right) \) & 9 & 0.009s \\\hline
+            3 & 2030 & \( \left(33 - \left(\left(\frac{3}{3}\right) - \left(333 \cdot \left(3 + 3\right)\right)\right)\right) \) & 9 & 0.015s \\\hline
+            3 & 2080 & \( \left(\left(33 \cdot \left(33 + \left(33 - 3\right)\right)\right) + \left(\frac{3}{3}\right)\right) \) & 9 & 0.015s \\\hline
+            3 & 2980 & \( \left(\left(\frac{3}{3}\right) + \left(3 \cdot \left(3 + \left(33 \cdot \left(33 - 3\right)\right)\right)\right)\right) \) & 9 & 0.017s \\\hline
+            4 & 2080 & \( \left(\left(44 - 4\right) \cdot \left(4 + \left(4 + 44\right)\right)\right) \) & 7 & 0.002s \\\hline
+            4 & 2020 & \( \left(\left(44 \cdot \left(\left(\frac{\left(4 + 4\right)}{4}\right) + 44\right)\right) - 4\right) \) & 8 & 0.004s \\\hline
+            4 & 2980 & \( \left(4 - \left(\left(4 \cdot 4\right) - \left(\left(4 + \left(4 \cdot \left(4 \cdot 4\right)\right)\right) \cdot 44\right)\right)\right) \) & 9 & 0.018s \\\hline
+            4 & 2030 & \( \left(\left(4 \cdot \left(\left(4 \cdot \left(4 \cdot \left(4 \cdot \left(4 + 4\right)\right)\right)\right) - 4\right)\right) - \left(\frac{\left(4 + 4\right)}{4}\right)\right) \) & 10 & 0.182s \\\hline
+            5 & 2980 & \( \left(5 + \left(5 - \left(\left(\left(\frac{5}{5}\right) - 55\right) \cdot 55\right)\right)\right) \) & 8 & 0.007s \\\hline
+            5 & 2030 & \( \left(\left(5 \cdot \left(5 + \left(5 \cdot \left(\left(5 \cdot 5\right) + 55\right)\right)\right)\right) + 5\right) \) & 8 & 0.007s \\\hline
+            5 & 2020 & \( \left(\left(5 \cdot \left(5 + \left(5 \cdot \left(\left(5 \cdot 5\right) + 55\right)\right)\right)\right) - 5\right) \) & 8 & 0.008s \\\hline
+            5 & 2080 & \( \left(\left(\left(5 \cdot 5\right) + 55\right) \cdot \left(\left(\frac{5}{5}\right) + \left(5 \cdot 5\right)\right)\right) \) & 8 & 0.008s \\\hline
+            6 & 2030 & \( \left(\left(\left(\frac{\left(6 + 6\right)}{6}\right) - \left(66 - 6\right)\right) \cdot \left(\left(\frac{6}{6}\right) - \left(6 \cdot 6\right)\right)\right) \) & 10 & 0.058s \\\hline
+            6 & 2020 & \( \left(\left(6 - \left(\frac{6}{6}\right)\right) \cdot \left(\left(\frac{\left(6 + 6\right)}{6}\right) + \left(6 + \left(6 \cdot 66\right)\right)\right)\right) \) & 10 & 0.130s \\\hline
+            6 & 2080 & \( \left(\left(66 - \left(\frac{6}{6}\right)\right) \cdot \left(\left(\frac{\left(6 + 6\right)}{6}\right) + \left(\left(6 \cdot 6\right) - 6\right)\right)\right) \) & 10 & 0.171s \\\hline
+            6 & 2980 & \( \left(\frac{\left(\left(\left(\left(\left(6 \cdot \left(6 \cdot \left(6 + 6\right)\right)\right) - 6\right) \cdot \left(6 + \left(6 \cdot 6\right)\right)\right) - 6\right) - 6\right)}{6}\right) \) & 11 & 0.328s \\\hline
+            7 & 2030 & \( \left(\left(7 \cdot \left(7 + \left(7 \cdot \left(\left(7 \cdot 7\right) - 7\right)\right)\right)\right) - 77\right) \) & 8 & 0.006s \\\hline
+            7 & 2020 & \( \left(\left(\frac{77}{7}\right) + \left(7 \cdot \left(\left(7 \cdot \left(\left(7 \cdot 7\right) - 7\right)\right) - 7\right)\right)\right) \) & 9 & 0.014s \\\hline
+            7 & 2080 & \( \left(\frac{\left(7 + \left(77 \cdot \left(\left(\left(7 + 7\right) \cdot \left(7 + 7\right)\right) - 7\right)\right)\right)}{7}\right) \) & 9 & 0.036s \\\hline
+            7 & 2980 & \( \left(\frac{\left(\left(\left(\left(7 + \left(7 \cdot \left(77 - 7\right)\right)\right) \cdot \left(\left(7 \cdot 7\right) - 7\right)\right) - 7\right) - 7\right)}{7}\right) \) & 11 & 0.322s \\\hline
+            8 & 2080 & \( \left(\left(8 + \left(8 + \left(8 + 8\right)\right)\right) \cdot \left(\left(\frac{8}{8}\right) + \left(8 \cdot 8\right)\right)\right) \) & 8 & 0.005s \\\hline
+            8 & 2020 & \( \left(\frac{\left(8 \cdot \left(8 - \left(8 \cdot \left(8 - \left(8 \cdot \left(8 \cdot 8\right)\right)\right)\right)\right)\right)}{\left(8 + 8\right)}\right) \) & 9 & 0.036s \\\hline
+            8 & 2030 & \( \left(\left(\left(8 + 8\right) \cdot \left(8 \cdot \left(8 + 8\right)\right)\right) - \left(8 - \left(\frac{\left(8 - 88\right)}{8}\right)\right)\right) \) & 10 & 0.132s \\\hline
+            8 & 2980 & \( \left(\left(\frac{8}{8}\right) + \left(\frac{\left(8 + \left(\left(8 \cdot \left(8 \cdot \left(8 \cdot 8\right)\right)\right) \cdot \left(8 \cdot 8\right)\right)\right)}{88}\right)\right) \) & 11 & 0.523s \\\hline
+            9 & 2020 & \( \left(\left(9 + \left(\frac{99}{9}\right)\right) \cdot \left(\left(\frac{\left(9 + 9\right)}{9}\right) + 99\right)\right) \) & 9 & 0.011s \\\hline
+            9 & 2080 & \( \left(\left(\frac{9}{9}\right) + \left(99 \cdot \left(9 + \left(\frac{\left(9 + 99\right)}{9}\right)\right)\right)\right) \) & 9 & 0.012s \\\hline
+            9 & 2980 & \( \left(9 + \left(\frac{\left(9 + \left(\left(9 + \left(9 + 9\right)\right) \cdot \left(999 - 9\right)\right)\right)}{9}\right)\right) \) & 10 & 0.059s \\\hline
+            9 & 2030 & \( \left(\left(\left(9 \cdot 9\right) - \left(\frac{99}{9}\right)\right) \cdot \left(9 + \left(9 + \left(\frac{99}{9}\right)\right)\right)\right) \) & 10 & 0.130s \\\hline
+    \end{longtable}
 \end{center}
 
 \subsection{Mit Exponenten und Fakultäten}
@@ -505,6 +497,55 @@ Argumente:
 ~--digits 0,1,2,3,4,5,6,7,8,9~\\
 ~--exponentiation --factorial --sync --latex~
 
+% % Targets: 2020, 2030, 2080, 2980
+% % Digits: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+% % Base: 10
+% % Exponentiation Factorial
+% \begin{center}
+%     \begin{longtable}{ | l | l | p{9.5cm} | l | l | }
+%     \hline \textbf{Digit} & \textbf{Value} & \textbf{Term} & \textbf{Digit Usages} & \textbf{Time} \\\hline
+%         0 & 2980 & \( \left(\left(\left(0!\right) + \left(\left(0!\right) + \left(\left(0!\right) + \left(0!\right)\right)\right)\right) \mnl\quad\cdot \left(\left(0!\right) + \left(\left((((0!) + (0!)) + ((0!) + (0!)))!\right) \nldelims{\nldelims{\mnl}}\ \ + \left(((((0!) + (0!)) + (0!))!)!\right)\right)\right)\right) \) & 24 & 0.476s \\\hline
+%         0 & 2080 & \( \left(\left({((0!) + (0!))}^{(((((0!) + (0!)) + (0!))!) - (0!))}\right) \mnl\quad\cdot \left(\left(0!\right) + \left({((0!) + (0!))}^{((((0!) + (0!)) + (0!))!)}\right)\right)\right) \) & 24 & 0.487s \\\hline
+%         0 & 2020 & \( \left(\left(\left(0!\right) + \left(0!\right)\right) \cdot \left(\left(0!\right) + \left(\left(0!\right) \nldelims{\nldelims{\mnl}}\ \ - \left(\frac{\left(((0!) + ((((0!) + (0!)) + (0!))!))!\right)}{\left(\left(0!\right) - \left((((0!) + (0!)) + (0!))!\right)\right)}\right)\right)\right)\right) \) & 24 & 0.490s \\\hline
+%         0 & 2030 & \( \left(\left(0!\right) + \left(\left(\left(\left(0!\right) + \left(\left(0!\right) + \left(0!\right)\right)\right) \cdot \left(((0!) + ((0!)+ ((((0!) \nldelims{\nldelims{\nldelims{\mnl}}}\ \ + (0!)) + ((0!) + (0!)))!)))^{((0!) + (0!))}\right)\right) + \left(0!\right)\right)\right) \) & 26 & 0.838s \\\hline
+%         1 & 2080 & \( \left(\left(\left(1 + \left(1 + 1\right)\right) \cdot 11\right) + \left(\left({(1 + 1)}^{11}\right) - 1\right)\right) \) & 10 & 0.037s \\\hline
+%         1 & 2030 & \( \left(\left(\left(\left({(1 + 1)}^{11}\right) - 1\right) - \left(((1 + 1) + 1)!\right)\right) - 11\right) \) & 10 & 0.037s \\\hline
+%         1 & 2020 & \( \left(\frac{\left(\left(11111 - 1\right) \cdot \left(1 + 1\right)\right)}{11}\right) \) & 10 & 0.047s \\\hline
+%         1 & 2980 & \( \left(\left(\left(((((1 + 1) + 1)!) + 1)!\right) - \left(\left({(1 + 1)}^{11}\right) + 11\right)\right) - 1\right) \) & 11 & 0.180s \\\hline
+%         2 & 2080 & \( \left(\left({(2 * 22)}^{2}\right) + \left({(((2 * 2)!) / 2)}^{2}\right)\right) \) & 8 & 0.019s \\\hline
+%         2 & 2030 & \( \left(\left(\left({2}^{(22 / 2)}\right) - 22\right) + \left(2 + 2\right)\right) \) & 8 & 0.020s \\\hline
+%         2 & 2020 & \( \left(\left(\left({2}^{(22 / 2)}\right) - \left(2 + 2\right)\right) - \left((2 * 2)!\right)\right) \) & 8 & 0.039s \\\hline
+%         2 & 2980 & \( \left(\left({(2 * ((2 * 2)!))}^{2}\right) + \left({(2 + ((2 * 2)!))}^{2}\right)\right) \) & 8 & 0.043s \\\hline
+%         3 & 2080 & \( \left(\left(3 \cdot \left(\left(((3 * 3) - 3)!\right) - \left({3}^{3}\right)\right)\right) + \left(\frac{3}{3}\right)\right) \) & 8 & 0.077s \\\hline
+%         3 & 2030 & \( \left(\left(33 - \left(\frac{3}{3}\right)\right) + \left(333 \cdot \left(3 + 3\right)\right)\right) \) & 9 & 0.188s \\\hline
+%         3 & 2020 & \( \left(\left(3 + \left(\left(3 + 3\right) \cdot \left(3 + 333\right)\right)\right) + \left(\frac{3}{3}\right)\right) \) & 9 & 0.326s \\\hline
+%         3 & 2980 & \( \left(\left(\frac{3}{3}\right) - \left(3 \cdot \left(\left(\left(3 - 33\right) \cdot 33\right) - 3\right)\right)\right) \) & 9 & 0.386s \\\hline
+%         4 & 2080 & \( \left(\left(4 + 4\right) \cdot \left(4 + \left({4}^{4}\right)\right)\right) \) & 5 & 0.001s \\\hline
+%         4 & 2020 & \( \left(4 + \left(\left(\left({4}^{4}\right) - 4\right) \cdot \left(4 + 4\right)\right)\right) \) & 6 & 0.002s \\\hline
+%         4 & 2980 & \( \left(\left(\left(\left({4}^{4}\right) - 4\right) \cdot \left(4 + \left(4 + 4\right)\right)\right) - 44\right) \) & 8 & 0.052s \\\hline
+%         4 & 2030 & \( \left(\left({4}^{4}\right) - \left(\left(\frac{\left(4 + 4\right)}{4}\right) - \left(4 \cdot 444\right)\right)\right) \) & 9 & 0.174s \\\hline
+%         5 & 2980 & \( \left(\left(5 - \left(5 \cdot \left(5 + \left(5 \cdot 5\right)\right)\right)\right) + \left({5}^{5}\right)\right) \) & 7 & 0.005s \\\hline
+%         5 & 2080 & \( \left(\left(5 + \left(5 \cdot \left(5 \cdot 5\right)\right)\right) \cdot \left(5 + \left(\frac{55}{5}\right)\right)\right) \) & 8 & 0.035s \\\hline
+%         5 & 2030 & \( \left(\left(5 + \left({5}^{5}\right)\right) - \left(\left(\left(5 \cdot 5\right) - 5\right) \cdot 55\right)\right) \) & 8 & 0.036s \\\hline
+%         5 & 2020 & \( \left(\left(5 \cdot \left(5 + \left(5 \cdot \left(\left(5 \cdot 5\right) + 55\right)\right)\right)\right) - 5\right) \) & 8 & 0.062s \\\hline
+%         6 & 2030 & \( \left(\left(\left(\frac{6}{6}\right) - \left(6 \cdot 6\right)\right) \cdot \left(6 - \left({((6 + 6) / 6)}^{6}\right)\right)\right) \) & 9 & 0.232s \\\hline
+%         6 & 2080 & \( \left(\left(\left(\frac{6}{6}\right) - 66\right) \cdot \left(\left(6 - \left(6 \cdot 6\right)\right) - \left(\frac{\left(6 + 6\right)}{6}\right)\right)\right) \) & 10 & 0.721s \\\hline
+%         6 & 2020 & \( \left(\frac{\left(\left(\left(66 \cdot 66\right) - \left(6 - \left(\frac{\left({6}^{6}\right)}{6}\right)\right)\right) - 6\right)}{6}\right) \) & 10 & 1.284s \\\hline
+%         6 & 2980 & \( \left(\left({((6 + 6) / 6)}^{6}\right) + \left({(6 + (6 - 66))}^{((6 + 6) / 6)}\right)\right) \) & 11 & 2.073s \\\hline
+%         7 & 2030 & \( \left(\left(7 \cdot \left(7 - \left(7 \cdot \left(7 - \left(7 \cdot 7\right)\right)\right)\right)\right) - 77\right) \) & 8 & 0.041s \\\hline
+%         7 & 2020 & \( \left(\left(\frac{77}{7}\right) - \left(7 \cdot \left(7 + \left(7 \cdot \left(7 - \left(7 \cdot 7\right)\right)\right)\right)\right)\right) \) & 9 & 0.239s \\\hline
+%         7 & 2080 & \( \left(\frac{\left(7 + \left(77 \cdot \left(\left(\left(7 + 7\right) \cdot \left(7 + 7\right)\right) - 7\right)\right)\right)}{7}\right) \) & 9 & 0.372s \\\hline
+%         7 & 2980 & \( \left(\left(\left(\left(\frac{77}{7}\right) - 7\right) \cdot 777\right) - \left({((7 + 7) / 7)}^{7}\right)\right) \) & 11 & 2.234s \\\hline
+%         8 & 2080 & \( \left(\left(\left(\frac{8}{8}\right) + \left(8 \cdot 8\right)\right) \cdot \left(8 + \left(8 + \left(8 + 8\right)\right)\right)\right) \) & 8 & 0.033s \\\hline
+%         8 & 2980 & \( \left(\left(\frac{8}{8}\right) + \left(\frac{\left(8 + \left(\frac{\left({8}^{8}\right)}{\left(8 \cdot 8\right)}\right)\right)}{88}\right)\right) \) & 9 & 0.098s \\\hline
+%         8 & 2020 & \( \left(\frac{\left(8 + \left(8 \cdot \left(\left(8 \cdot \left(8 \cdot 8\right)\right) - 8\right)\right)\right)}{\left(\frac{\left(8 + 8\right)}{8}\right)}\right) \) & 9 & 0.228s \\\hline
+%         8 & 2030 & \( \left(\left(\frac{\left(8 - 88\right)}{8}\right) - \left(8 - \left(8 \cdot \left(\left(8 + 8\right) \cdot \left(8 + 8\right)\right)\right)\right)\right) \) & 10 & 0.390s \\\hline
+%         9 & 2030 & \( \left(\left({((9 + 9) / 9)}^{(99 / 9)}\right) - \left(9 + 9\right)\right) \) & 8 & 0.012s \\\hline
+%         9 & 2080 & \( \left(\left(9 + \left(9 + \left(9 - \left(\frac{9}{9}\right)\right)\right)\right) \cdot \left(\left(9 \cdot 9\right) - \left(\frac{9}{9}\right)\right)\right) \) & 9 & 0.051s \\\hline
+%         9 & 2020 & \( \left(\left(\left(\frac{99}{9}\right) + 999\right) \cdot \left(\frac{\left(9 + 9\right)}{9}\right)\right) \) & 9 & 0.053s \\\hline
+%         9 & 2980 & \( \left(\left(\frac{9}{9}\right) + \left(\left(\left(9 + \left(9 \cdot \left(9 + 9\right)\right)\right) \cdot \left(9 + 9\right)\right) - 99\right)\right) \) & 10 & 0.259s \\\hline
+% \end{longtable}
+% \end{center}
 % Targets: 2020, 2030, 2080, 2980
 % Digits: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
 % Base: 10
@@ -512,47 +553,47 @@ Argumente:
 \begin{center}
     \begin{longtable}{ | l | l | p{9.5cm} | l | l | }
     \hline \textbf{Digit} & \textbf{Value} & \textbf{Term} & \textbf{Digit Usages} & \textbf{Time} \\\hline
-        0 & 2980 & \( \left(\left(\left(0!\right) + \left(\left(0!\right) + \left(\left(0!\right) + \left(0!\right)\right)\right)\right) \mnl\quad\cdot \left(\left(0!\right) + \left(\left((((0!) + (0!)) + ((0!) + (0!)))!\right) \nldelims{\nldelims{\mnl}}\ \ + \left(((((0!) + (0!)) + (0!))!)!\right)\right)\right)\right) \) & 24 & 0.476s \\\hline
-        0 & 2080 & \( \left(\left({((0!) + (0!))}^{(((((0!) + (0!)) + (0!))!) - (0!))}\right) \mnl\quad\cdot \left(\left(0!\right) + \left({((0!) + (0!))}^{((((0!) + (0!)) + (0!))!)}\right)\right)\right) \) & 24 & 0.487s \\\hline
-        0 & 2020 & \( \left(\left(\left(0!\right) + \left(0!\right)\right) \cdot \left(\left(0!\right) + \left(\left(0!\right) \nldelims{\nldelims{\mnl}}\ \ - \left(\frac{\left(((0!) + ((((0!) + (0!)) + (0!))!))!\right)}{\left(\left(0!\right) - \left((((0!) + (0!)) + (0!))!\right)\right)}\right)\right)\right)\right) \) & 24 & 0.490s \\\hline
-        0 & 2030 & \( \left(\left(0!\right) + \left(\left(\left(\left(0!\right) + \left(\left(0!\right) + \left(0!\right)\right)\right) \cdot \left(((0!) + ((0!)+ ((((0!) \nldelims{\nldelims{\nldelims{\mnl}}}\ \ + (0!)) + ((0!) + (0!)))!)))^{((0!) + (0!))}\right)\right) + \left(0!\right)\right)\right) \) & 26 & 0.838s \\\hline
-        1 & 2080 & \( \left(\left(\left(1 + \left(1 + 1\right)\right) \cdot 11\right) + \left(\left({(1 + 1)}^{11}\right) - 1\right)\right) \) & 10 & 0.037s \\\hline
-        1 & 2030 & \( \left(\left(\left(\left({(1 + 1)}^{11}\right) - 1\right) - \left(((1 + 1) + 1)!\right)\right) - 11\right) \) & 10 & 0.037s \\\hline
-        1 & 2020 & \( \left(\frac{\left(\left(11111 - 1\right) \cdot \left(1 + 1\right)\right)}{11}\right) \) & 10 & 0.047s \\\hline
-        1 & 2980 & \( \left(\left(\left(((((1 + 1) + 1)!) + 1)!\right) - \left(\left({(1 + 1)}^{11}\right) + 11\right)\right) - 1\right) \) & 11 & 0.180s \\\hline
-        2 & 2080 & \( \left(\left({(2 * 22)}^{2}\right) + \left({(((2 * 2)!) / 2)}^{2}\right)\right) \) & 8 & 0.019s \\\hline
-        2 & 2030 & \( \left(\left(\left({2}^{(22 / 2)}\right) - 22\right) + \left(2 + 2\right)\right) \) & 8 & 0.020s \\\hline
-        2 & 2020 & \( \left(\left(\left({2}^{(22 / 2)}\right) - \left(2 + 2\right)\right) - \left((2 * 2)!\right)\right) \) & 8 & 0.039s \\\hline
-        2 & 2980 & \( \left(\left({(2 * ((2 * 2)!))}^{2}\right) + \left({(2 + ((2 * 2)!))}^{2}\right)\right) \) & 8 & 0.043s \\\hline
-        3 & 2080 & \( \left(\left(3 \cdot \left(\left(((3 * 3) - 3)!\right) - \left({3}^{3}\right)\right)\right) + \left(\frac{3}{3}\right)\right) \) & 8 & 0.077s \\\hline
-        3 & 2030 & \( \left(\left(33 - \left(\frac{3}{3}\right)\right) + \left(333 \cdot \left(3 + 3\right)\right)\right) \) & 9 & 0.188s \\\hline
-        3 & 2020 & \( \left(\left(3 + \left(\left(3 + 3\right) \cdot \left(3 + 333\right)\right)\right) + \left(\frac{3}{3}\right)\right) \) & 9 & 0.326s \\\hline
-        3 & 2980 & \( \left(\left(\frac{3}{3}\right) - \left(3 \cdot \left(\left(\left(3 - 33\right) \cdot 33\right) - 3\right)\right)\right) \) & 9 & 0.386s \\\hline
-        4 & 2080 & \( \left(\left(4 + 4\right) \cdot \left(4 + \left({4}^{4}\right)\right)\right) \) & 5 & 0.001s \\\hline
-        4 & 2020 & \( \left(4 + \left(\left(\left({4}^{4}\right) - 4\right) \cdot \left(4 + 4\right)\right)\right) \) & 6 & 0.002s \\\hline
-        4 & 2980 & \( \left(\left(\left(\left({4}^{4}\right) - 4\right) \cdot \left(4 + \left(4 + 4\right)\right)\right) - 44\right) \) & 8 & 0.052s \\\hline
-        4 & 2030 & \( \left(\left({4}^{4}\right) - \left(\left(\frac{\left(4 + 4\right)}{4}\right) - \left(4 \cdot 444\right)\right)\right) \) & 9 & 0.174s \\\hline
-        5 & 2980 & \( \left(\left(5 - \left(5 \cdot \left(5 + \left(5 \cdot 5\right)\right)\right)\right) + \left({5}^{5}\right)\right) \) & 7 & 0.005s \\\hline
-        5 & 2080 & \( \left(\left(5 + \left(5 \cdot \left(5 \cdot 5\right)\right)\right) \cdot \left(5 + \left(\frac{55}{5}\right)\right)\right) \) & 8 & 0.035s \\\hline
-        5 & 2030 & \( \left(\left(5 + \left({5}^{5}\right)\right) - \left(\left(\left(5 \cdot 5\right) - 5\right) \cdot 55\right)\right) \) & 8 & 0.036s \\\hline
-        5 & 2020 & \( \left(\left(5 \cdot \left(5 + \left(5 \cdot \left(\left(5 \cdot 5\right) + 55\right)\right)\right)\right) - 5\right) \) & 8 & 0.062s \\\hline
-        6 & 2030 & \( \left(\left(\left(\frac{6}{6}\right) - \left(6 \cdot 6\right)\right) \cdot \left(6 - \left({((6 + 6) / 6)}^{6}\right)\right)\right) \) & 9 & 0.232s \\\hline
-        6 & 2080 & \( \left(\left(\left(\frac{6}{6}\right) - 66\right) \cdot \left(\left(6 - \left(6 \cdot 6\right)\right) - \left(\frac{\left(6 + 6\right)}{6}\right)\right)\right) \) & 10 & 0.721s \\\hline
-        6 & 2020 & \( \left(\frac{\left(\left(\left(66 \cdot 66\right) - \left(6 - \left(\frac{\left({6}^{6}\right)}{6}\right)\right)\right) - 6\right)}{6}\right) \) & 10 & 1.284s \\\hline
-        6 & 2980 & \( \left(\left({((6 + 6) / 6)}^{6}\right) + \left({(6 + (6 - 66))}^{((6 + 6) / 6)}\right)\right) \) & 11 & 2.073s \\\hline
-        7 & 2030 & \( \left(\left(7 \cdot \left(7 - \left(7 \cdot \left(7 - \left(7 \cdot 7\right)\right)\right)\right)\right) - 77\right) \) & 8 & 0.041s \\\hline
-        7 & 2020 & \( \left(\left(\frac{77}{7}\right) - \left(7 \cdot \left(7 + \left(7 \cdot \left(7 - \left(7 \cdot 7\right)\right)\right)\right)\right)\right) \) & 9 & 0.239s \\\hline
-        7 & 2080 & \( \left(\frac{\left(7 + \left(77 \cdot \left(\left(\left(7 + 7\right) \cdot \left(7 + 7\right)\right) - 7\right)\right)\right)}{7}\right) \) & 9 & 0.372s \\\hline
-        7 & 2980 & \( \left(\left(\left(\left(\frac{77}{7}\right) - 7\right) \cdot 777\right) - \left({((7 + 7) / 7)}^{7}\right)\right) \) & 11 & 2.234s \\\hline
-        8 & 2080 & \( \left(\left(\left(\frac{8}{8}\right) + \left(8 \cdot 8\right)\right) \cdot \left(8 + \left(8 + \left(8 + 8\right)\right)\right)\right) \) & 8 & 0.033s \\\hline
-        8 & 2980 & \( \left(\left(\frac{8}{8}\right) + \left(\frac{\left(8 + \left(\frac{\left({8}^{8}\right)}{\left(8 \cdot 8\right)}\right)\right)}{88}\right)\right) \) & 9 & 0.098s \\\hline
-        8 & 2020 & \( \left(\frac{\left(8 + \left(8 \cdot \left(\left(8 \cdot \left(8 \cdot 8\right)\right) - 8\right)\right)\right)}{\left(\frac{\left(8 + 8\right)}{8}\right)}\right) \) & 9 & 0.228s \\\hline
-        8 & 2030 & \( \left(\left(\frac{\left(8 - 88\right)}{8}\right) - \left(8 - \left(8 \cdot \left(\left(8 + 8\right) \cdot \left(8 + 8\right)\right)\right)\right)\right) \) & 10 & 0.390s \\\hline
-        9 & 2030 & \( \left(\left({((9 + 9) / 9)}^{(99 / 9)}\right) - \left(9 + 9\right)\right) \) & 8 & 0.012s \\\hline
-        9 & 2080 & \( \left(\left(9 + \left(9 + \left(9 - \left(\frac{9}{9}\right)\right)\right)\right) \cdot \left(\left(9 \cdot 9\right) - \left(\frac{9}{9}\right)\right)\right) \) & 9 & 0.051s \\\hline
-        9 & 2020 & \( \left(\left(\left(\frac{99}{9}\right) + 999\right) \cdot \left(\frac{\left(9 + 9\right)}{9}\right)\right) \) & 9 & 0.053s \\\hline
-        9 & 2980 & \( \left(\left(\frac{9}{9}\right) + \left(\left(\left(9 + \left(9 \cdot \left(9 + 9\right)\right)\right) \cdot \left(9 + 9\right)\right) - 99\right)\right) \) & 10 & 0.259s \\\hline
-\end{longtable}
+            0 & 2980 & \( \left(\left(\left(0!\right) + \left(\left(0!\right) + \left(\left(0!\right) + \left(0!\right)\right)\right)\right) \mnl\quad\cdot \left(\left(\left(0!\right) + \left(\left(\left(\left(0!\right) + \left(0!\right)\right) + \left(\left(0!\right) + \left(0!\right)\right)\right)!\right)\right) \nldelims{\mnl}\ \ + \left(\left(\left(\left(\left(0!\right) + \left(0!\right)\right) + \left(0!\right)\right)!\right)!\right)\right)\right) \) & 24 & 0.292s \\\hline
+            0 & 2080 & \( \left(\left(\left(0!\right) + \left({\left(\left(0!\right) + \left(0!\right)\right)}^{\left(\left(\left(\left(0!\right) + \left(0!\right)\right) + \left(0!\right)\right)!\right)}\right)\right) \mnl\quad\cdot \left({\left(\left(0!\right) + \left(0!\right)\right)}^{\left(\left(\left(\left(\left(0!\right) + \left(0!\right)\right) + \left(0!\right)\right)!\right) - \left(0!\right)\right)}\right)\right) \) & 24 & 0.293s \\\hline
+            0 & 2020 & \( \left(\left(\left(0!\right) + \left(0!\right)\right) \cdot \left(\left(\left(0!\right) + \left(0!\right)\right) \nldelims{\mnl}\ \ - \left(\frac{\left(\left(\left(0!\right) + \left(\left(\left(\left(0!\right) + \left(0!\right)\right) + \left(0!\right)\right)!\right)\right)!\right)}{\left(\left(0!\right) - \left(\left(\left(\left(0!\right) + \left(0!\right)\right) + \left(0!\right)\right)!\right)\right)}\right)\right)\right) \) & 24 & 0.341s \\\hline
+            0 & 2030 & \( \left(\left(\left(0!\right) + \left(0!\right)\right) + \left(\left(\left(0!\right) + \left(\left(0!\right) + \left(0!\right)\right)\right) \cdot \left(\left(\left(0!\right) + \left(\left(0!\right) \nldelims{\nldelims{\nldelims{\nldelims{\mnl}}}}\ \ + \left(\left(\left(\left(0!\right) + \left(0!\right)\right) + \left(\left(0!\right) + \left(0!\right)\right)\right)!\right)\right)\right)^{\left(\left(0!\right) + \left(0!\right)\right)}\right)\right)\right) \) & 26 & 0.964s \\\hline
+            1 & 2080 & \( \left(\left(\left(1 + \left(1 + 1\right)\right) \cdot 11\right) - \left(1 - \left({\left(1 + 1\right)}^{11}\right)\right)\right) \) & 10 & 0.060s \\\hline
+            1 & 2030 & \( \left(\left(\left(\left({\left(1 + 1\right)}^{11}\right) - \left(\left(\left(1 + 1\right) + 1\right)!\right)\right) - 1\right) - 11\right) \) & 10 & 0.083s \\\hline
+            1 & 2020 & \( \left(\frac{\left(\left(11111 - 1\right) \cdot \left(1 + 1\right)\right)}{11}\right) \) & 10 & 0.127s \\\hline
+            1 & 2980 & \( \left(\left(\left(\left(\left(\left(1 + 1\right) + 1\right)!\right) + 1\right)!\right) \mnl\ \ - \left(\left(1 + \left({\left(1 + 1\right)}^{11}\right)\right) + 11\right)\right) \) & 11 & 0.405s \\\hline
+            2 & 2020 & \( \left(\left(\left({2}^{\left(\frac{22}{2}\right)}\right) - \left(\left(2 \cdot 2\right)!\right)\right) - \left(2 + 2\right)\right) \) & 8 & 0.029s \\\hline
+            2 & 2030 & \( \left(\left(\left({2}^{\left(\frac{22}{2}\right)}\right) - 22\right) + \left(2 + 2\right)\right) \) & 8 & 0.031s \\\hline
+            2 & 2080 & \( \left(\left({2}^{\left(\frac{22}{2}\right)}\right) + \left(2 \cdot \left({2}^{\left(2 + 2\right)}\right)\right)\right) \) & 8 & 0.035s \\\hline
+            2 & 2980 & \( \left(2 \cdot \left(2 + \left(2 \cdot \left(\left(\left(2 \cdot 2\right)!\right) + \left(\left(\left(2 + 2\right) + 2\right)!\right)\right)\right)\right)\right) \) & 8 & 0.103s \\\hline
+            3 & 2080 & \( \left(\left(\frac{3}{3}\right) - \left(3 \cdot \left(\left({3}^{3}\right) - \left(\left(\left(3 \cdot 3\right) - 3\right)!\right)\right)\right)\right) \) & 8 & 0.105s \\\hline
+            3 & 2030 & \( \left(\left(33 + \left(333 \cdot \left(3 + 3\right)\right)\right) - \left(\frac{3}{3}\right)\right) \) & 9 & 0.300s \\\hline
+            3 & 2980 & \( \left(\frac{\left(3 + \left(\left({33}^{3}\right) - \left({\left(3 + \left({3}^{3}\right)\right)}^{3}\right)\right)\right)}{3}\right) \) & 9 & 0.448s \\\hline
+            3 & 2020 & \( \left(\left(\frac{3}{3}\right) + \left(3 + \left(\left(3 + 333\right) \cdot \left(3 + 3\right)\right)\right)\right) \) & 9 & 0.831s \\\hline
+            4 & 2080 & \( \left(\left(4 + 4\right) \cdot \left(4 + \left({4}^{4}\right)\right)\right) \) & 5 & 0.001s \\\hline
+            4 & 2020 & \( \left(4 + \left(\left(\left({4}^{4}\right) - 4\right) \cdot \left(4 + 4\right)\right)\right) \) & 6 & 0.002s \\\hline
+            4 & 2980 & \( \left(4 \cdot \left(\left({\left(4 + \left(\frac{4}{4}\right)\right)}^{4}\right) + \left(\left(\left(\frac{4}{4}\right) + 4\right)!\right)\right)\right) \) & 8 & 0.147s \\\hline
+            4 & 2030 & \( \left(\left({4}^{4}\right) - \left(\left(\frac{\left(4 + 4\right)}{4}\right) - \left(4 \cdot 444\right)\right)\right) \) & 9 & 0.272s \\\hline
+            5 & 2980 & \( \left(5 + \left(5 \cdot \left(\left(5 \cdot \left(\left(5 \cdot \left(\frac{5}{5}\right)\right)!\right)\right) - 5\right)\right)\right) \) & 7 & 0.004s \\\hline
+            5 & 2020 & \( \left(\left({5}^{5}\right) + \left(\left(\left(5 - \left(5 \cdot 5\right)\right) \cdot 55\right) - 5\right)\right) \) & 8 & 0.025s \\\hline
+            5 & 2030 & \( \left(\left({5}^{5}\right) + \left(5 - \left(55 \cdot \left(\left(5 \cdot 5\right) - 5\right)\right)\right)\right) \) & 8 & 0.054s \\\hline
+            5 & 2080 & \( \left(\left(5 + \left(\frac{55}{5}\right)\right) \cdot \left(5 + \left(5 \cdot \left(5 \cdot 5\right)\right)\right)\right) \) & 8 & 0.055s \\\hline
+            6 & 2030 & \( \left(\left({\left(\frac{\left(6 + 6\right)}{6}\right)}^{\left(\frac{66}{6}\right)}\right) - \left(6 + \left(6 + 6\right)\right)\right) \) & 9 & 0.454s \\\hline
+            6 & 2020 & \( \left(\frac{\left(\left(\left(\frac{\left({6}^{6}\right)}{6}\right) - \left(6 + 6\right)\right) + \left(66 \cdot 66\right)\right)}{6}\right) \) & 10 & 2.340s \\\hline
+            6 & 2080 & \( \left(\frac{\left(\left(\left(\frac{6}{6}\right) + \left(6 + 6\right)\right)!\right)}{\left(\left({\left(6 + 6\right)}^{6}\right) + \left(\frac{\left({6}^{6}\right)}{6}\right)\right)}\right) \) & 10 & 2.928s \\\hline
+            6 & 2980 & \( \left(6 - \left(\frac{\left(\frac{\left(\left(\left(6 - \left(\left(\left(\frac{6}{6}\right) + 6\right)!\right)\right) \cdot \left(6 + 6\right)\right) - \left({6}^{6}\right)\right)}{6}\right)}{6}\right)\right) \) & 11 & 7.633s \\\hline
+            7 & 2030 & \( \left(\left(7 \cdot \left(7 - \left(7 \cdot \left(7 - \left(7 \cdot 7\right)\right)\right)\right)\right) - 77\right) \) & 8 & 0.101s \\\hline
+            7 & 2020 & \( \left(\left(\frac{77}{7}\right) - \left(7 \cdot \left(7 + \left(7 \cdot \left(7 - \left(7 \cdot 7\right)\right)\right)\right)\right)\right) \) & 9 & 0.660s \\\hline
+            7 & 2080 & \( \left(\frac{\left(7 + \left(77 \cdot \left(\left(\left(7 + 7\right) \cdot \left(7 + 7\right)\right) - 7\right)\right)\right)}{7}\right) \) & 9 & 0.948s \\\hline
+            7 & 2980 & \( \left(\left(\left(77 + \left(\left(\frac{7}{7}\right) - 7\right)\right) \cdot \left(\left(7 \cdot 7\right) - 7\right)\right) - \left(\frac{\left(7 + 7\right)}{7}\right)\right) \) & 11 & 10.411s \\\hline
+            8 & 2080 & \( \left(\left(\left(8 + \left(8 + 8\right)\right) \cdot \left(88 - \left(\frac{8}{8}\right)\right)\right) - 8\right) \) & 8 & 0.046s \\\hline
+            8 & 2980 & \( \left(\left(\frac{8}{8}\right) + \left(\frac{\left(8 + \left(\frac{\left(\frac{\left({8}^{8}\right)}{8}\right)}{8}\right)\right)}{88}\right)\right) \) & 9 & 0.293s \\\hline
+            8 & 2020 & \( \left(\frac{\left(8 \cdot \left(8 - \left(8 \cdot \left(8 - \left(8 \cdot \left(8 \cdot 8\right)\right)\right)\right)\right)\right)}{\left(8 + 8\right)}\right) \) & 9 & 0.887s \\\hline
+            8 & 2030 & \( \left(\left(\left(\frac{\left(\frac{\left(\left(8 \cdot \left(\frac{8}{8}\right)\right)!\right)}{8}\right)}{8}\right) - 8\right) + \left(\left(8 + 8\right) \cdot 88\right)\right) \) & 10 & 1.325s \\\hline
+            9 & 2030 & \( \left(\left({\left(\frac{\left(9 + 9\right)}{9}\right)}^{\left(\frac{99}{9}\right)}\right) - \left(9 + 9\right)\right) \) & 8 & 0.076s \\\hline
+            9 & 2080 & \( \left(\left(\frac{9}{9}\right) + \left(\left(9 + \left(\frac{\left(9 + 99\right)}{9}\right)\right) \cdot 99\right)\right) \) & 9 & 0.171s \\\hline
+            9 & 2020 & \( \left(\frac{\left(\left(\left(\frac{99}{9}\right) + 999\right) \cdot \left(9 + 9\right)\right)}{9}\right) \) & 9 & 0.186s \\\hline
+            9 & 2980 & \( \left(\left(\frac{9}{9}\right) + \left(\left(9 \cdot \left(9 + \left(\left(9 + 9\right) \cdot \left(9 + 9\right)\right)\right)\right) - \left(9 + 9\right)\right)\right) \) & 10 & 0.854s \\\hline
+    \end{longtable}
 \end{center}
 
 \section{Code}
