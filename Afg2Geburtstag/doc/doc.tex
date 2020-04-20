@@ -116,7 +116,7 @@ literate=%
 }
 \lstMakeShortInline[
   language=CSharp,
-  columns=fixed,]~
+  columns=fixed,]?
 
 \lstnewenvironment{lstcs}[1][]
     {\lstset{
@@ -414,35 +414,35 @@ Die Beispiele unten enthalten daher auch Lösungen mit der Ziffer \(0\).
 Der Algorithmus wurde in C\# 8.0 mit .NET Core 3.1 implementiert.
 Es wurde als Library CommandLineParser\footnote{https://github.com/commandlineparser/commandline} verwendet. Diese implementiert Methoden um Unix-Style Konsolenargumente entgegenzunehmen.
 Der Code ist in zwei Projekte geteilt;
-~Afg2Geburtstag.CLI~ und ~Afg2Geburtstag~.
-~Afg2Geburtstag.CLI~ kümmert sich um das Konsolen-Interface und ruft ~Afg2Geburtstag~ auf, was den eigentlichen Algorithmus enthält.
-~Afg2Geburtstag~ definiert einige Typen:
+?Afg2Geburtstag.CLI? und ?Afg2Geburtstag?.
+?Afg2Geburtstag.CLI? kümmert sich um das Konsolen-Interface und ruft ?Afg2Geburtstag? auf, was den eigentlichen Algorithmus enthält.
+?Afg2Geburtstag? definiert einige Typen:
 
 \begin{description}
     \item[Rational] definiert rationale Zahlen und Operationen auf diesen.
-    \item[ITerm] repräsentiert eine Schnittstelle für beliebige Terme mit einem ~Rational~ Wert. Wird von ~Rational~ implementiert.
-    \item[UnaryOperator] repräsentiert einen unären Operator der zur Erstellung einer ~UnaryOperation~ verwendet werden kann.
-    \item[UnaryOperation] repräsentiert eine unäre Operation auf einem ~ITerm~ und implementiert selbst ~ITerm~.
-    \item[BinaryOperator] repräsentiert einen binären Operator der zur Erstellung einer ~BinaryOperation~ verwendet werden kann.
-    \item[BinaryOperation] repräsentiert eine binäre Operation zwischen zwei ~ITerm~s und implementiert selbst ~ITerm~.
+    \item[ITerm] repräsentiert eine Schnittstelle für beliebige Terme mit einem ?Rational? Wert. Wird von ?Rational? implementiert.
+    \item[UnaryOperator] repräsentiert einen unären Operator der zur Erstellung einer ?UnaryOperation? verwendet werden kann.
+    \item[UnaryOperation] repräsentiert eine unäre Operation auf einem ?ITerm? und implementiert selbst ?ITerm?.
+    \item[BinaryOperator] repräsentiert einen binären Operator der zur Erstellung einer ?BinaryOperation? verwendet werden kann.
+    \item[BinaryOperation] repräsentiert eine binäre Operation zwischen zwei ?ITerm?s und implementiert selbst ?ITerm?.
     \item[DigitRepresenter] enthält den Kernalgorithmus für eine Ziffer und mehrere Zielzahlen.
 \end{description}
 
-~UnaryOperation~ und ~BinaryOperation~ speichern als Optimierung ihren berechneten Wert und Hashcode.
-Weiterhin sind die Operanden der beiden Typen ~ITerm~ Instanzen und somit Referenztypen.
+?UnaryOperation? und ?BinaryOperation? speichern als Optimierung ihren berechneten Wert und Hashcode.
+Weiterhin sind die Operanden der beiden Typen ?ITerm? Instanzen und somit Referenztypen.
 Dies bedeutet, dass jede Operation nur einmal gespeichert wird und nicht in anderen Operationen, die sie verwenden, gedoppelt wird.
 
-In ~DigitRepresenter~, worin der Hauptalgorithmus implementiert wird, werden an vielen Stellen Hashsets verwendet, um schnelle Lookups zu erlauben.
-Spezifischer, da ~HashSet<T>~ nicht Thread-Safe ist, verwendet der Code ~ConcurrentDictionary<T, byte>~, wobei der ~byte~-Wert ignoriert wird.
+In ?DigitRepresenter?, worin der Hauptalgorithmus implementiert wird, werden an vielen Stellen Hashsets verwendet, um schnelle Lookups zu erlauben.
+Spezifischer, da ?HashSet<T>? nicht Thread-Safe ist, verwendet der Code ?ConcurrentDictionary<T, byte>?, wobei der ?byte?-Wert ignoriert wird.
 
-Für Informationen zur Verwendung des Programms kann ~Afg2Geburtstag.exe --help~ ausgeführt werden.
+Für Informationen zur Verwendung des Programms kann ?Afg2Geburtstag.exe --help? ausgeführt werden.
 
 \section{Beispiele}
 
 \subsection{Ohne Exponenten und Fakultäten}
 
 Argumente:
-~--targets 2020, 2030, 2080, 2980 --digits 1,2,3,4,5,6,7,8,9 --sync --latex~
+?--targets 2020, 2030, 2080, 2980 --digits 1,2,3,4,5,6,7,8,9 --sync --latex?
 
 % Targets: 2020, 2030, 2080, 2980
 % Digits: 1, 2, 3, 4, 5, 6, 7, 8, 9
@@ -493,9 +493,9 @@ Argumente:
 \subsection{Mit Exponenten und Fakultäten}
 
 Argumente:
-~--targets 2020, 2030, 2080, 2980~
-~--digits 0,1,2,3,4,5,6,7,8,9~\\
-~--exponentiation --factorial --sync --latex~
+?--targets 2020, 2030, 2080, 2980?
+?--digits 0,1,2,3,4,5,6,7,8,9?\\
+?--exponentiation --factorial --sync --latex?
 
 % % Targets: 2020, 2030, 2080, 2980
 % % Digits: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9

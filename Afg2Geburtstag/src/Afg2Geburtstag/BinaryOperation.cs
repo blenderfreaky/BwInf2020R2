@@ -3,12 +3,13 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents the application of a binary operator on two <see cref="ITerm"/> operands.
     /// </summary>
     [DebuggerDisplay("{ToString()} = {Value}")]
-    public sealed class BinaryOperation : ITerm
+    public sealed class BinaryOperation : ITerm, IEquatable<BinaryOperation>
     {
         public BinaryOperator Operator { get; }
 
@@ -21,7 +22,7 @@
         /// <summary>
         /// The hash code of the object.
         /// </summary>
-        public long HashCode { get; }
+        public int HashCode { get; }
 
         private BinaryOperation(BinaryOperator @operator, ITerm lhs, ITerm rhs, Rational value)
         {
@@ -31,9 +32,9 @@
             Value = value;
 
             var hashCode = -1180296392;
-            hashCode = (hashCode * -1521134295) + EqualityComparer<BinaryOperator>.Default.GetHashCode(Operator);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<ITerm>.Default.GetHashCode(Lhs);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<ITerm>.Default.GetHashCode(Rhs);
+            hashCode = (hashCode * -1521134295) + Operator.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Lhs.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Rhs.GetHashCode();
             HashCode = hashCode;
         }
 
@@ -54,10 +55,8 @@
                     ? new BinaryOperation(@operator, lhs, rhs, value.Value)
                     : null;
             }
-            catch (OverflowException)
-            {
-                return null;
-            }
+            catch (OverflowException) { return null; }
+            catch (DivideByZeroException) { return null; }
         }
 
         /// <inheritdoc/>
@@ -67,14 +66,23 @@
         public string ToLaTeX() => Operator.OperationToLaTeX(Lhs, Rhs);
 
         /// <inheritdoc/>
-        public override bool Equals(object? obj) => obj is BinaryOperation operation
-            && HashCode == operation.HashCode
-            && Value == operation.Value
-            && EqualityComparer<BinaryOperator>.Default.Equals(Operator, operation.Operator)
-            && EqualityComparer<ITerm>.Default.Equals(Lhs, operation.Lhs)
-            && EqualityComparer<ITerm>.Default.Equals(Rhs, operation.Rhs);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override bool Equals(object? obj) => obj is BinaryOperation operation && Equals(operation);
 
         /// <inheritdoc/>
-        public override int GetHashCode() => (int)(HashCode % int.MaxValue);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(ITerm obj) => obj is BinaryOperation operation && Equals(operation);
+
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(BinaryOperation operation) => HashCode == operation.HashCode
+                    && Value == operation.Value
+                    && Operator == operation.Operator
+                    && Lhs.Equals(operation.Lhs)
+                    && Rhs.Equals(operation.Rhs);
+
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int GetHashCode() => HashCode;
     }
 }

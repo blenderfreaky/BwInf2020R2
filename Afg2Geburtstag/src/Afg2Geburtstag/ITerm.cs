@@ -1,9 +1,11 @@
-﻿namespace Afg2Geburtstag
+﻿using System;
+
+namespace Afg2Geburtstag
 {
     /// <summary>
     /// Represents an arbitrary mathematical teerm.
     /// </summary>
-    public interface ITerm
+    public interface ITerm : IEquatable<ITerm>
     {
         /// <summary>
         /// The value of the term.

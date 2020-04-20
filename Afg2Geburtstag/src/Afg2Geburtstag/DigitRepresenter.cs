@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Runtime.CompilerServices;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using RationalSet = System.Collections.Concurrent.ConcurrentDictionary<Rational, byte>;
@@ -46,7 +47,7 @@
         /// <summary>
         /// The number of targets for which no optimal representation has been found yet.
         /// </summary>
-        public int UnfoundTargets { get; private set; }
+        public int UnfoundTargets;
 
         /// <summary>
         /// An action to execute once an optimal representation for any given target was found.
@@ -163,7 +164,7 @@
             if (Targets.TryGetValue(term.Value, out var otherTerm) && otherTerm == null)
             {
                 Targets[term.Value] = term;
-                UnfoundTargets--;
+                Interlocked.Decrement(ref UnfoundTargets);
                 OnFound(term, digitCount);
             }
 

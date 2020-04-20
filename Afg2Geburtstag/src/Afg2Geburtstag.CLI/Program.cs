@@ -64,7 +64,7 @@
             new BinaryOperator((l, r) => checked(l.Value * r.Value), (l, r) => $"({l} * {r})", (l, r) => $"{LatexLParens}{l.ToLaTeX()} \\cdot {r.ToLaTeX()}{LatexRParens}");
 
         public static readonly BinaryOperator DivisionWithFractions =
-            new BinaryOperator((l, r) => !r.Value.IsZero ? (Rational?)(l.Value / r.Value) : null,
+            new BinaryOperator((l, r) => !r.Value.IsZero ? (Rational?)checked(l.Value / r.Value) : null,
                 (l, r) => $"({l} / {r})", (l, r) => $"{LatexLParens}\\frac{{{l.ToLaTeX()}}}{{{r.ToLaTeX()}}}{LatexRParens}");
 
         public static readonly BinaryOperator DivisionWithoutFractions =
@@ -85,23 +85,43 @@
             new BinaryOperator(
                 (l, r) =>
                 {
-                    if (!r.Value.IsInteger) return null;
+                    if (!r.Value.IsInteger) return null; // Roots are not supported
 
                     if (l.Value.IsZero) return r.Value.IsPositive ? Rational.Zero : (Rational?)null; // 0^0 and 0^negative = 0/1 are both undefined => no return
                     if (l.Value == Rational.One) return Rational.One; // 1^x = 1 for all x
 
                     var exponentPositive = r.Value.IsPositive;
-                    var exponentBig = r.Value.Absolute;
-                    if (exponentBig > 64) return null; // 2^64 can't be stored by int64, much less any bigger value ^64
-                    var exponent = (int)exponentBig.Numerator;
+                    var exponentRational = r.Value.Absolute;
+                    if (exponentRational.Numerator > 64) return null; // 2^64 can't be stored by int64, much less any bigger value ^64
+                    var exponent = (int)exponentRational.Numerator;
 
                     if (exponent == 0) return Rational.One;
 
-                    var numerator = BigInteger.Pow(l.Value.Numerator, exponent);
-                    var denominator = BigInteger.Pow(l.Value.Denominator, exponent);
+                    var numerator = 1L;
+                    var denominator = 1L;
 
-                    if (numerator > long.MaxValue || numerator < long.MinValue) return null;
-                    if (denominator > long.MaxValue || denominator < long.MinValue) return null;
+                    // Credit: https://stackoverflow.com/questions/101439/the-most-efficient-way-to-implement-an-integer-based-power-function-powint-int
+                    static long intPow(long @base, long exp)
+                    {
+                        long result = 1;
+                        while (true)
+                        {
+                            if ((exp & 1) != 0) result *= @base;
+                            exp >>= 1;
+                            if (exp == 0) break;
+                            @base *= @base;
+                        }
+                        return result;
+                    }
+
+                    checked
+                    {
+                        numerator = intPow(l.Value.Numerator, exponent);
+                        denominator = intPow(l.Value.Denominator, exponent);
+                    }
+
+                    if (numerator > long.MaxValue / 2 || numerator < long.MinValue / 2) return null;
+                    if (denominator > long.MaxValue / 2 || denominator < long.MinValue / 2) return null;
 
                     var result = exponentPositive
                         ? new Rational((long)numerator, (long)denominator)

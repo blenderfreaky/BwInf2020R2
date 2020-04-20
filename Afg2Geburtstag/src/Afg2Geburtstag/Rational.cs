@@ -4,6 +4,7 @@
     using System.Diagnostics;
     using System.Globalization;
     using System.Numerics;
+    using System.Runtime.CompilerServices;
 
     [DebuggerDisplay("{Numerator}/{Denominator}")]
     public readonly struct Rational : IEquatable<Rational>, ITerm
@@ -11,15 +12,17 @@
         public readonly long Numerator;
         public readonly long Denominator;
 
-        /// <inheritdoc/>
-        Rational ITerm.Value => this;
+        public readonly int HashCode;
 
         public Rational(long numerator, long denominator, bool validate = true)
         {
+            HashCode = 0;
+
             if (!validate || denominator == 1)
             {
                 Numerator = numerator;
                 Denominator = denominator;
+                HashCode = CalculateHashCode();
                 return;
             }
 
@@ -29,7 +32,7 @@
             {
                 Numerator = 0;
                 Denominator = 1;
-
+                HashCode = CalculateHashCode();
                 return;
             }
 
@@ -50,12 +53,23 @@
                 Numerator = sign * numerator / gcd;
                 Denominator = denominator / gcd;
             }
+            HashCode = CalculateHashCode();
+        }
+
+        private int CalculateHashCode()
+        {
+            var hashCode = 1503752452;
+            hashCode = (hashCode * -1521134295) + Numerator.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Denominator.GetHashCode();
+            return hashCode;
         }
 
         public Rational(long numerator)
         {
             Numerator = numerator;
             Denominator = 1;
+            HashCode = 0;
+            HashCode = CalculateHashCode();
         }
 
         /// <summary>
@@ -182,19 +196,23 @@
             : $"\\frac{{{Numerator}}}{{{Denominator}}}";
 
         /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(Rational other) => other.Numerator == Numerator && other.Denominator == Denominator;
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => obj is Rational rational && Equals(rational);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override bool Equals(object? obj) => obj is Rational rational && Equals(rational);
 
         /// <inheritdoc/>
-        public override int GetHashCode()
-        {
-            var hashCode = 1503752452;
-            hashCode = (hashCode * -1521134295) + Numerator.GetHashCode();
-            hashCode = (hashCode * -1521134295) + Denominator.GetHashCode();
-            return hashCode;
-        }
+        Rational ITerm.Value => this;
+
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        bool IEquatable<ITerm>.Equals(ITerm other) => other is Rational rational && Equals(rational);
+
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int GetHashCode() => HashCode;
 
         public static Rational operator +(Rational lhs, Rational rhs) =>
             new Rational((lhs.Numerator * rhs.Denominator) + (rhs.Numerator * lhs.Denominator), lhs.Denominator * rhs.Denominator);
@@ -214,8 +232,10 @@
         public static bool operator <(Rational lhs, Rational rhs) =>
             lhs.Numerator * rhs.Denominator < rhs.Numerator * lhs.Denominator;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Rational left, Rational right) => left.Equals(right);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(Rational left, Rational right) => !(left == right);
     }
 }

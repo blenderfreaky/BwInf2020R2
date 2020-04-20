@@ -1,13 +1,15 @@
 ﻿namespace Afg2Geburtstag
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents the application of a unary operator on an <see cref="ITerm"/> operand.
     /// </summary>
     [DebuggerDisplay("{ToString()} = {Value}")]
-    public sealed class UnaryOperation : ITerm
+    public sealed class UnaryOperation : ITerm, IEquatable<UnaryOperation>
     {
         public UnaryOperator Operator { get; }
 
@@ -19,7 +21,7 @@
         /// <summary>
         /// The hash code of the object.
         /// </summary>
-        public long HashCode { get; }
+        public int HashCode { get; }
 
         private UnaryOperation(UnaryOperator @operator, ITerm operand, Rational value)
         {
@@ -28,8 +30,8 @@
             Value = value;
 
             var hashCode = -1180296392;
-            hashCode = (hashCode * -1521134295) + EqualityComparer<UnaryOperator>.Default.GetHashCode(Operator);
-            hashCode = (hashCode * -1521134295) + EqualityComparer<ITerm>.Default.GetHashCode(Operand);
+            hashCode = (hashCode * -1521134295) + Operator.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Operand.GetHashCode();
             HashCode = hashCode;
         }
 
@@ -41,11 +43,16 @@
         /// <returns>The operation, or null if the operation was invalid (like (-1)!).</returns>
         public static UnaryOperation? Create(UnaryOperator @operator, ITerm operand)
         {
-            var value = @operator.Evaluate(operand);
+            try
+            {
+                var value = @operator.Evaluate(operand);
 
-            return value.HasValue
-                ? new UnaryOperation(@operator, operand, value.Value)
-                : null;
+                return value.HasValue
+                    ? new UnaryOperation(@operator, operand, value.Value)
+                    : null;
+            }
+            catch (OverflowException) { return null; }
+            catch (DivideByZeroException) { return null; }
         }
 
         /// <inheritdoc/>
@@ -55,13 +62,22 @@
         public string ToLaTeX() => Operator.OperationToLaTeX(Operand);
 
         /// <inheritdoc/>
-        public override bool Equals(object? obj) => obj is UnaryOperation operation
-            && HashCode == operation.HashCode
-            && Value == operation.Value
-            && EqualityComparer<UnaryOperator>.Default.Equals(Operator, operation.Operator)
-            && EqualityComparer<ITerm>.Default.Equals(Operand, operation.Operand);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override bool Equals(object? obj) => obj is UnaryOperation operation && Equals(operation);
 
-        /// <inheritdoc/> A                      
-        public override int GetHashCode() => (int)(HashCode % int.MaxValue);
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(ITerm term) => term is UnaryOperation operation && Equals(operation);
+
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(UnaryOperation operation) => HashCode == operation.HashCode
+                    && Value == operation.Value
+                    && Operator == operation.Operator
+                    && Operand.Equals(operation.Operand);
+
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int GetHashCode() => HashCode;
     }
 }
