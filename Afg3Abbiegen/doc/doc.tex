@@ -189,8 +189,9 @@ Alle Knoten einer Kreuzung sind dabei verbunden durch Kanten mit Kosten von 1.
 \end{tikzpicture}
 \end{center}
 
-Die Priority-Queue des Dijkstra-Algorithmus ist hierbei primär nach Anzahl an Abbiegungen und sekundär nach Länge sortiert, sodass zu jeder Kreuzung (inklusive Richtung, in der diese befahren wird) für jede Anzahl an Abbiegungen mit der dieser erreicht werden kann der kürzeste Weg ermittelt wird.
-Ist hierbei das Ziel an der Spitze der Priority-Queue, so ist der gespeicherte Weg dahin der am wenigsten abbiegende Weg dahin und dazu der kürzeste mit so vielen Abbiegungen.
+Die Priority-Queue des Dijkstra-Algorithmus ist hierbei primär nach Anzahl an Abbiegungen und sekundär nach Länge sortiert.
+Für jede Kreuzung und jede Anzahl an Abbiegungen, mit der diese erreicht werden kann, wird jeweils der kürzeste Weg ermittelt. Dabei muss die Richtung, in der die Kreuzung befahren wird, mitberücksichtigt werden.
+Erreicht der Weg an der Spite der Priority-Queue das Ziel, so ist der Weg dorthin optimal. Das heißt, er weist nicht nur die geringste Anzahl an Abbiegungen auf, sondern gleichzeitig auch die für diese Anzahl an Abbiegungen kürzeste Wegstrecke.
 
 Der endgültige Algorithmus geht dann wie folgt vor:
 
